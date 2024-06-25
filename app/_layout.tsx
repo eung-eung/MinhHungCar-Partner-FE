@@ -24,6 +24,7 @@ export default function RootLayout() {
     if (loaded) {
       SplashScreen.hideAsync();
       if (!authCtx.isAuthenticated) {
+        // folder signIn có index.tsx => route= /signIn
         router.replace('/signIn')
       }
     }
@@ -39,6 +40,7 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
+          {/* config ẩn header ở route signIn */}
           <Stack.Screen name="signIn/index" options={{ headerShown: false }} />
         </Stack>
       </ThemeProvider>
