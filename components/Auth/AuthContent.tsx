@@ -1,10 +1,23 @@
-import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
-import AuthForm from '@/components/Auth/AuthForm'
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import AuthForm from '@/components/Auth/AuthForm';
 import { router } from 'expo-router';
 
-export default function AuthContent({ isLogin, onAuthenticate }) {
+interface SignUpCredentials {
+    email: string;
+    password: string;
+    last_name?: string; // Optional because it might not be required in login
+    first_name?: string; // Optional because it might not be required in login
+    phone_number?: string; // Optional because it might not be required in login
+    confirmPassword?: string; // Optional to align with the error message
+}
 
+interface AuthContentProps {
+    isLogin: boolean;
+    onAuthenticate: (credentials: SignUpCredentials) => void;
+}
+
+const AuthContent: React.FC<AuthContentProps> = ({ isLogin, onAuthenticate }) => {
     const [credentialsInvalid, setCredentialsInvalid] = useState({
         email: false,
         password: false,
@@ -12,29 +25,29 @@ export default function AuthContent({ isLogin, onAuthenticate }) {
         last_name: false,
         first_name: false,
         phone_number: false
-    })
+    });
 
     const switchAuthModeHandler = () => {
         if (isLogin) {
-            router.replace('/signUp')
+            router.replace('/signUp');
         } else {
-            router.replace('signIn')
+            router.replace('/signIn');
         }
-    }
-    const submitHandler = (credentials) => {
+    };
+
+    const submitHandler = (credentials: SignUpCredentials) => {
         let { password, confirmPassword, phone_number, first_name, last_name } = credentials;
 
-        // email = email.trim();
         password = password.trim();
-        first_name = first_name.trim();
-        last_name = last_name.trim();
-        confirmPassword = confirmPassword.trim();
-        phone_number = phone_number.trim();
+        first_name = first_name?.trim() || '';
+        last_name = last_name?.trim() || '';
+        confirmPassword = confirmPassword?.trim() || ''; // Ensure confirmPassword is defined
+        phone_number = phone_number?.trim() || '';
 
-        const emailIsValid = email.includes('@');
+        const emailIsValid = credentials.email.includes('@');
         const passwordIsValid = password.length > 1;
         const passwordsAreEqual = password === confirmPassword;
-        const firstNameIsValid = first_name.length > 0
+        const firstNameIsValid = first_name.length > 0;
         const lastNameIsValid = last_name.length > 0;
         const phoneNumIsValid = /^[0-9]{10,15}$/.test(phone_number);
 
@@ -54,12 +67,14 @@ export default function AuthContent({ isLogin, onAuthenticate }) {
             });
             return;
         }
+
         if (isLogin) {
-            onAuthenticate({ email, password });
+            onAuthenticate({ email: credentials.email, password });
         } else {
-            onAuthenticate({ email, password, last_name, first_name, phone_number })
+            onAuthenticate({ email: credentials.email, password, last_name, first_name, phone_number });
         }
-    }
+    };
+
     return (
         <View style={styles.authContent}>
             <AuthForm
@@ -69,29 +84,29 @@ export default function AuthContent({ isLogin, onAuthenticate }) {
             />
             <View style={styles.buttons}>
                 <TouchableOpacity onPress={switchAuthModeHandler}>
-                    {isLogin ?
+                    {isLogin ? (
                         <Text style={styles.formFooter}>
                             Chưa có tài khoản?{' '}
                             <Text style={{ color: '#5548E2' }}>Đăng kí</Text>
                         </Text>
-                        :
+                    ) : (
                         <Text style={styles.formFooter}>
                             Đã có tài khoản?{' '}
                             <Text style={{ color: '#5548E2' }}>Đăng nhập</Text>
                         </Text>
-                    }
+                    )}
                 </TouchableOpacity>
             </View>
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     authContent: {
         marginHorizontal: 18,
         padding: 16,
         borderRadius: 8,
-        flex: 1
+        flex: 1,
     },
     buttons: {
         marginTop: 20,
@@ -104,3 +119,5 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
 });
+
+export default AuthContent;

@@ -1,26 +1,37 @@
-import { View, Text, TextInput, StyleSheet } from 'react-native';
-
+import React from 'react';
+import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
-function Input({
+interface InputProps {
+    label?: string;
+    keyboardType?: TextInputProps['keyboardType'];
+    secure?: boolean;
+    onUpdateValue: (value: string) => void;
+    value: string;
+    isInvalid: boolean;
+    placeholder?: string;
+}
+
+const Input: React.FC<InputProps> = ({
     label,
-    keyboardType,
-    secure,
+    keyboardType = 'default',
+    secure = false,
     onUpdateValue,
     value,
     isInvalid,
-    placeholder
-}) {
+    placeholder = ''
+}) => {
     return (
         <View style={styles.inputContainer}>
-            <Text style={[styles.label, isInvalid && styles.labelInvalid]}>
-                {label}
-            </Text>
+            {label && (
+                <Text style={[styles.label, isInvalid && styles.labelInvalid]}>
+                    {label}
+                </Text>
+            )}
             <TextInput
                 placeholder={placeholder}
                 style={[styles.input, isInvalid && styles.inputInvalid]}
                 autoCapitalize='none'
-                // autoCapitalize="none"
                 keyboardType={keyboardType}
                 secureTextEntry={secure}
                 onChangeText={onUpdateValue}
@@ -28,16 +39,19 @@ function Input({
             />
         </View>
     );
-}
+};
 
 export default Input;
 
 const styles = StyleSheet.create({
     inputContainer: {
-        // marginVertical: 8,
-
+        marginVertical: 8,
     },
-
+    label: {
+        fontSize: 16,
+        marginBottom: 4,
+        color: '#000',
+    },
     labelInvalid: {
         color: Colors.colors.error500,
     },
