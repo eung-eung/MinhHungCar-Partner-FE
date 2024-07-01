@@ -27,10 +27,10 @@ export default function AddCarPhotoScreen() {
     const [isUploading, setIsUploading] = useState(false);
 
     const placeholderImages = [
-        require('../assets/front.jpg'),
-        require('../assets/back.jpg'),
-        require('../assets/left.jpg'),
-        require('../assets/right.jpg'),
+        require('../../assets/images/front.jpg'),
+        require('../../assets/images/back.jpg'),
+        require('../../assets/images/left.jpg'),
+        require('../../assets/images/right.jpg'),
     ];
 
     const pickImage = async (isMainImage: boolean, index: number | null = null) => {
@@ -171,7 +171,7 @@ export default function AddCarPhotoScreen() {
                         ) : (
                             <Image
                                 style={styles.mainImage}
-                                source={require('../assets/main.jpg')}
+                                source={require('../../assets/images/main.jpg')}
                             />
                         )}
                     </TouchableOpacity>
