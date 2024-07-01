@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack, router, useNavigation } from 'expo-router';
+import { Stack, useRouter } from 'expo-router'; // Updated import
 import * as SplashScreen from 'expo-splash-screen';
 import { useContext, useEffect } from 'react';
 import 'react-native-reanimated';
@@ -13,22 +13,28 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const authCtx = useContext(AuthConText)
+  const authCtx = useContext(AuthConText);
+  const router = useRouter(); // Use useRouter hook instead of useNavigation
 
-  const navigate = useNavigation()
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-      if (!authCtx.isAuthenticated) {
-        // folder signIn có index.tsx => route= /signIn
-        router.replace('/signIn')
+    const checkAuthentication = async () => {
+      if (loaded) {
+        SplashScreen.hideAsync();
+        if (!authCtx.isAuthenticated) {
+          router.replace('/signIn');
+        } else {
+          router.replace('/');
+        }
       }
-    }
-  }, [loaded]);
+    };
+
+    checkAuthentication();
+  }, [authCtx.isAuthenticated, loaded, router]);
+
 
   if (!loaded) {
     return null;
@@ -42,6 +48,28 @@ export default function RootLayout() {
           <Stack.Screen name="+not-found" />
           {/* config ẩn header ở route signIn */}
           <Stack.Screen name="signIn/index" options={{ headerShown: false }} />
+          <Stack.Screen name="signUp/index" options={{ headerShown: false }} />
+          <Stack.Screen name="OTP/index" options={{ headerShown: false }} />
+          <Stack.Screen name="profile/index"
+            options={{
+              headerBackTitleVisible: false,
+              title: 'Tài khoản của tôi',
+            }} />
+          <Stack.Screen name="payInfo/index"
+            options={{
+              headerBackTitleVisible: false,
+              title: 'Thông tin thanh toán',
+            }} />
+          <Stack.Screen name="uploadQR/index"
+            options={{
+              headerBackTitleVisible: false,
+              title: 'Cập nhật mã QR',
+            }} />
+          <Stack.Screen name="contract/index"
+            options={{
+              headerBackTitleVisible: false,
+              title: 'Hợp đồng',
+            }} />
         </Stack>
       </ThemeProvider>
     </AuthConTextProvider>

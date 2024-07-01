@@ -3,24 +3,20 @@ import { View, Text, StyleSheet, Alert } from 'react-native';
 import OtpInput from '../../components/Auth/OTPinputFields';
 import Button from '../../components/Button';
 import { verifyOtp } from '../../util/auth';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, RouteProp } from '@react-navigation/native'; // Import RouteProp for type-checking route props
 import LoadingOverlay from '../../components/LoadingOverlay';
-import { router } from 'expo-router';
-
+import { router, useLocalSearchParams } from 'expo-router';
 
 interface OTPScreenProps {
-    route: {
-        params: {
-            phone_number: string;
-        };
-    };
+    route: RouteProp<{ params: { phone_number: string; email?: string; password: string; last_name?: string; first_name?: string } }, 'params'>; // Define the route prop type
 }
 
 const OTPScreen: React.FC<OTPScreenProps> = ({ route }) => {
     const [otp, setOtp] = useState<string>('');
     const [disabled, setDisabled] = useState<boolean>(true);
-    const { phone_number } = route.params;
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const params = useLocalSearchParams();
+    const { phone_number, email, password, last_name, first_name } = params;
 
     const handleOtpValues = (enteredValue: string) => {
         setOtp(enteredValue);
@@ -32,10 +28,10 @@ const OTPScreen: React.FC<OTPScreenProps> = ({ route }) => {
         try {
             setIsLoading(true);
             await verifyOtp(phone_number, otp);
-            Alert.alert('Thành công', 'Tài khoản của bạn đã được xác minh thành công!');
+            Alert.alert('Success', 'Your account has been successfully verified!');
             router.replace('/signIn');
         } catch (error) {
-            Alert.alert('OTP không hợp lệ', 'Mã OTP không đúng. Vui lòng thử lại!');
+            Alert.alert('Invalid OTP', 'The OTP entered is incorrect. Please try again!');
         } finally {
             setIsLoading(false);
         }
@@ -45,18 +41,18 @@ const OTPScreen: React.FC<OTPScreenProps> = ({ route }) => {
         <>
             {isLoading ? (
                 <View style={styles.loadingContainer}>
-                    <LoadingOverlay message='' />
+                    <LoadingOverlay message='Verifying OTP...' />
                 </View>
             ) : (
                 <View style={styles.outerContainer}>
                     <View style={styles.titleContainer}>
-                        <Text style={styles.title}>Xác minh</Text>
+                        <Text style={styles.title}>Xác thực</Text>
                         <Text style={styles.detail}>MinhHungCar đã gửi mã OTP đến số điện thoại của bạn.</Text>
                     </View>
                     <View style={styles.innerContainer}>
                         <OtpInput numberOfInputs={6} onChangeText={handleOtpValues} />
                         <Button disabled={disabled} onPress={handleSubmitOTP}>
-                            <Text style={{ color: 'white' }}>Gửi</Text>
+                            <Text style={{ color: 'white' }}>Submit</Text>
                         </Button>
                     </View>
                 </View>

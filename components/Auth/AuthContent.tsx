@@ -4,12 +4,12 @@ import AuthForm from '@/components/Auth/AuthForm';
 import { router } from 'expo-router';
 
 interface SignUpCredentials {
-    email: string;
+    email?: string;
     password: string;
-    last_name?: string; // Optional because it might not be required in login
-    first_name?: string; // Optional because it might not be required in login
-    phone_number?: string; // Optional because it might not be required in login
-    confirmPassword?: string; // Optional to align with the error message
+    last_name?: string;
+    first_name?: string;
+    phone_number: string;
+    confirmPassword?: string;
 }
 
 interface AuthContentProps {
@@ -24,7 +24,7 @@ const AuthContent: React.FC<AuthContentProps> = ({ isLogin, onAuthenticate }) =>
         confirmPassword: false,
         last_name: false,
         first_name: false,
-        phone_number: false
+        phone_number: false,
     });
 
     const switchAuthModeHandler = () => {
@@ -41,10 +41,10 @@ const AuthContent: React.FC<AuthContentProps> = ({ isLogin, onAuthenticate }) =>
         password = password.trim();
         first_name = first_name?.trim() || '';
         last_name = last_name?.trim() || '';
-        confirmPassword = confirmPassword?.trim() || ''; // Ensure confirmPassword is defined
+        confirmPassword = confirmPassword?.trim() || '';
         phone_number = phone_number?.trim() || '';
 
-        const emailIsValid = credentials.email.includes('@');
+        const emailIsValid = credentials.email?.includes('@') || isLogin;
         const passwordIsValid = password.length > 1;
         const passwordsAreEqual = password === confirmPassword;
         const firstNameIsValid = first_name.length > 0;
@@ -63,36 +63,30 @@ const AuthContent: React.FC<AuthContentProps> = ({ isLogin, onAuthenticate }) =>
                 confirmPassword: !passwordIsValid || !passwordsAreEqual,
                 first_name: !firstNameIsValid,
                 last_name: !lastNameIsValid,
-                phone_number: !phoneNumIsValid
+                phone_number: !phoneNumIsValid,
             });
             return;
         }
 
         if (isLogin) {
-            onAuthenticate({ email: credentials.email, password });
+            onAuthenticate({ phone_number, password });
         } else {
-            onAuthenticate({ email: credentials.email, password, last_name, first_name, phone_number });
+            onAuthenticate({ email: credentials.email!, password, last_name, first_name, phone_number });
         }
     };
 
     return (
         <View style={styles.authContent}>
-            <AuthForm
-                isLogin={isLogin}
-                onSubmit={submitHandler}
-                credentialsInvalid={credentialsInvalid}
-            />
+            <AuthForm isLogin={isLogin} onSubmit={submitHandler} credentialsInvalid={credentialsInvalid} />
             <View style={styles.buttons}>
                 <TouchableOpacity onPress={switchAuthModeHandler}>
                     {isLogin ? (
                         <Text style={styles.formFooter}>
-                            Chưa có tài khoản?{' '}
-                            <Text style={{ color: '#5548E2' }}>Đăng kí</Text>
+                            Chưa có tài khoản? <Text style={{ color: '#5548E2' }}>Đăng kí</Text>
                         </Text>
                     ) : (
                         <Text style={styles.formFooter}>
-                            Đã có tài khoản?{' '}
-                            <Text style={{ color: '#5548E2' }}>Đăng nhập</Text>
+                            Đã có tài khoản? <Text style={{ color: '#5548E2' }}>Đăng nhập</Text>
                         </Text>
                     )}
                 </TouchableOpacity>

@@ -16,47 +16,6 @@ const GlobalStyles = {
   },
 };
 
-const AuthStack = () => {
-  return (
-    <Stack
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: '#f4511e',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}>
-      <Stack.Screen
-        name="signIn"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="signUp"
-        options={{
-          headerShown: false
-        }}
-      />
-      <Stack.Screen
-        name='detail'
-        options={{
-          headerShown: false
-
-        }}
-      />
-
-
-      <Stack.Screen
-        name='OTP'
-        options={{
-          headerShown: false
-        }}
-      />
-    </Stack>
-  );
-}
-
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -65,7 +24,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
+        // headerShown: false,
       }}>
       <Tabs.Screen
         name="index"
@@ -77,44 +36,47 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/* <Tabs.Screen
+      <Tabs.Screen
         name="activity"
         options={{
           title: 'Hoạt động mới nhất',
           tabBarLabel: 'Hoạt động',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <TabBarIcon name={focused ? 'file-document' : 'file-document-outline'} color={color} />
           ),
         }}
-      /> */}
-      {/* <Tabs.Screen
+      />
+      <Tabs.Screen
         name='car'
         options={{
-          title: 'Hoạt động mới nhất',
-          tabBarLabel: 'Hoạt động',
+          title: 'Xe của tôi',
+          tabBarLabel: 'Xe',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
-          ),
-        }}
-      /> */}
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <TabBarIcon name={focused ? 'car' : 'car-outline'} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="car"
+        name='chat'
         options={{
-          title: 'Xe',
+          tabBarLabel: 'Chat',
+          title: 'Chat',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <TabBarIcon name={focused ? 'chat-processing' : 'chat-processing-outline'} color={color} />
           ),
         }}
       />
+      <Tabs.Screen
+        name="setting"
+        options={{
+          tabBarLabel: 'Tôi',
+          title: 'Tài khoản của tôi',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'account-cog' : 'account-cog-outline'} color={color} />
+          ),
+        }}
+      />
+
     </Tabs>
   );
 }

@@ -1,24 +1,40 @@
-
 import axios from 'axios';
 import { apiAccount } from '@/api/apiConfig';
-// import axios from '../lib/axios'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 
-export async function getUser(email: any, password: any) {
+export async function getUser(phone_number: string, password: string) {
     try {
         const response = await axios.post(apiAccount.login, {
-            email: email,
+            phone_number: phone_number,
             password: password
         });
-        const token = response.data.access_token;
 
-        await AsyncStorage.setItem('token', token);
+        // Log response for debugging
+        console.log('Login Response:', response.data);
 
-        return token;
-    } catch (error) {
-        Alert.alert("Đăng nhập thất bại!", "Vui lòng kiểm tra lại!");
+        // Check if the response is as expected
+        if (response.data && response.data.data && response.data.data.access_token) {
+            const token = response.data.data.access_token;
+            console.log("token: ", token)
+            await AsyncStorage.setItem('token', token);
 
+            return { token };
+        }
+    } catch (error: any) {
+        if (error.response) {
+            if (error.response.data.error_code === 10014) {
+                Alert.alert('Sai mật khẩu', 'Vui lòng kiểm tra lại');
+            } else if (error.response.data.error_code === 10001) {
+                Alert.alert('Đăng nhập thất bại!', 'Tài khoản này chưa được đăng kí');
+            } else {
+                Alert.alert('Đăng nhập thất bại!', 'Vui lòng kiểm tra lại!');
+            }
+            console.log('Login Error:', error.response.data.message);
+        } else {
+            Alert.alert('Đăng nhập thất bại!', 'Vui lòng kiểm tra lại!');
+            console.log('Login Error:', error.response.data.message);
+        }
     }
 }
 
@@ -41,10 +57,10 @@ export async function sendOtpToUser(email: any, password: any, first_name: any, 
     }
 }
 
-export async function verifyOtp(email: any, otp: any) {
+export async function verifyOtp(phone_number: any, otp: any) {
     try {
         const response = await axios.post(apiAccount.verifyOTP, {
-            email,
+            phone_number,
             otp
         });
         return response.status;
