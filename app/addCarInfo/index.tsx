@@ -10,6 +10,7 @@ import { useRouter } from 'expo-router';
 import { apiCar } from '@/api/apiConfig';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+import { Ionicons } from '@expo/vector-icons';
 
 interface CarModel {
     id: string;
@@ -360,7 +361,7 @@ const AddCarInformationScreen: React.FC = () => {
                         <View style={styles.tabItemContainer}>
                             <View style={styles.tabItem}>
                                 <View style={styles.tabItemIcon}>
-                                    <Image style={styles.tabImage} source={require('../assets/image_purple.png')} />
+                                    <Ionicons name='image' />
                                     <TabBarIcon name='file-image-outline' color='#773BFF' style={styles.tabImage} />
                                 </View>
                                 <Text style={styles.tabText}>Hình ảnh</Text>
