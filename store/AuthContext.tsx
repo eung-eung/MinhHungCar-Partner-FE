@@ -15,15 +15,14 @@ export default function AuthConTextProvider({ children }: { children: any }) {
 
 
     const authenticate = async (token: any) => {
+        console.log('context: ', token);
+
         setAuthToken(token)
-        setId(id)
         await AsyncStorage.setItem('token', token)
-        // await AsyncStorage.setItem('id', id)
     }
 
     const logout = () => {
         AsyncStorage.removeItem('token')
-        // AsyncStorage.removeItem("id")
         setAuthToken(null)
         setId(null)
     }
@@ -32,7 +31,7 @@ export default function AuthConTextProvider({ children }: { children: any }) {
         authenticate,
         logout,
         id: id,
-        isAuthenticated: !!authToken || !!id
+        isAuthenticated: !!authToken
     }
     return <AuthConText.Provider value={value}>{children}</AuthConText.Provider>
 }

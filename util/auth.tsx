@@ -16,9 +16,7 @@ export async function getUser(phone_number: string, password: string) {
         // Check if the response is as expected
         if (response.data && response.data.data && response.data.data.access_token) {
             const token = response.data.data.access_token;
-            console.log("token: ", token)
-            await AsyncStorage.setItem('token', token);
-
+            console.log("tokennn: ", token)
             return { token };
         }
     } catch (error: any) {
