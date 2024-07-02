@@ -47,7 +47,7 @@ const RentingFeeScreen: React.FC = () => {
             });
             console.log('Price updated:', response.data.data);
             setIsPriceUpdated(true);
-            route.push("/success");
+            route.replace("/success");
         } catch (error: any) {
             const errorMsg = error.response?.data?.error_code === 10058
                 ? 'Không thể cập nhật giá ngay lúc này'

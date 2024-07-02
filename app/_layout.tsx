@@ -87,6 +87,16 @@ export default function RootLayout() {
                   callBack={() => router.push("/car")}
                 />
               }} />
+            <Stack.Screen name="detail/[slug]"
+              options={{
+                headerBackTitleVisible: false,
+                title: 'Chi tiết xe',
+              }} />
+            <Stack.Screen name="success/index"
+              options={{
+                headerBackTitleVisible: false,
+                headerShown: false
+              }} />
           </Stack>
         </ThemeProvider>
       </ProtectedProvider>
