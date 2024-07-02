@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import AuthConTextProvider, { AuthConText } from '@/store/AuthContext';
 import ProtectedProvider from '@/components/Auth/ProtectedProvider';
+import BackButton from '@/components/BackButton';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -45,6 +46,46 @@ export default function RootLayout() {
               options={{
                 headerBackTitleVisible: false,
                 title: 'Hợp đồng',
+              }} />
+            <Stack.Screen name="addCarInfo/index"
+              options={{
+                headerBackTitleVisible: false,
+                title: 'Đăng kí xe',
+                gestureEnabled: false,
+                headerLeft: (props) => <BackButton title="Bạn có muốn trở về?"
+                  subTitle="Bạn đang ở màn hình nhập thông xin xe. Bạn có muốn hủy và trở về?"
+                  callBack={() => router.push("/car")}
+                />
+              }} />
+            <Stack.Screen name="addCarPhoto/index"
+              options={{
+                headerBackTitleVisible: false,
+                title: 'Đăng kí xe',
+                gestureEnabled: false,
+                headerLeft: (props) => <BackButton title="Bạn có muốn trở về?"
+                  subTitle="Bạn đang ở màn hình nhập thông xin xe. Bạn có muốn hủy và trở về?"
+                  callBack={() => router.push("/car")}
+                />
+              }} />
+            <Stack.Screen name="addRegist/index"
+              options={{
+                headerBackTitleVisible: false,
+                title: 'Đăng kí xe',
+                gestureEnabled: false,
+                headerLeft: (props) => <BackButton title="Bạn có muốn trở về?"
+                  subTitle="Bạn đang ở màn hình nhập thông xin xe. Bạn có muốn hủy và trở về?"
+                  callBack={() => router.push("/car")}
+                />
+              }} />
+            <Stack.Screen name="rentingFee/index"
+              options={{
+                headerBackTitleVisible: false,
+                title: 'Đăng kí xe',
+                gestureEnabled: false,
+                headerLeft: (props) => <BackButton title="Bạn có muốn trở về?"
+                  subTitle="Bạn đang ở màn hình nhập thông xin xe. Bạn có muốn hủy và trở về?"
+                  callBack={() => router.push("/car")}
+                />
               }} />
           </Stack>
         </ThemeProvider>

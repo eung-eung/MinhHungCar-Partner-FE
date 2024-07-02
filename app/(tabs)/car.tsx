@@ -146,21 +146,16 @@ const MyCar: React.FC = () => {
 
     const navigateToScreen = (car: any) => {
         if (car && car.status === 'pending_application:pending_car_images') {
-            // router.push('AddCarPhoto', { carId: car.id, based_price: car.car_model?.based_price });
             router.push({ pathname: "/addCarPhoto", params: { carId: car.id, based_price: car.car_model?.based_price } });
         } else if (car && car.status === 'pending_application:pending_car_caveat') {
-            // router.push('AddRegist', { carId: car.id, based_price: car.car_model?.based_price });
             router.push({ pathname: "/addRegist", params: { carId: car.id, based_price: car.car_model?.based_price } });
         } else if (car && car.status === 'pending_application:pending_price') {
-            // router.push('RentingFee', { carId: car.id, based_price: car.car_model?.based_price });
             router.push({ pathname: "/rentingFee", params: { carId: car.id, based_price: car.car_model?.based_price } });
         } else if (car) {
-            // router.push('Detail', { detailID: car.id });
-            router.push({ pathname: "/detail", params: { detailID: car.id } });
+            router.push({ pathname: `/detail/${car.id}` });
 
         }
     };
-
     const getStatusDisplay = (status: any) => {
         if (status.startsWith('pending_application:')) {
             return statusConvert[status];
@@ -200,13 +195,11 @@ const MyCar: React.FC = () => {
                                 backgroundColor='#B4B1B1'
                                 height={60}
                             >
-                                {/* <Image style={styles.statusIcon} source={require('../assets/question_round.png')} /> */}
-                                <TabBarIcon name='progress-question' size={24} color='#C7C8CC' style={{ marginLeft: 8 }} />
+                                <TabBarIcon name='progress-question' size={24} color='#C7C8CC' style={{ marginLeft: 2 }} />
                             </ControlledTooltip>
                         </View>
                         {(item.status === 'approved' || item.status === 'active' || item.status === 'waiting_car_delivery') && (
                             <TouchableOpacity style={styles.button} onPress={() =>
-                                //  router.push('Contract', { carId: item.id })
                                 router.push({ pathname: "/contract", params: { carId: item.id } })
 
                             }>

@@ -12,9 +12,10 @@ interface ImageState {
     selectedImage: string | null;
     imageURL: string | null;
 }
-export default function AddCarPhotoScreen() {
+
+const AddCarPhotoScreen: React.FC = () => {
     const route = useRouter();
-    const params = useLocalSearchParams()
+    const params = useLocalSearchParams();
     const { carId, based_price } = params;
     const authCtx = useContext(AuthConText);
     const token = authCtx.access_token;
@@ -192,11 +193,12 @@ export default function AddCarPhotoScreen() {
 
                 <View style={styles.action}>
                     <TouchableOpacity onPress={!isUploading ? handleUpload : undefined} disabled={isUploading}>
-                        <View style={[styles.btn, ((!mainImages.selectedImage || smallImages!.some((image) => image === null)) || isUploading) && styles.btnDisabled]}>                            {isUploading ? (
-                            <ActivityIndicator size="small" color="#FFF" />
-                        ) : (
-                            <Text style={styles.btnText}>Tiếp tục</Text>
-                        )}
+                        <View style={[styles.btn, ((!mainImages.selectedImage || smallImages!.some((image) => image === null)) || isUploading) && styles.btnDisabled]}>
+                            {isUploading ? (
+                                <ActivityIndicator size="small" color="#FFF" />
+                            ) : (
+                                <Text style={styles.btnText}>Tiếp tục</Text>
+                            )}
                         </View>
                     </TouchableOpacity>
                 </View>
@@ -204,6 +206,7 @@ export default function AddCarPhotoScreen() {
         </SafeAreaView>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {
@@ -319,3 +322,5 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
 });
+
+export default AddCarPhotoScreen;

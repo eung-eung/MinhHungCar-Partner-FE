@@ -303,37 +303,72 @@ const AddCarInformationScreen: React.FC = () => {
     const handlePeriodChange = (periodCode: string) => {
         setSelectedPeriodCode(periodCode);
     };
+    const validateLicensePlate = (licensePlate: any) => {
+        licensePlate = licensePlate.trim();
+
+        const pattern = /^(?:\d{2}[a-zA-Z]\d{4}|\d{2}[a-zA-Z]\d{5})$/;
+
+
+
+        if (!pattern.test(licensePlate)) {
+            Alert.alert('Lỗi', 'Sai cú pháp biển số xe. Vui lòng nhập lại!');
+            return false;
+        }
+
+        return true;
+    };
 
     const handleSubmit = async () => {
-        const payload = {
-            license_plate: licensePlate,
-            car_model_id: carModelId,
-            motion_code: selectedMotionCode,
-            fuel_code: selectedFuelCode,
-            parking_lot_code: selectedParking,
-            period_code: selectedPeriodCode,
-            description: description,
-            based_price: basePrice,
-        };
+        if (
+            !licensePlate ||
+            !carModelId ||
+            !selectedMotionCode ||
+            !selectedFuelCode ||
+            !selectedParking ||
+            !selectedPeriodCode ||
+            !description ||
+            !selectedBrand ||
+            !selectedModel ||
+            !selectedYear ||
+            !selectedSeat
+        ) {
+            Alert.alert('Lỗi', 'Vui lòng điền đầy đủ tất cả thông tin');
+            return;
+        }
+
+        if (!validateLicensePlate(licensePlate)) {
+            return;
+        }
 
         try {
-            const response = await axios.post(apiCar.registerCar, payload, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            setLoadButton(true);
 
-            if (response.status === 201) {
-                setId(response.data.data.id);
-            } else {
-                Alert.alert('Lỗi', 'Không thể đăng ký xe');
-            }
-        } catch (error: any) {
-            if (error.response.status === 10044) {
-                Alert.alert('Lỗi', 'Bạn đã đăng ký xe');
-            } else {
-                Alert.alert('Lỗi', 'Lỗi hệ thống, vui lòng thử lại');
-            }
+            const response = await axios.post(
+                apiCar.registerCar,
+                {
+                    license_plate: licensePlate,
+                    car_model_id: carModelId,
+                    motion_code: selectedMotionCode,
+                    fuel_code: selectedFuelCode,
+                    parking_lot: selectedParking,
+                    period_code: selectedPeriodCode,
+                    description: description,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            setId(response.data.data.car.id);
+            setBasePrice(response.data.data.car.car_model.based_price);
+            console.log("id: ", response.data.data.car.id)
+            console.log("basePrice: ", response.data.data.car.car_model.based_price)
+        } catch (error) {
+            Alert.alert('Lỗi', 'Thêm xe thất bại. Vui lòng thử lại!');
+        } finally {
+            setLoadButton(false);
         }
     };
 
@@ -361,7 +396,6 @@ const AddCarInformationScreen: React.FC = () => {
                         <View style={styles.tabItemContainer}>
                             <View style={styles.tabItem}>
                                 <View style={styles.tabItemIcon}>
-                                    <Ionicons name='image' />
                                     <TabBarIcon name='file-image-outline' color='#773BFF' style={styles.tabImage} />
                                 </View>
                                 <Text style={styles.tabText}>Hình ảnh</Text>

@@ -1,37 +1,44 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, SafeAreaView, Image, ActivityIndicator } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, SafeAreaView, ActivityIndicator } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { AuthConText } from '@/store/AuthContext';
 import { apiCar } from '@/api/apiConfig';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+import { AuthConText } from '@/store/AuthContext';
 
+interface RentingFeeScreenParams {
+    carId?: number;
+    based_price?: number;
+}
 
-
-export default function RentingFeeScreen() {
-    const route = useRouter()
+const RentingFeeScreen: React.FC = () => {
+    const route = useRouter();
     const params = useLocalSearchParams();
     const { carId, based_price } = params;
     const authCtx = useContext(AuthConText);
-    const token = authCtx.access_token;
+    const token = authCtx?.access_token;
 
-    const initialSliderValue = typeof based_price === 'number' ? based_price : 0; // Default to 0 if based_price is undefined or not a number
+    const basedPriceNumber = based_price ? Number(based_price) : 0;
+    const carIdNumber = carId ? Number(carId) : 0;
 
-    const [sliderValue, setSliderValue] = useState<number>(initialSliderValue);
-
+    const [sliderValue, setSliderValue] = useState<number>(basedPriceNumber);
     const [isPriceUpdated, setIsPriceUpdated] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        setSliderValue(basedPriceNumber);
+    }, [basedPriceNumber]);
 
     const handleUpdatePrice = async () => {
         setLoading(true);
         try {
             const response = await axios.put(apiCar.updatePrice, {
-                car_id: carId,
+                car_id: carIdNumber,
                 new_price: sliderValue
             }, {
                 headers: {
@@ -40,14 +47,14 @@ export default function RentingFeeScreen() {
             });
             console.log('Price updated:', response.data.data);
             setIsPriceUpdated(true);
-            route.push("/success")
+            route.push("/success");
         } catch (error: any) {
-            if (error.response.data.error_code === 10058) {
-                Alert.alert('Lỗi', 'Không thể cập nhật giá ngay lúc này');
-            } else {
-                console.log('Error updating price:', error.response.data.message);
-            }
+            const errorMsg = error.response?.data?.error_code === 10058
+                ? 'Không thể cập nhật giá ngay lúc này'
+                : error.response?.data?.message || 'Error updating price';
+            Alert.alert('Lỗi', errorMsg);
             setLoading(false);
+            console.log('Error: ', error.response.data.message)
         }
     };
 
@@ -79,7 +86,6 @@ export default function RentingFeeScreen() {
                     <View style={styles.tabItemContainer}>
                         <View style={styles.tabItem}>
                             <View style={styles.tabItemIcon}>
-                                {/* <Image style={styles.tabImage} source={require('../assets/image_purple.png')} /> */}
                                 <TabBarIcon name='file-image-outline' color='#773BFF' style={styles.tabImage} />
                             </View>
                             <Text style={styles.tabText}>Hình ảnh</Text>
@@ -90,7 +96,6 @@ export default function RentingFeeScreen() {
                     <View style={styles.tabItemContainer}>
                         <View style={styles.tabItem}>
                             <View style={styles.tabItemIcon}>
-                                {/* <Image style={styles.tabImage} source={require('../assets/vehicle_regsister_purple.png')} /> */}
                                 <TabBarIcon name='file-document-multiple-outline' color='#773BFF' style={styles.tabImage} />
                             </View>
                             <Text style={styles.tabText}>Giấy tờ xe</Text>
@@ -101,9 +106,7 @@ export default function RentingFeeScreen() {
                     <View style={styles.tabItemContainer}>
                         <View style={styles.tabItem}>
                             <View style={styles.tabItemIconActive}>
-                                {/* <Image style={styles.tabImage} source={require('../assets/dollar_purple.png')} /> */}
                                 <TabBarIcon name='currency-usd' color='white' style={styles.tabImage} />
-
                             </View>
                             <Text style={styles.tabText}>Giá cho thuê</Text>
                         </View>
@@ -115,7 +118,7 @@ export default function RentingFeeScreen() {
                     <Text style={styles.description}>
                         Mức giá thuê đề xuất cho mẫu xe này là{' '}
                         <Text style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
-                            {based_price.toLocaleString()}/ ngày
+                            {basedPriceNumber.toLocaleString()} VNĐ/ ngày
                         </Text>
                     </Text>
                     <View style={{ marginVertical: 30, flexDirection: 'column', alignItems: 'center' }}>
@@ -124,9 +127,9 @@ export default function RentingFeeScreen() {
                     </View>
                     <View style={styles.priceRange}>
                         <Text style={styles.priceRangeText}>
-                            {Math.max(typeof based_price === 'number' ? based_price - 200000 : 0, 200000).toLocaleString()} VND
+                            {(basedPriceNumber - 200000).toLocaleString()} VND
                         </Text>
-                        <Text style={styles.priceRangeText}>{(typeof based_price === 'number' ? based_price + 200000 : 0).toLocaleString()} VND</Text>
+                        <Text style={styles.priceRangeText}>{(basedPriceNumber + 200000).toLocaleString()} VND</Text>
                     </View>
                     <View style={styles.sliderContainer}>
                         <LinearGradient
@@ -137,18 +140,15 @@ export default function RentingFeeScreen() {
                         />
                         <Slider
                             style={styles.slider}
-                            minimumValue={Math.max(typeof based_price === 'number' ? based_price - 200000 : 0, 200000)}
-                            maximumValue={typeof based_price === 'number' ? based_price + 200000 : 0}
+                            minimumValue={basedPriceNumber - 200000}
+                            maximumValue={basedPriceNumber + 200000}
                             step={1000}
                             value={sliderValue}
-                            onValueChange={(value) => setSliderValue(value)}
+                            onValueChange={setSliderValue}
                             minimumTrackTintColor="transparent"
                             maximumTrackTintColor="transparent"
                             thumbTintColor="#773BFF"
-                        // thumbStyle={styles.thumb}
-                        // trackStyle={styles.track}
                         />
-
                     </View>
                     <View style={styles.priceRangeLabel}>
                         <Text style={styles.priceRangeText}>Giá thấp nhất</Text>
@@ -321,3 +321,6 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
     },
 });
+
+
+export default RentingFeeScreen;

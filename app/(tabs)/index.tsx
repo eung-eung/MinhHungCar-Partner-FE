@@ -61,7 +61,6 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         style={pickerSelectStyles}
                         Icon={() => <TabBarIcon name="chevron-down" size={24} color="black" style={styles.icon} />}
                     />
-                    <Link href='/detail/1'>Go to Details</Link>
 
                 </View>
                 <View style={styles.totalAvenue}>

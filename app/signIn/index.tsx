@@ -38,12 +38,13 @@ export default function SignInScreen() {
 
             if (user && user.token) {
                 authCtx.authenticate(user.token);
-            } else {
+            }
+            else {
                 throw new Error('Authentication failed. Please check your credentials.');
             }
         } catch (error) {
             console.log('SignIn error:', error);
-            Alert.alert('Authentication failed', 'Please check your credentials and try again.');
+            // Alert.alert('Authentication failed', 'Please check your credentials and try again.');
             setIsAuthenticating(false);
         }
     };

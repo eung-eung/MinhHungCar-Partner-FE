@@ -146,7 +146,8 @@ export default function AddCarRegistrationScreen() {
                                 {image.uri ? (
                                     <Image style={styles.licensePhoto} source={{ uri: image.uri }} />
                                 ) : (
-                                    <Image style={styles.licensePhotoPlaceholder} source={require('../../assets/images/splash.png')} />
+                                    // <Image style={styles.licensePhotoPlaceholder} source={require('../../assets/images/splash.png')} />
+                                    <TabBarIcon name='image-plus' size={60} />
                                 )}
                             </TouchableOpacity>
                         </View>
