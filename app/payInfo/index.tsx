@@ -230,7 +230,7 @@ const PaymentInformationScreen: React.FC = () => {
                             </View>
 
                             <View style={styles.formActionDriving}>
-                                <TouchableOpacity onPress={() => router.push("/uploadQR")}>
+                                <TouchableOpacity onPress={() => router.replace("/uploadQR")}>
                                     <View style={styles.btnDriving}>
                                         <TabBarIcon name='card-account-details-outline' style={{ width: 30, height: 30, marginRight: 12 }} />
                                         <Text style={styles.btnDrivingText}>Upload mã QR</Text>

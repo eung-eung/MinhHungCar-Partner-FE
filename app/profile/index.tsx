@@ -24,7 +24,6 @@ import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 const ProfileScreen: React.FC = () => {
     const authCtx = useContext(AuthConText);
     const token = authCtx.access_token;
-    // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ2ZDlhNTk0LTk5Y2MtNGNkMC04NmM3LWI5NDE1NDcwM2U2MCIsInBob25lX251bWJlciI6IjA5ODcyNzE3MTUiLCJyb2xlIjoiY3VzdG9tZXIiLCJpc3N1ZWRfYXQiOiIyMDI0LTA3LTAxVDA5OjA3OjU5LjIzOTUxMzY1MVoiLCJleHBpcmVkX2F0IjoiMjAyNC0wNy0wMlQwOTowNzo1OS4yMzk1MTM3MjFaIn0.qLL8NcAUZj9R9GgEviGn1JWp5de0xdGwYyC8CN8IPks"
 
     const [firstName, setFirstName] = useState<string>('');
     const [lastName, setLastName] = useState<string>('');
@@ -35,11 +34,8 @@ const ProfileScreen: React.FC = () => {
     const [day, setDay] = useState<string>('');
     const [month, setMonth] = useState<string>('');
     const [year, setYear] = useState<string>('');
-
     const [isLoading, setLoading] = useState<boolean>(true);
-
     const [avatarURL, setAvatarURL] = useState<string | null>(null);
-
     const [image, setImage] = useState<{
         selectedImage: string | null;
         avatarURL: string | null;
@@ -104,6 +100,11 @@ const ProfileScreen: React.FC = () => {
         }
     };
 
+    const validateEmail = (email: string): boolean => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
     const submitForm = async () => {
         try {
             // Validate phoneNum
@@ -118,11 +119,11 @@ const ProfileScreen: React.FC = () => {
                 return;
             }
 
-            // Validate driveLicense
-            // if (driveLicense.length !== 12) {
-            //   Alert.alert('Lỗi', 'Giấy phép lái xe không hợp lệ. Vui lòng nhập đúng 12 chữ số.');
-            //   return;
-            // }
+            // Validate email
+            if (!validateEmail(email)) {
+                Alert.alert('Lỗi', 'Địa chỉ email không hợp lệ. Vui lòng nhập đúng định dạng email.');
+                return;
+            }
 
             // Validate year
             const currentYear = new Date().getFullYear();

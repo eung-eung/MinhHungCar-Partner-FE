@@ -146,11 +146,11 @@ const MyCar: React.FC = () => {
 
     const navigateToScreen = (car: any) => {
         if (car && car.status === 'pending_application:pending_car_images') {
-            router.push({ pathname: "/addCarPhoto", params: { carId: car.id, based_price: car.car_model?.based_price } });
+            router.replace({ pathname: "/addCarPhoto", params: { carId: car.id, based_price: car.car_model?.based_price } });
         } else if (car && car.status === 'pending_application:pending_car_caveat') {
-            router.push({ pathname: "/addRegist", params: { carId: car.id, based_price: car.car_model?.based_price } });
+            router.replace({ pathname: "/addRegist", params: { carId: car.id, based_price: car.car_model?.based_price } });
         } else if (car && car.status === 'pending_application:pending_price') {
-            router.push({ pathname: "/rentingFee", params: { carId: car.id, based_price: car.car_model?.based_price } });
+            router.replace({ pathname: "/rentingFee", params: { carId: car.id, based_price: car.car_model?.based_price } });
         } else if (car) {
             router.push({ pathname: `/detail/${car.id}` });
 
@@ -244,7 +244,7 @@ const MyCar: React.FC = () => {
                     {registeredCars.length > 0 && (
                         <>
                             <View style={{ flex: 1, alignItems: 'flex-end', paddingRight: 15, marginBottom: 60 }}>
-                                <TouchableOpacity style={styles.addCar} onPress={() => router.push('/addCarInfo')}>
+                                <TouchableOpacity style={styles.addCar} onPress={() => router.replace('/addCarInfo')}>
                                     {/* <Image style={{ width: 25, height: 25 }} source={require('../assets/add.png')} /> */}
                                     <TabBarIcon name='plus' size={24} />
                                     <Text style={{ fontWeight: 600 }}>{' '} Thêm xe</Text>
@@ -270,7 +270,7 @@ const MyCar: React.FC = () => {
                         <View >
                             <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 30 }}>
                                 <Text style={{ fontSize: 16, color: '#686D76', marginBottom: 20 }}>Chưa có xe nào {statusConvert[activeTab]}</Text>
-                                <TouchableOpacity style={styles.addCar} onPress={() => router.push("/addCarInfo")}>
+                                <TouchableOpacity style={styles.addCar} onPress={() => router.replace("/addCarInfo")}>
                                     <TabBarIcon name='plus' size={24} />
                                     <Text style={{ fontWeight: 600 }}>{' '} Thêm xe</Text>
                                 </TouchableOpacity>

@@ -22,6 +22,9 @@ export default function ContractScreen() {
 
     const webViewRef = useRef<WebView | null>(null);
 
+    const carIdNumber = carId ? Number(carId) : 0;
+
+
     console.log("carID", carId)
 
     useEffect(() => {
@@ -30,7 +33,7 @@ export default function ContractScreen() {
 
     const getDetailContract = async () => {
         try {
-            const response = await axios.get(`https://minhhungcar.xyz/partner/contract?car_id=${carId}`, {
+            const response = await axios.get(`https://minhhungcar.xyz/partner/contract?car_id=${carIdNumber}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -41,14 +44,20 @@ export default function ContractScreen() {
             console.log('Fetch contract successfully!');
             setTimeout(() => {
                 setLoading(false);
-            }, 2500);
+            }, 2000);
         } catch (error: any) {
             if (error.response.data.error_code === 10033) {
                 Alert.alert('Lỗi', 'Không thể lấy được trạng thái hợp đồng');
+                console.log("Error get  contract: ", error.response.data.message)
+
             } else if (error.response.data.error_code === 10061) {
                 Alert.alert('Lỗi', 'Không thể xem chi tiết hợp đồng lúc này. Vui lòng thử lại sau');
+                console.log("Error get  contract: ", error.response.data.message)
+
             } else if (error.response.data.error_code === 10001) {
                 Alert.alert('Lỗi', 'Không tìm thấy hợp đồng. Vui lòng thử lại sau');
+                console.log("Error get  contract: ", error.response.data.message)
+
             } else {
                 Alert.alert('Lỗi', error.response.data.message);
             }
@@ -63,7 +72,7 @@ export default function ContractScreen() {
         try {
             const response = await axios.put(`https://minhhungcar.xyz/partner/contract/agree`,
                 {
-                    car_id: carId
+                    car_id: carIdNumber
                 },
                 {
                     headers: {
@@ -77,13 +86,15 @@ export default function ContractScreen() {
                 [
                     {
                         text: 'OK',
-                        onPress: () => route.push('/car')
+                        onPress: () => route.replace('/car')
                     }
                 ]
             );
         } catch (error: any) {
             if (error.response.data.error_code === 10060) {
                 Alert.alert('Lỗi', 'Không thể ký hợp đồng lúc này. Vui lòng thử lại sau');
+                console.log("Error sign contract: ", error.response.data.message)
+
             } else {
                 console.log('Sign contract error: ', error.response.data.message);
                 Alert.alert('Lỗi', error.response.data.message);

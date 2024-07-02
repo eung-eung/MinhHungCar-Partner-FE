@@ -94,7 +94,7 @@ const AddCarPhotoScreen: React.FC = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            route.push({ pathname: "/addRegist", params: { carId: carId, based_price: based_price } });
+            route.replace({ pathname: "/addRegist", params: { carId: carId, based_price: based_price } });
             console.log('Images uploaded:', response.data.message);
 
         } catch (error: any) {
@@ -192,8 +192,8 @@ const AddCarPhotoScreen: React.FC = () => {
                 </View>
 
                 <View style={styles.action}>
-                    <TouchableOpacity onPress={!isUploading ? handleUpload : undefined} disabled={isUploading}>
-                        <View style={[styles.btn, ((!mainImages.selectedImage || smallImages!.some((image) => image === null)) || isUploading) && styles.btnDisabled]}>
+                    <TouchableOpacity onPress={!isUploading ? handleUpload : undefined} disabled={!mainImages.selectedImage || smallImages!.some((image) => !image) || isUploading}>
+                        <View style={[styles.btn, ((!mainImages.selectedImage || smallImages!.some((image) => !image)) || isUploading) && styles.btnDisabled]}>
                             {isUploading ? (
                                 <ActivityIndicator size="small" color="#FFF" />
                             ) : (

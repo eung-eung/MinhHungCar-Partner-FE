@@ -21,7 +21,7 @@ export default function RootLayout() {
       <ProtectedProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false, gestureEnabled: false, }} />
             <Stack.Screen name="+not-found" />
             {/* config ẩn header ở route signIn */}
             <Stack.Screen name="signIn/index" options={{ headerShown: false }} />
@@ -45,6 +45,7 @@ export default function RootLayout() {
             <Stack.Screen name="contract/index"
               options={{
                 headerBackTitleVisible: false,
+                gestureEnabled: false,
                 title: 'Hợp đồng',
               }} />
             <Stack.Screen name="addCarInfo/index"
@@ -54,7 +55,7 @@ export default function RootLayout() {
                 gestureEnabled: false,
                 headerLeft: (props) => <BackButton title="Bạn có muốn trở về?"
                   subTitle="Bạn đang ở màn hình nhập thông xin xe. Bạn có muốn hủy và trở về?"
-                  callBack={() => router.push("/car")}
+                  callBack={() => router.replace("/car")}
                 />
               }} />
             <Stack.Screen name="addCarPhoto/index"
@@ -64,7 +65,7 @@ export default function RootLayout() {
                 gestureEnabled: false,
                 headerLeft: (props) => <BackButton title="Bạn có muốn trở về?"
                   subTitle="Bạn đang ở màn hình nhập thông xin xe. Bạn có muốn hủy và trở về?"
-                  callBack={() => router.push("/car")}
+                  callBack={() => router.replace("/car")}
                 />
               }} />
             <Stack.Screen name="addRegist/index"
@@ -74,7 +75,7 @@ export default function RootLayout() {
                 gestureEnabled: false,
                 headerLeft: (props) => <BackButton title="Bạn có muốn trở về?"
                   subTitle="Bạn đang ở màn hình nhập thông xin xe. Bạn có muốn hủy và trở về?"
-                  callBack={() => router.push("/car")}
+                  callBack={() => router.replace("/car")}
                 />
               }} />
             <Stack.Screen name="rentingFee/index"
@@ -84,7 +85,7 @@ export default function RootLayout() {
                 gestureEnabled: false,
                 headerLeft: (props) => <BackButton title="Bạn có muốn trở về?"
                   subTitle="Bạn đang ở màn hình nhập thông xin xe. Bạn có muốn hủy và trở về?"
-                  callBack={() => router.push("/car")}
+                  callBack={() => router.replace("/car")}
                 />
               }} />
             <Stack.Screen name="detail/[slug]"
@@ -95,6 +96,7 @@ export default function RootLayout() {
             <Stack.Screen name="success/index"
               options={{
                 headerBackTitleVisible: false,
+                gestureEnabled: false,
                 headerShown: false
               }} />
           </Stack>

@@ -72,7 +72,7 @@ export default function AddCarRegistrationScreen() {
                 },
             });
             console.log('Caveat uploaded:', response.data.message);
-            route.push({ pathname: "/rentingFee", params: { carId, based_price } });
+            route.replace({ pathname: "/rentingFee", params: { carId, based_price } });
         } catch (error: any) {
             console.log('Error uploading caveat:', error.response?.data?.error_code);
             if (error.response?.data?.error_code === 10023) {
@@ -147,7 +147,7 @@ export default function AddCarRegistrationScreen() {
                                     <Image style={styles.licensePhoto} source={{ uri: image.uri }} />
                                 ) : (
                                     // <Image style={styles.licensePhotoPlaceholder} source={require('../../assets/images/splash.png')} />
-                                    <TabBarIcon name='image-plus' size={60} />
+                                    <TabBarIcon name='folder-multiple-image' size={60} />
                                 )}
                             </TouchableOpacity>
                         </View>

@@ -27,8 +27,9 @@ export async function getUser(phone_number: string, password: string) {
                 Alert.alert('Đăng nhập thất bại!', 'Tài khoản này chưa được đăng kí');
             } else {
                 Alert.alert('Đăng nhập thất bại!', 'Vui lòng kiểm tra lại!');
+                console.log('Login Error:', error.response.data.message);
             }
-            console.log('Login Error:', error.response.data.message);
+
         } else {
             Alert.alert('Đăng nhập thất bại!', 'Vui lòng kiểm tra lại!');
             console.log('Login Error:', error.response.data.message);
@@ -47,22 +48,53 @@ export async function sendOtpToUser(email: any, password: any, first_name: any, 
         });
         return response.status;
     } catch (error: any) {
-        if (error.response?.status === 400) {
-            Alert.alert('Đăng kí thất bại', 'Tài khoản này đã có người đăng kí');
+        if (error.response) {
+            if (error.response.data.error_code === 10062) {
+                Alert.alert('Tài khoản đã được đăng kí', 'Vui lòng kiểm tra lại');
+                console.log('Login Error:', error.response.data.message);
+
+            } else if (error.response.data.error_code === 10010) {
+                Alert.alert('Không thể xác thực OTP', 'Vui lòng thử lại sau');
+                console.log('Login Error:', error.response.data.message);
+
+            } else if (error.response.data.error_code === 10047) {
+                Alert.alert('Không thể gửi OTP', 'Vui lòng thử lại sau');
+                console.log('Login Error:', error.response.data.message);
+
+            } else {
+                Alert.alert('Đăng kí thất bại!', 'Vui lòng kiểm tra lại!');
+                console.log('Login Error:', error.response.data.message);
+
+            }
         } else {
-            Alert.alert('Lỗi đăng kí', error.response?.data || 'Vui lòng thử lại');
+            Alert.alert('Đăng kí thất bại!', 'Vui lòng kiểm tra lại!');
+            console.log('Login Error:', error.response.data.message);
+
         }
     }
 }
 
-export async function verifyOtp(phone_number: any, otp: any) {
+export async function verifyOtp(phone_number: string, otp: string) {
     try {
         const response = await axios.post(apiAccount.verifyOTP, {
             phone_number,
-            otp
+            otp,
         });
-        return response.status;
-    } catch (error) {
-        Alert.alert('OTP không hợp lệ', 'Vui lòng thử lại!');
+
+        if (response.status === 200) {
+            return response.status;
+        } else {
+            throw new Error('OTP verification failed');
+        }
+    } catch (error: any) {
+        if (error.response?.data?.error_code === 10012) {
+            Alert.alert('OTP không hợp lệ', 'Vui lòng thử lại!');
+        } else if (error.response?.data?.error_code === 10010) {
+            Alert.alert('Không thể xác thực OTP', 'Vui lòng thử lại sau');
+        } else if (error.response?.data?.error_code === 10047) {
+            Alert.alert('Không thể gửi OTP', 'Vui lòng thử lại sau');
+        } else {
+            throw error;
+        }
     }
 }

@@ -15,8 +15,14 @@ const OTPScreen: React.FC<OTPScreenProps> = ({ route }) => {
     const [otp, setOtp] = useState<string>('');
     const [disabled, setDisabled] = useState<boolean>(true);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    // Ensure the params are properly typed and cast to string
     const params = useLocalSearchParams();
-    const { phone_number, email, password, last_name, first_name } = params;
+    const phone_number = String(params.phone_number);
+    const email = params.email ? String(params.email) : undefined;
+    const password = String(params.password);
+    const last_name = params.last_name ? String(params.last_name) : undefined;
+    const first_name = params.first_name ? String(params.first_name) : undefined;
 
     const handleOtpValues = (enteredValue: string) => {
         setOtp(enteredValue);
@@ -27,11 +33,13 @@ const OTPScreen: React.FC<OTPScreenProps> = ({ route }) => {
         if (otp.length !== 6) return;
         try {
             setIsLoading(true);
-            await verifyOtp(phone_number, otp);
-            Alert.alert('Success', 'Your account has been successfully verified!');
-            router.replace('/signIn');
+            const status = await verifyOtp(phone_number, otp);
+            if (status === 200) {
+                Alert.alert('Thành công', 'Tài khoản của bạn đã được xác thực thành công!');
+                router.replace('/signIn');
+            }
         } catch (error) {
-            Alert.alert('Invalid OTP', 'The OTP entered is incorrect. Please try again!');
+            Alert.alert('OTP không hợp lệ', 'Mã OTP không chính xác. Vui lòng thử lại!');
         } finally {
             setIsLoading(false);
         }
@@ -41,7 +49,7 @@ const OTPScreen: React.FC<OTPScreenProps> = ({ route }) => {
         <>
             {isLoading ? (
                 <View style={styles.loadingContainer}>
-                    <LoadingOverlay message='Verifying OTP...' />
+                    <LoadingOverlay message='Xác thực OTP...' />
                 </View>
             ) : (
                 <View style={styles.outerContainer}>
@@ -52,7 +60,7 @@ const OTPScreen: React.FC<OTPScreenProps> = ({ route }) => {
                     <View style={styles.innerContainer}>
                         <OtpInput numberOfInputs={6} onChangeText={handleOtpValues} />
                         <Button disabled={disabled} onPress={handleSubmitOTP}>
-                            <Text style={{ color: 'white' }}>Submit</Text>
+                            <Text style={{ color: 'white' }}>Gửi</Text>
                         </Button>
                     </View>
                 </View>
