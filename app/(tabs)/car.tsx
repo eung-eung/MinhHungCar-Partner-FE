@@ -245,7 +245,6 @@ const MyCar: React.FC = () => {
                         <>
                             <View style={{ flex: 1, alignItems: 'flex-end', paddingRight: 15, marginBottom: 60 }}>
                                 <TouchableOpacity style={styles.addCar} onPress={() => router.replace('/addCarInfo')}>
-                                    {/* <Image style={{ width: 25, height: 25 }} source={require('../assets/add.png')} /> */}
                                     <TabBarIcon name='plus' size={24} />
                                     <Text style={{ fontWeight: 600 }}>{' '} Thêm xe</Text>
                                 </TouchableOpacity>

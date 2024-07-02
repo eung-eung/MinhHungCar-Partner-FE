@@ -141,7 +141,6 @@ const AddCarPhotoScreen: React.FC = () => {
                     <View style={styles.tabItemContainer}>
                         <View style={styles.tabItem}>
                             <View style={styles.tabItemIcon}>
-                                {/* <Image style={styles.tabImage} source={require('../assets/vehicle_regsister_purple.png')} /> */}
                                 <TabBarIcon name='file-document-multiple-outline' color='#773BFF' style={styles.tabImage} />
                             </View>
                             <Text style={styles.tabText}>Giấy tờ xe</Text>
@@ -152,7 +151,6 @@ const AddCarPhotoScreen: React.FC = () => {
                     <View style={styles.tabItemContainer}>
                         <View style={styles.tabItem}>
                             <View style={styles.tabItemIcon}>
-                                {/* <Image style={styles.tabImage} source={require('../assets/dollar_purple.png')} /> */}
                                 <TabBarIcon name='currency-usd' color='#773BFF' style={styles.tabImage} />
 
                             </View>

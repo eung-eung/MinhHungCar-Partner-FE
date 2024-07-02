@@ -126,17 +126,11 @@ export default function DetailScreen() {
                                     </Text>
 
                                     <View style={styles.infoRating}>
-                                        {/* <Image
-                                            style={{ width: 20, height: 20, marginRight: 5 }}
-                                            source={require('../assets/star.png')}
-                                        /> */}
+
                                         <TabBarIcon name='star' size={26} color="#F3CA52" style={{ marginRight: 5 }} />
                                         <Text style={styles.infoRatingLabel}>5.0</Text>
 
-                                        {/* <Image
-                                            style={{ width: 20, height: 20, marginRight: 5, marginLeft: 25 }}
-                                            source={require('../assets/history_green.png')}
-                                        /> */}
+
                                         <TabBarIcon name='history' size={26} color='green' style={{ marginRight: 5, marginLeft: 25 }} />
                                         <Text style={styles.infoRatingLabel}>{detailCar.total_trip} chuyến</Text>
                                     </View>

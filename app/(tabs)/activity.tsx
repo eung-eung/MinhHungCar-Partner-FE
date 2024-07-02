@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, StatusBar, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
@@ -30,6 +31,7 @@ const getStatusColor = (status: string) => {
 
 const ActivityScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const [activeTab, setActiveTab] = useState('Tất cả');
+    const router = useRouter()
 
     const handleTabPress = (tabName: string) => {
         setActiveTab(tabName);
@@ -71,7 +73,7 @@ const ActivityScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                                                 </View>
                                                 <TouchableOpacity
                                                     style={{ width: 80, height: 30, backgroundColor: '#773BFF', borderRadius: 5, alignItems: 'center', justifyContent: 'center' }}
-                                                    onPress={() => { navigation.navigate('History') }}
+                                                    onPress={() => { router.push('/history') }}
                                                 >
                                                     <Text style={{ color: 'white', fontSize: 14 }}>Lịch sử</Text>
                                                 </TouchableOpacity>
