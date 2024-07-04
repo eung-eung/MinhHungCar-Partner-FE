@@ -2,48 +2,59 @@ import { View, Text, SafeAreaView, ScrollView, StyleSheet, Image } from 'react-n
 import React from 'react';
 import { Divider } from 'react-native-paper';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+import { useLocalSearchParams } from 'expo-router';
 
 export default function ActivityDetailScreen() {
+    const params = useLocalSearchParams()
+    const { licensePlate, carName, startDate, endDate, feebackRating, feebackContent, rentPrice, customerName, avatarUrl } = params
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <ScrollView>
                 <View style={styles.container}>
                     {/* Info */}
                     <View>
-                        <Text style={styles.date}>08/05/2024 → 14/05/2024</Text>
-                        <Text style={styles.name}>HUYNDAI I10 2023</Text>
-                        <Text style={styles.plate}>Biển số xe: K38BIG</Text>
-                        <Text style={styles.price}>Giá thuê: 850.000 đ</Text>
+                        <Text style={styles.date}>{startDate} → {endDate}</Text>
+                        <Text style={styles.name}>{carName}</Text>
+                        <Text style={styles.plate}>Biển số xe: {licensePlate}</Text>
+                        <Text style={styles.price}>Giá thuê: {rentPrice?.toLocaleString()} đ</Text>
                         <Text style={styles.price}>Thực nhận: 680.000 đ</Text>
-                        <View style={{ flexDirection: 'row' }}>
-                            <Text style={styles.ratingText}>Đánh giá: </Text>
-                            <TabBarIcon name='star' color='orange' size={24} />
-                            <Text style={styles.ratingText}>1</Text>
-                        </View>
+                        {(feebackRating && feebackContent) ?
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={styles.ratingText}>Đánh giá: </Text>
+                                <TabBarIcon name='star' color='orange' size={24} />
+                                <Text style={styles.ratingText}>{feebackRating}</Text>
+                            </View>
+                            : ""}
                     </View>
 
                     <Divider style={{ marginVertical: 20 }} />
 
                     {/* Feedback */}
-                    <View style={{ marginTop: 5 }}>
-                        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Đánh giá của khách hàng</Text>
-                        <View style={styles.commentContainer}>
-                            <Image source={{ uri: 'https://www.bootdey.com/img/Content/avatar/avatar2.png' }} style={styles.commentAvatar} />
-                            <View style={styles.commentTextContainer}>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={styles.commentAuthor}>Tôi là khách hàng</Text>
-                                    <Text style={styles.commentDate}>19/05/2024</Text>
-                                </View>
+                    {(feebackRating && feebackContent) ?
+                        <View style={{ marginTop: 5 }}>
+                            <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Đánh giá của khách hàng</Text>
+                            <View style={styles.commentContainer}>
+                                {avatarUrl && typeof avatarUrl === 'string' ? (
+                                    <Image source={{ uri: avatarUrl }} style={styles.commentAvatar} />
+                                ) : (
+                                    <TabBarIcon name='account-circle' size={40} style={{ borderRadius: 20, marginRight: 10 }} />
+                                )}
 
-                                <View style={styles.commentRating}>
-                                    <TabBarIcon name='star' color='orange' size={24} />
-                                    <Text>5</Text>
+                                <View style={styles.commentTextContainer}>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                        <Text style={styles.commentAuthor}>{customerName}</Text>
+                                        {/* <Text style={styles.commentDate}>19/05/2024</Text> */}
+                                    </View>
+
+                                    <View style={styles.commentRating}>
+                                        <TabBarIcon name='star' color='orange' size={18} style={{ marginLeft: 3 }} />
+                                        <Text>5</Text>
+                                    </View>
+                                    <Text style={styles.commentText}>{feebackContent}</Text>
                                 </View>
-                                <Text style={styles.commentText}>Xe không ok, thấy ghéccc</Text>
                             </View>
                         </View>
-                    </View>
-
+                        : ""}
                     {/* Note */}
                     <View style={{ marginTop: 10 }}>
                         <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Ghi chú</Text>
@@ -68,30 +79,30 @@ const styles = StyleSheet.create({
     },
     date: {
         color: '#5A5A5A',
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: '600',
-        marginBottom: 10
+        marginBottom: 15
     },
     name: {
         textTransform: 'uppercase',
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: 'bold',
-        marginBottom: 5
+        marginBottom: 8
     },
     plate: {
         color: '#757575',
-        fontSize: 16,
+        fontSize: 14,
         marginBottom: 15
     },
     price: {
         color: '#5A5A5A',
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: 'bold',
-        marginBottom: 15
+        marginBottom: 17
     },
     ratingText: {
         color: '#5A5A5A',
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: 'bold'
     },
 

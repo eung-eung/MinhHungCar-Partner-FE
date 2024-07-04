@@ -1,20 +1,25 @@
+import LoadingOverlay from '@/components/LoadingOverlay';
+import { AuthConText } from '@/store/AuthContext';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import axios from 'axios';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { View, Text, StatusBar, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { View, Text, StatusBar, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 
-interface CarData {
-    name: string;
-    imagePath: string;
-    licensePlate: string;
-    model: string;
+interface Car {
+    id: number;
     status: string;
+    images: string[];
+    car_model: {
+        brand: string;
+        model: string;
+        year: number;
+        based_price: number;
+    };
+    license_plate: string;
 }
 
-const carsData: CarData[] = [
-    { name: 'Tesla Model S', imagePath: 'https://images.unsplash.com/photo-1617704548623-340376564e68?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8dGVzbGElMjBtb2RlbCUyMHN8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60', licensePlate: 'K38BIG', model: 'Tesla Model S', status: 'Đang thuê' },
-    { name: 'Mercedes-Benz S-Class', imagePath: 'https://upload.wikimedia.org/wikipedia/commons/b/b5/R8_Coupe_V10_performance-1.jpg', licensePlate: 'K38BIG', model: 'Tesla Model S', status: 'Đã đặt' },
-    { name: 'Audi R8', imagePath: 'https://katavina.com/uploaded/tin/BMW-i8/BMW-i8.jpg', licensePlate: 'K38BIG', model: 'Tesla Model S', status: 'Trong kho' },
-];
+
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -29,22 +34,74 @@ const getStatusColor = (status: string) => {
     }
 };
 
-const ActivityScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const ActivityScreen: React.FC = () => {
     const [activeTab, setActiveTab] = useState('Tất cả');
+    const authCtx = useContext(AuthConText);
+    const token = authCtx.access_token;
     const router = useRouter()
+    const [registeredCars, setRegisteredCars] = useState<Car[]>([]);
+
+    const [isLoading, setLoading] = useState<boolean>(true);
+    const [page, setPage] = useState<number>(1); // State for pagination
+
+    const isFocused = useIsFocused();
+
 
     const handleTabPress = (tabName: string) => {
         setActiveTab(tabName);
+    };
+
+    useEffect(() => {
+        getRegisteredCar();
+    }, [activeTab, page, isFocused]);
+
+    useFocusEffect(
+        useCallback(() => {
+            getRegisteredCar();
+        }, [activeTab, page, isFocused])
+    );
+
+    const getRegisteredCar = async () => {
+        // if(!isLoading){}
+        setLoading(true);
+
+        try {
+            console.log('PAGE: ', page);
+            const response = await axios.get(
+                `https://minhhungcar.xyz/partner/cars?offset=${(page - 1) * 2}&limit=100`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+            const newCars = response.data.data.cars;
+            if (newCars.length > 0) {
+                setRegisteredCars(newCars)
+            }
+            setLoading(false)
+        } catch (error: any) {
+            if (error.response.data.error_code === 10026) {
+                Alert.alert('Lỗi', 'Hiện giờ thể lấy dữ liệu các chiếc xe')
+            } else {
+                console.log("Error: ", error.response.data.message)
+            }
+        }
     };
 
     return (
         <View style={{ flex: 1 }}>
             <StatusBar barStyle="dark-content" />
             <SafeAreaView style={{ flex: 1 }}>
-                <ScrollView>
-                    <View style={styles.container}>
-                        {/* Tab */}
-                        <View style={styles.tabContainer}>
+                {isLoading ? (
+                    <View style={styles.loadingContainer}>
+                        <LoadingOverlay message='' />
+                    </View>
+                ) : (
+                    <ScrollView>
+                        <View style={styles.container}>
+                            {/* Tab */}
+                            {/* <View style={styles.tabContainer}>
                             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollViewContent}>
                                 {['Tất cả', 'Đang thuê', 'Đã đặt', 'Trong kho'].map((tab, index) => (
                                     <TouchableOpacity key={index} onPress={() => handleTabPress(tab)} style={[styles.tabItem, activeTab === tab && styles.activeTabItem]}>
@@ -52,39 +109,48 @@ const ActivityScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                                     </TouchableOpacity>
                                 ))}
                             </ScrollView>
-                        </View>
+                        </View> */}
 
-                        {/* Card */}
-                        <View>
-                            {carsData.map((car, index) => (
-                                <View key={index} style={styles.card}>
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <Image
-                                            resizeMode="cover"
-                                            source={{ uri: car.imagePath }}
-                                            style={styles.cardImg}
-                                        />
-                                        <View style={styles.cardBody}>
-                                            <Text style={styles.cardTag}>Biển số xe: {car.licensePlate}</Text>
-                                            <Text style={styles.cardTitle}>{car.name}</Text>
-                                            <View style={styles.cardRow}>
-                                                <View style={styles.cardRowItem}>
-                                                    <Text style={{ color: getStatusColor(car.status), fontWeight: '600', fontSize: 15 }}>{car.status}</Text>
+                            {/* Card */}
+                            <View style={{ marginTop: 15 }}>
+                                {registeredCars.length > 0 ?
+                                    <>
+                                        {registeredCars.map((car, index) => (
+                                            <View key={index} style={styles.card}>
+                                                <View style={{ flexDirection: 'row' }}>
+                                                    <Image
+                                                        resizeMode="cover"
+                                                        source={{ uri: car.images[0] }}
+                                                        style={styles.cardImg}
+                                                    />
+                                                    <View style={styles.cardBody}>
+                                                        <Text style={styles.cardTag}>Biển số xe: {car.license_plate}</Text>
+                                                        <Text style={styles.cardTitle}>{car.car_model.brand + '' + car.car_model.model + ' ' + car.car_model.year}</Text>
+                                                        <View style={styles.cardRow}>
+                                                            <View style={styles.cardRowItem}>
+                                                                {/* <Text style={{ color: getStatusColor(car.status), fontWeight: '600', fontSize: 15 }}>{car.status}</Text> */}
+                                                            </View>
+                                                            <TouchableOpacity
+                                                                style={{ width: 80, height: 30, backgroundColor: '#773BFF', borderRadius: 5, alignItems: 'center', justifyContent: 'center' }}
+                                                                onPress={() => { router.push({ pathname: '/history', params: { carID: car.id } }) }}
+                                                            >
+                                                                <Text style={{ color: 'white', fontSize: 14 }}>Lịch sử</Text>
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                    </View>
                                                 </View>
-                                                <TouchableOpacity
-                                                    style={{ width: 80, height: 30, backgroundColor: '#773BFF', borderRadius: 5, alignItems: 'center', justifyContent: 'center' }}
-                                                    onPress={() => { router.push('/history') }}
-                                                >
-                                                    <Text style={{ color: 'white', fontSize: 14 }}>Lịch sử</Text>
-                                                </TouchableOpacity>
                                             </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            ))}
+                                        ))}
+                                    </>
+                                    :
+                                    // <View>
+                                    <Text style={{ textAlign: 'center', marginTop: 40, color: '#B4B4B8', fontSize: 20 }}>Chưa có hoạt động nào</Text>
+                                    // </View>
+                                }
+                            </View>
                         </View>
-                    </View>
-                </ScrollView>
+                    </ScrollView>
+                )}
             </SafeAreaView>
         </View>
     );
@@ -93,6 +159,11 @@ const ActivityScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     card: {
         marginBottom: 10,

@@ -1,44 +1,156 @@
-import { View, Text, StatusBar, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, StatusBar, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
 import { Image } from 'react-native'
 import { Divider } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { AuthConText } from '@/store/AuthContext';
+import { useIsFocused } from '@react-navigation/native';
+import axios from 'axios';
 
-interface CarData {
+
+interface Activity {
+  id: number;
+  car_id: number;
+  customer: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    avatar_url: string
+  };
+  car: {
+    id: number;
+    car_model: {
+      brand: string;
+      model: string;
+      year: number;
+    };
+    license_plate: string;
+    price: number;
+    status: string;
+  };
+  start_date: string;
+  end_date: string;
   status: string;
-  startDate: string;
-  endDate: string;
+  rent_price: number;
+  insurance_amount: number;
+  feedback_rating: number;
+  feedback_content: string;
+
+
 }
 
-const carsData: CarData[] = [
-  { status: 'Đã đặt', startDate: '09/05/2024', endDate: '10/05/2024' },
-  { status: 'Hoàn thành', startDate: '09/05/2024', endDate: '10/05/2024' },
-  { status: 'Đã hủy', startDate: '09/05/2024', endDate: '10/05/2024' },
-];
+interface CarDetail {
+  id: number;
+  car_model: {
+    brand: string;
+    model: string;
+    year: number;
+  };
+  license_plate: string;
+  rating: number
+}
 
-const getStatusColor = (status: string): string => {
+const convertUTCToICT = (utcDateStr: string) => {
+  const utcDate = new Date(utcDateStr);
+  const ictOffset = 7 * 60;
+  const ictDate = new Date(utcDate.getTime() + (ictOffset * 60 * 1000));
+  return ictDate;
+};
+
+const formatDateToDDMMYYYY = (date: Date) => {
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-based
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+const getStatusStyles = (status: string) => {
   switch (status) {
-    case 'Đã đặt':
-      return '#F4BB4C';
-    case 'Hoàn thành':
-      return '#4FB33F';
-    case 'Đã hủy':
-      return '#F11B1B';
+    case 'no_filter':
+      return { borderColor: '#F89F36', color: '#F89F36' };
+    case 'waiting_contract_payment':
+      return { borderColor: '#56AEFF', color: '#56AEFF' };
+    case 'waiting_for_agreement':
+      return { borderColor: 'gray', color: 'gray' };
+    case 'ordered':
+      return { borderColor: '#F4BB4C', color: '#F4BB4C' };
+    case 'renting':
+      return { borderColor: '#24D02B', color: '#24D02B' };
+    case 'completed':
+      return { borderColor: '#15891A', color: '#15891A' };
     default:
-      return '#000000';
+      return {};
   }
+};
+
+const statusConvert: Record<string, string> = {
+  no_filter: 'Tất cả',
+  waiting_for_agreement: 'Chờ chấp thuận',
+  waiting_contract_payment: 'Chờ thanh toán',
+  ordered: 'Đã đặt',
+  renting: 'Đang thuê',
+  completed: 'Hoàn thành',
 };
 
 
 
 const HistoryScreen: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('Tất cả');
+  const [activeTab, setActiveTab] = useState<string>('no_filter');
+  const authCtx = useContext(AuthConText);
+  const token = authCtx.access_token;
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const { carID } = params
+  const [activityHistory, setActivityHistory] = useState<Activity[]>([]);
+  const [isLoading, setLoading] = useState<boolean>(true);
+  const [page, setPage] = useState<number>(1);
 
-  const router = useRouter()
+  const [newestStatus, setNewestStatus] = useState()
+  const [detailCar, setDetailCar] = useState<CarDetail>();
+  const isFocused = useIsFocused();
+
+  console.log("carID: ", carID)
+
+  useEffect(() => {
+    getActivity();
+    getDetailCar();
+  }, [activeTab, page, isFocused, carID])
+
+  const getActivity = async () => {
+    try {
+      const response = await axios.get(`https://minhhungcar.xyz/partner/activity?car_id=${carID}&customer_contract_status=${activeTab}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      })
+      setActivityHistory(response.data.data);
+      console.log("Fetch activity history: ", response.data.message)
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error get Activity history: ", error.response.data.message)
+    }
+  }
+
+  const getDetailCar = async () => {
+    try {
+      const response = await axios.get(`https://minhhungcar.xyz/car/${carID}`);
+      setDetailCar(response.data.data);
+      console.log('Fetch successfully: ', response.data.message);
+    } catch (error: any) {
+      if (error.response.data.error_code === 10027) {
+        Alert.alert('Lỗi', 'Không thể xem được chi tiết xe lúc này. Vui lòng thử lại sau!');
+      } else {
+        console.log('Error getDetailCar: ', error.response.data.message);
+      }
+    }
+  };
+
 
   const handleTabPress = (tabName: string) => {
     setActiveTab(tabName);
   };
+
+
 
   return (
     <View style={{ flex: 1 }}>
@@ -49,61 +161,94 @@ const HistoryScreen: React.FC = () => {
           <View style={styles.container}>
             {/* Info */}
             <View style={{ width: '100%', height: 'auto', backgroundColor: 'white', marginBottom: 10, paddingVertical: 20, justifyContent: 'center', paddingLeft: 28 }}>
-              <Text style={{ fontSize: 20, fontWeight: 'bold', textTransform: 'uppercase' }}>HUYNDAI I10 2023</Text>
-              <Text style={{ fontSize: 14, color: '#939393', marginBottom: 9, marginTop: 8, fontWeight: '600' }}>Biển số xe: K38BIG</Text>
-              <View style={{ flexDirection: 'row', paddingVertical: 5 }}>
+              <Text style={{ fontSize: 20, fontWeight: 'bold', textTransform: 'uppercase' }}>{detailCar?.car_model.brand + '' + detailCar?.car_model.model + '' + detailCar?.car_model.year}</Text>
+              <Text style={{ fontSize: 14, color: '#939393', marginBottom: 9, marginTop: 8, fontWeight: '600', textTransform: 'uppercase' }}>Biển số xe: {detailCar?.license_plate}</Text>
+              {/* <View style={{ flexDirection: 'row', paddingVertical: 5 }}>
                 <Text style={{ fontSize: 14, marginRight: 5 }}>Hoạt động mới nhất:</Text>
-                <Text style={{ fontSize: 14, color: '#24D02B', fontWeight: 'bold' }}>Đang thuê</Text>
-              </View>
+                <Text style={{ fontSize: 14, color: '#24D02B', fontWeight: 'bold' }}>---</Text>
+              </View> */}
             </View>
 
             {/* Tab */}
             <View style={styles.tabContainer}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollViewContent}>
-                <TouchableOpacity onPress={() => handleTabPress('Tất cả')} style={[styles.tabItem, activeTab === 'Tất cả' && styles.activeTabItem]}>
-                  <Text style={[styles.tabText, activeTab === 'Tất cả' && { color: '#773BFF', fontWeight: '600' }]}>Tất cả</Text>
+                <TouchableOpacity onPress={() => handleTabPress('no_filter')} style={[styles.tabItem, activeTab === 'no_filter' && styles.activeTabItem]}>
+                  <Text style={[styles.tabText, activeTab === 'no_filter' && { color: '#773BFF', fontWeight: '600' }]}>Tất cả</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => handleTabPress('Đã đặt')} style={[styles.tabItem, activeTab === 'Đã đặt' && styles.activeTabItem]}>
-                  <Text style={[styles.tabText, activeTab === 'Đã đặt' && { color: '#773BFF', fontWeight: '600' }]}>Đã đặt</Text>
+                <TouchableOpacity onPress={() => handleTabPress('ordered')} style={[styles.tabItem, activeTab === 'ordered' && styles.activeTabItem]}>
+                  <Text style={[styles.tabText, activeTab === 'ordered' && { color: '#773BFF', fontWeight: '600' }]}>Đã đặt</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleTabPress('Hoàn thành')} style={[styles.tabItem, activeTab === 'Hoàn thành' && styles.activeTabItem]}>
-                  <Text style={[styles.tabText, activeTab === 'Hoàn thành' && { color: '#773BFF', fontWeight: '600' }]}>Hoàn thành</Text>
+                <TouchableOpacity onPress={() => handleTabPress('renting')} style={[styles.tabItem, activeTab === 'renting' && styles.activeTabItem]}>
+                  <Text style={[styles.tabText, activeTab === 'renting' && { color: '#773BFF', fontWeight: '600' }]}>Đang thuê</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleTabPress('Đã hủy')} style={[styles.tabItem, activeTab === 'Đã hủy' && styles.activeTabItem]}>
-                  <Text style={[styles.tabText, activeTab === 'Đã hủy' && { color: '#773BFF', fontWeight: '600' }]}>Đã hủy</Text>
+                <TouchableOpacity onPress={() => handleTabPress('completed')} style={[styles.tabItem, activeTab === 'completed' && styles.activeTabItem]}>
+                  <Text style={[styles.tabText, activeTab === 'completed' && { color: '#773BFF', fontWeight: '600' }]}>Hoàn thành</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleTabPress('waiting_for_agreement')} style={[styles.tabItem, activeTab === 'waiting_for_agreement' && styles.activeTabItem]}>
+                  <Text style={[styles.tabText, activeTab === 'waiting_for_agreement' && { color: '#773BFF', fontWeight: '600' }]}>Chờ chấp thuận</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleTabPress('waiting_contract_payment')} style={[styles.tabItem, activeTab === 'waiting_contract_payment' && styles.activeTabItem]}>
+                  <Text style={[styles.tabText, activeTab === 'waiting_contract_payment' && { color: '#773BFF', fontWeight: '600' }]}>Chờ thanh toán</Text>
                 </TouchableOpacity>
               </ScrollView>
             </View>
 
             {/* Card */}
             <View>
-              {carsData.map((car, index) => (
-                <View key={index} style={styles.card}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
-                    <View style={{ flexDirection: 'row' }}>
-                      <Text style={{ fontWeight: '600' }}>{car.startDate}</Text>
-                      <Text style={{ fontWeight: 'bold', marginHorizontal: 5 }}>→</Text>
-                      <Text style={{ fontWeight: '600' }}>{car.endDate}</Text>
-                    </View>
-                    <Text style={{ color: getStatusColor(car.status), fontWeight: '600', fontSize: 15 }}>{car.status}</Text>
-                  </View>
-                  <Divider style={{ marginBottom: 10, marginTop: -5 }} />
-                  <View style={{ flexDirection: 'row' }}>
-                    <View style={styles.cardBody}>
-                      <Text style={styles.cardTitle}>HUYNDAI I10 2023</Text>
-                      <View style={styles.cardRow}>
-                        <Text style={styles.cardTag}>Biển số xe:  K38BIG</Text>
-                        <TouchableOpacity
-                          onPress={() => { router.push('/activityDetail') }}
-                          style={styles.button}>
-                          <Text style={{ color: 'white', fontSize: 14 }}>Chi tiết</Text>
-                        </TouchableOpacity>
+              {activityHistory.length > 0 ?
+                <>
+                  {activityHistory.map((act, index) => {
+                    const startDate = formatDateToDDMMYYYY(convertUTCToICT(act.start_date));
+                    const endDate = formatDateToDDMMYYYY(convertUTCToICT(act.end_date));
+
+                    return (
+                      <View key={index} style={styles.card}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
+                          <View style={{ flexDirection: 'row' }}>
+                            <Text style={{ fontWeight: '600', marginLeft: 8 }}>{startDate}</Text>
+                            <Text style={{ fontWeight: 'bold', marginHorizontal: 5 }}>→</Text>
+                            <Text style={{ fontWeight: '600' }}>{endDate}</Text>
+                          </View>
+                          <Text style={{ color: getStatusStyles(act.status).color, fontWeight: 'bold' }}>{statusConvert[act.status]}</Text>
+                        </View>
+                        <Divider style={{ marginBottom: 10, marginTop: -5 }} />
+                        <View style={{ flexDirection: 'row' }}>
+                          <View style={styles.cardBody}>
+                            {/* <Text style={styles.cardTitle}>HUYNDAI I10 2023</Text> */}
+                            <View style={styles.cardRow}>
+                              <Text style={styles.cardTag}>Thành tiền:  {(act.rent_price + act.insurance_amount).toLocaleString()} VNĐ</Text>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  router.push({
+                                    pathname: '/activityDetail', params: {
+                                      licensePlate: act.car.license_plate,
+                                      carName: act.car.car_model + ' ' + act.car.car_model.model + ' ' + act.car.car_model.year,
+                                      startDate: startDate,
+                                      endDate: endDate,
+                                      feebackRating: act.feedback_rating,
+                                      feebackContent: act.feedback_content,
+                                      rentPrice: act.rent_price,
+                                      customerName: act.customer.first_name + ' ' + act.customer.last_name,
+                                      avatarUrl: act.customer.avatar_url
+                                    }
+                                  })
+                                }}
+                                style={styles.button}>
+                                <Text style={{ color: 'white', fontSize: 14 }}>Chi tiết</Text>
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+                        </View>
                       </View>
-                    </View>
-                  </View>
-                </View>
-              ))}
+                    );
+                  })}
+                </>
+                :
+                <Text style={{ fontSize: 16, color: '#B4B4B8', textAlign: 'center', marginTop: 30, marginHorizontal: 30 }}>
+                  Không có hoạt động nào
+                  trong trạng thái {statusConvert[activeTab]}
+                </Text>
+              }
             </View>
           </View>
         </ScrollView>
@@ -125,12 +270,13 @@ const styles = StyleSheet.create({
   },
   cardBody: {
     flex: 1,
-    paddingLeft: 14,
+    paddingLeft: 8,
   },
   cardTag: {
     fontSize: 13,
-    color: '#939393',
-    textTransform: 'capitalize',
+    color: 'red',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
   },
   cardTitle: {
     fontSize: 20,

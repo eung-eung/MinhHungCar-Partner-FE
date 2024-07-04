@@ -55,6 +55,16 @@ const statusConvert: Record<string, string> = {
     'pending_application:pending_price': 'Chưa đăng kí thông tin giá cả',
 };
 
+const TabConvert: Record<string, string> = {
+    no_filter: 'Tất cả',
+    pending_approval: 'Chờ duyệt',
+    approved: 'Đã duyệt',
+    rejected: 'Đã từ chối',
+    active: 'Đang hoạt động',
+    waiting_car_delivery: 'Đợi giao xe',
+    pending_application: 'Đợi hoàn thành thông tin',
+};
+
 const MyCar: React.FC = () => {
     const authCtx = useContext(AuthConText);
     const token = authCtx.access_token;
@@ -86,19 +96,10 @@ const MyCar: React.FC = () => {
         setLoading(true);
 
         try {
-            let carStatus;
-            if (activeTab === 'pending_application') {
-                carStatus = [
-                    'pending_application:pending_car_images',
-                    'pending_application:pending_car_caveat',
-                    'pending_application:pending_price',
-                ];
-            } else {
-                carStatus = [activeTab];
-            }
+
             console.log('PAGE: ', page);
             const response = await axios.get(
-                `https://minhhungcar.xyz/partner/cars?offset=${(page - 1) * 2}&limit=100&car_status=${carStatus.join(',')}`,
+                `https://minhhungcar.xyz/partner/cars?offset=${(page - 1) * 2}&limit=100&car_status=${activeTab}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -226,14 +227,14 @@ const MyCar: React.FC = () => {
 
                 <View style={styles.tabContainer}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollViewContent}>
-                        {Object.keys(statusConvert).map((statusKey) => (
+                        {Object.keys(TabConvert).map((statusKey) => (
                             <TouchableOpacity
                                 key={statusKey}
                                 style={[styles.tabItem, activeTab === statusKey && styles.activeTabItem]}
                                 onPress={() => handleTabPress(statusKey)}
                             >
                                 <Text style={[styles.tabText, activeTab === statusKey && styles.activeTabText]}>
-                                    {statusConvert[statusKey]}
+                                    {TabConvert[statusKey]}
                                 </Text>
                             </TouchableOpacity>
                         ))}

@@ -39,7 +39,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="activity"
         options={{
-          title: 'Hoạt động mới nhất',
+          title: 'Hoạt động của xe',
           tabBarLabel: 'Hoạt động',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'file-document' : 'file-document-outline'} color={color} />
