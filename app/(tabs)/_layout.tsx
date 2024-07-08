@@ -4,26 +4,15 @@ import React from 'react';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Stack } from 'expo-router';
-
-// const Stack = createNativeStackNavigator();
-
-const GlobalStyles = {
-  colors: {
-    backgroundColorActive: '#773BFF',
-    backgroundColorInactive: '#6C6C6C',
-  },
-};
 
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const colorScheme = 'light';
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme].tint,
         // headerShown: false,
       }}>
       <Tabs.Screen

@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import {
     StyleSheet,
     Text,
     View,
-    Image,
     TextInput,
     FlatList,
     Dimensions,
     TouchableOpacity,
     KeyboardAvoidingView,
     Platform,
+    Alert,
+    ListRenderItem,
+    ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { AuthConText } from '@/store/AuthContext';
+import axios from 'axios';
 
 const { width } = Dimensions.get('window');
 
@@ -20,115 +23,170 @@ interface Message {
     id: number;
     sent: boolean;
     msg: string;
-    image: string;
+    content?: string;
+    msg_type: string;
+    conversation_id?: number;
+    sender: string;
 }
 
-const initialMessages: Message[] = [
-    {
-        id: 1,
-        sent: true,
-        msg: 'Xin chào! Tôi có thể giúp gì cho anh/chị?',
-        image: 'https://www.bootdey.com/img/Content/avatar/avatar1.png',
-    },
-    {
-        id: 2,
-        sent: true,
-        msg: 'Bạn có quan tâm đến sản phẩm nào không?',
-        image: 'https://www.bootdey.com/img/Content/avatar/avatar1.png',
-    },
-    {
-        id: 3,
-        sent: false,
-        msg: 'Xin chào! Tôi muốn hỏi thông tin về sản phẩm này.',
-        image: 'https://www.bootdey.com/img/Content/avatar/avatar6.png',
-    },
-    {
-        id: 4,
-        sent: true,
-        msg: 'Sản phẩm này có sẵn và đảm bảo chất lượng.',
-        image: 'https://www.bootdey.com/img/Content/avatar/avatar1.png',
-    },
-    {
-        id: 5,
-        sent: false,
-        msg: 'Tôi muốn biết thêm về chi tiết kỹ thuật của sản phẩm.',
-        image: 'https://www.bootdey.com/img/Content/avatar/avatar6.png',
-    },
-    {
-        id: 6,
-        sent: true,
-        msg: 'Sản phẩm này có thể đáp ứng các nhu cầu của bạn.',
-        image: 'https://www.bootdey.com/img/Content/avatar/avatar1.png',
-    },
-    {
-        id: 7,
-        sent: false,
-        msg: 'Tôi cần thêm thông tin về chính sách bảo hành.',
-        image: 'https://www.bootdey.com/img/Content/avatar/avatar6.png',
-    },
-    {
-        id: 8,
-        sent: false,
-        msg: 'Sản phẩm này có giao hàng miễn phí không?',
-        image: 'https://www.bootdey.com/img/Content/avatar/avatar6.png',
-    },
-];
+// interface ChatHistory {
+//     id: number;
+//     conversation_id: number;
+//     sender: number;
+//     account: {
+//         role_id: number;
+//         phone_number: string;
+//     };
+//     content: string;
+//     created_at: string;
+// }
+
+interface ChatHistory {
+    sender: number;
+    content: string;
+}
+
+const MessageTypes = {
+    USER_JOIN: "USER_JOIN",
+    TEXTING: "TEXTING",
+    SYSTEM_USER_JOIN_RESPONSE: "SYSTEM_USER_JOIN_RESPONSE",
+    ERROR: "ERROR",
+};
 
 const ChatScreen: React.FC = () => {
-    const [messages, setMessages] = useState<Message[]>(initialMessages);
+    const authCtx = useContext(AuthConText);
+    const token = authCtx.access_token;
+
+    const [userMessages, setUserMessages] = useState<ChatHistory[]>([]);
     const [newMessage, setNewMessage] = useState<string>('');
+    const [conversationId, setConversationId] = useState<number>(-1);
+    const [historyMess, setHistoryMess] = useState<ChatHistory[]>([]);
+    const socketRef = useRef<WebSocket | null>(null);
 
-    const reply = () => {
-        const messagesList = [...messages];
-        messagesList.push({
-            id: Math.floor(Math.random() * 99999999999999999 + 1),
-            sent: false,
-            msg: newMessage,
-            image: 'https://www.bootdey.com/img/Content/avatar/avatar6.png',
-        });
-        setNewMessage('');
-        setMessages(messagesList);
-    };
+    useEffect(() => {
+        if (!socketRef.current) {
+            const webSocket = new WebSocket('wss://minhhungcar.xyz/chat');
 
-    const send = () => {
-        if (newMessage.length > 0) {
-            const messagesList = [...messages];
-            const newMessageItem = {
-                id: Math.floor(Math.random() * 99999999999999999 + 1),
-                sent: true, // Set this message as sent by the user
-                msg: newMessage,
-                image: 'https://www.bootdey.com/img/Content/avatar/avatar1.png',
+            webSocket.onopen = () => {
+                console.log('WebSocket connection opened');
+                webSocket.send(
+                    JSON.stringify({
+                        msg_type: MessageTypes.USER_JOIN,
+                        access_token: `Bearer ${token}`,
+                        conversation_id: conversationId,
+                    })
+                );
             };
-            messagesList.push(newMessageItem);
-            setMessages(messagesList);
-            setNewMessage('');
-            setTimeout(() => {
-                reply();
-            }, 2000);
+
+            webSocket.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                console.log('Received message:', e.data);
+                handleResponse(data);
+            };
+
+            webSocket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                Alert.alert('Error', 'WebSocket connection error');
+            };
+
+            webSocket.onclose = () => {
+                console.log('WebSocket connection closed');
+            };
+
+            socketRef.current = webSocket;
+        }
+
+        if (conversationId !== -1) {
+            getHistoryChat();
+        }
+    }, [conversationId]);
+
+    const sendMessage = async () => {
+        try {
+            if (socketRef.current && newMessage.trim()) {
+                const message = {
+                    conversation_id: conversationId,
+                    msg_type: MessageTypes.TEXTING,
+                    content: newMessage,
+                    access_token: `Bearer ${token}`,
+                };
+
+                console.log('Sending message:', message);
+                socketRef.current.send(JSON.stringify(message));
+                setNewMessage('');
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            Alert.alert('Error', 'Failed to send message');
         }
     };
 
-    const renderItem = ({ item }: { item: Message }) => {
-        return item.sent ? (
-            <View style={styles.sentMsg}>
-                <LinearGradient
-                    colors={['#447EFF', '#773BFF']}
-                    start={{ x: 0, y: 0.5 }}
-                    end={{ x: 1, y: 0.5 }}
-                    locations={[0.09, 0.67]}
-                    style={styles.sentMsgBlock}
-                >
-                    <Text style={styles.sentMsgTxt}>{item.msg}</Text>
-                </LinearGradient>
-            </View>
-        ) : (
-            <View style={styles.receivedMsg}>
-                <Image source={{ uri: item.image }} style={styles.userPic} />
-                <View style={styles.receivedMsgBlock}>
-                    <Text style={styles.receivedMsgTxt}>{item.msg}</Text>
+    const handleResponse = (data: any) => {
+        switch (data.msg_type) {
+            case MessageTypes.TEXTING:
+                if (data.sender === 'system') {
+                    return;
+                }
+                if (data.sender === 'admin') {
+                    setUserMessages((prev) => [
+                        ...prev,
+                        { content: data.content, sender: data.sender === "admin" ? 1 : data.sender },
+                    ]);
+                }
+                break;
+            case MessageTypes.SYSTEM_USER_JOIN_RESPONSE:
+                setConversationId(data.conversation_id);
+                break;
+            case MessageTypes.ERROR:
+                if (data.content.includes('foreign key constraint "messages_conversation_id_fkey"')) {
+                    Alert.alert('Error', 'Invalid conversation ID');
+                } else {
+                    Alert.alert('Error', data.content);
+                }
+                break;
+            default:
+                break;
+        }
+    };
+
+    const getHistoryChat = async () => {
+        try {
+            const response = await axios.get(
+                `https://minhhungcar.xyz/customer/conversation/messages?conversation_id=${conversationId}&offset=0&limit=100`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            // console.log('Chat history response:', response.data.data); // Log the response data
+            setHistoryMess(response.data.data);
+        } catch (error: any) {
+            console.log(error.response.data.message);
+        }
+    };
+
+    const renderItemHis: ListRenderItem<ChatHistory> = ({ item }) => {
+        console.log('Rendering item:', item); // Log each item being rendered
+        if (item.sender === 1) {
+            return (
+                <View style={styles.receivedMsg}>
+                    <View style={styles.receivedMsgBlock}>
+                        <Text style={styles.receivedMsgTxt}>{item.content}</Text>
+                    </View>
                 </View>
-            </View>
-        );
+            );
+        } else {
+            return (
+                <View style={styles.sentMsg}>
+                    <LinearGradient
+                        colors={['#A5B4FC', '#C084FC']}
+                        start={{ x: 0, y: 0.5 }}
+                        end={{ x: 1, y: 0.5 }}
+                        locations={[0.09, 0.67]}
+                        style={styles.sentMsgBlock}
+                    >
+                        <Text style={styles.sentMsgTxt}>{item.content}</Text>
+                    </LinearGradient>
+                </View>
+            );
+        }
     };
 
     return (
@@ -137,26 +195,28 @@ const ChatScreen: React.FC = () => {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
         >
+
             <FlatList
                 contentContainerStyle={{ paddingBottom: 10 }}
-                extraData={messages}
-                data={messages}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={renderItem}
-                inverted // Display messages from bottom to top
+                extraData={historyMess}
+                data={historyMess as ChatHistory[]}
+                keyExtractor={(item, index) => `${item.sender}-${index}`}
+                renderItem={renderItemHis}
+                inverted
             />
+
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
                     placeholderTextColor="#696969"
                     onChangeText={setNewMessage}
                     blurOnSubmit={false}
-                    onSubmitEditing={send}
+                    onSubmitEditing={sendMessage}
                     placeholder="Type a message"
                     returnKeyType="send"
                     value={newMessage}
                 />
-                <TouchableOpacity onPress={send} style={styles.sendButton}>
+                <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
                     <Text style={styles.sendButtonText}>Gửi</Text>
                 </TouchableOpacity>
             </View>
@@ -164,6 +224,7 @@ const ChatScreen: React.FC = () => {
     );
 };
 
+// Styles for components
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -218,7 +279,7 @@ const styles = StyleSheet.create({
     sentMsgBlock: {
         maxWidth: width * 0.7,
         borderRadius: 10,
-        backgroundColor: '#6897FF',
+        // backgroundColor: '#6897FF',
         padding: 10,
         marginLeft: 0,
     },
@@ -226,12 +287,8 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: 'white',
     },
-    userPic: {
-        height: 30,
-        width: 30,
-        borderRadius: 20,
-        backgroundColor: '#f8f8f8',
-    },
 });
 
 export default ChatScreen;
+
+

@@ -107,6 +107,12 @@ const ProfileScreen: React.FC = () => {
 
     const submitForm = async () => {
         try {
+            // Check if any fields are blank
+            if (!firstName || !lastName || !phoneNum || !IDCard || !day || !month || !year || !email) {
+                Alert.alert('Lỗi', 'Vui lòng điền đầy đủ tất cả các trường.');
+                return;
+            }
+
             // Validate phoneNum
             if (!phoneNum || phoneNum.length !== 10 || !phoneNum.startsWith('0')) {
                 Alert.alert('Lỗi', 'Vui lòng nhập số điện thoại có 10 chữ số và bắt đầu bằng số 0.');
