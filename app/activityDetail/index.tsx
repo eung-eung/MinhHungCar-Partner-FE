@@ -6,7 +6,11 @@ import { useLocalSearchParams } from 'expo-router';
 
 export default function ActivityDetailScreen() {
     const params = useLocalSearchParams()
-    const { licensePlate, carName, startDate, endDate, feebackRating, feebackContent, rentPrice, customerName, avatarUrl } = params
+    const { licensePlate, carName, startDate, endDate, feebackRating, feebackContent, rentPrice, customerName, avatarUrl, net_receive } = params
+    const formatNumber = (number: any) => {
+        return new Intl.NumberFormat('vi-VN').format(number);
+    };
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             <ScrollView>
@@ -16,8 +20,9 @@ export default function ActivityDetailScreen() {
                         <Text style={styles.date}>{startDate} → {endDate}</Text>
                         <Text style={styles.name}>{carName}</Text>
                         <Text style={styles.plate}>Biển số xe: {licensePlate}</Text>
-                        <Text style={styles.price}>Giá thuê: {rentPrice?.toLocaleString()} đ</Text>
-                        <Text style={styles.price}>Thực nhận: 680.000 đ</Text>
+                        <Text style={styles.price}>Giá thuê: {formatNumber(rentPrice)} đ</Text>
+                        <Text style={styles.price}>Thực nhận: {formatNumber(net_receive)} đ</Text>
+
                         {(feebackRating && feebackContent) ?
                             <View style={{ flexDirection: 'row' }}>
                                 <Text style={styles.ratingText}>Đánh giá: </Text>

@@ -35,7 +35,7 @@ interface Activity {
   insurance_amount: number;
   feedback_rating: number;
   feedback_content: string;
-
+  net_receive: number;
 
 }
 
@@ -222,14 +222,15 @@ const HistoryScreen: React.FC = () => {
                                   router.push({
                                     pathname: '/activityDetail', params: {
                                       licensePlate: act.car.license_plate,
-                                      carName: act.car.car_model + ' ' + act.car.car_model.model + ' ' + act.car.car_model.year,
+                                      carName: `${act.car.car_model.brand} ${act.car.car_model.model} ${act.car.car_model.year}`,
                                       startDate: startDate,
                                       endDate: endDate,
                                       feebackRating: act.feedback_rating,
                                       feebackContent: act.feedback_content,
                                       rentPrice: act.rent_price,
                                       customerName: act.customer.first_name + ' ' + act.customer.last_name,
-                                      avatarUrl: act.customer.avatar_url
+                                      avatarUrl: act.customer.avatar_url,
+                                      net_receive: act.net_receive
                                     }
                                   })
                                 }}
