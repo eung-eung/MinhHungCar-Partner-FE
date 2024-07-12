@@ -56,6 +56,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="notification"
+        options={{
+          title: 'Thông báo mới nhất',
+          tabBarLabel: 'Thông báo',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'bell' : 'bell-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="setting"
         options={{
           tabBarLabel: 'Tôi',
