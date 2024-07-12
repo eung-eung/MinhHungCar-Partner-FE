@@ -30,22 +30,65 @@ interface CarDetail {
     status: string;
     motion: string;
     fuel: string;
+    rating: number;
+    license_plate: string;
 }
 
-const comments = [
-    {
-        id: 1,
-        author: 'Jane Doe',
-        authorAvatar: 'https://www.bootdey.com/img/Content/avatar/avatar2.png',
-        text: 'Dịch vụ tốt!',
-    },
-    {
-        id: 2,
-        author: 'John Smith',
-        authorAvatar: 'https://www.bootdey.com/img/Content/avatar/avatar3.png',
-        text: 'Xe chất lượng ok, giá cả hợp lý, MinhHungCar hỗ trợ khách hàng nhiệt tình',
-    },
-];
+interface Feedback {
+    id: number;
+    customer_id: number;
+    customer: {
+        first_name: string;
+        last_name: string;
+        avatar_url: string
+    };
+    car_id: number;
+    feedback_content: string;
+    feedback_rating: string;
+    created_at: string
+}
+
+function formatDate(dateString: string) {
+    // Parse the date string
+    const date = new Date(dateString);
+
+    // Extract day, month, and year
+    const day = date.getUTCDate();
+    const month = date.getUTCMonth() + 1; // Months are zero-based, so we add 1
+    const year = date.getUTCFullYear();
+
+    // Format the date as day/month/year
+    return `${day}/${month}/${year}`;
+}
+
+const getStatusStyles = (status: any) => {
+    switch (status) {
+        case 'pending_approval':
+            return { borderColor: '#F89F36', color: '#F89F36', borderRadius: 15, borderWidth: 1 };
+        case 'approved':
+            return { borderColor: '#773BFF', color: '#773BFF', borderRadius: 15, borderWidth: 1 };
+        case 'rejected':
+            return { borderColor: '#FF4040', color: '#FF4040', borderRadius: 15, borderWidth: 1 };
+        case 'active':
+            return { borderColor: '#53D23E', color: '#53D23E', borderRadius: 15, borderWidth: 1 };
+        case 'waiting_car_delivery':
+            return { borderColor: '#56AEFF', color: '#56AEFF', borderRadius: 15, borderWidth: 1 };
+        default:
+            return { borderColor: 'gray', color: 'gray', borderRadius: 15, borderWidth: 1 };
+    }
+};
+
+const statusConvert: Record<string, string> = {
+    no_filter: 'Tất cả',
+    pending_approval: 'Chờ duyệt',
+    approved: 'Đã duyệt',
+    rejected: 'Đã từ chối',
+    active: 'Đang hoạt động',
+    waiting_car_delivery: 'Đợi giao xe',
+    'pending_application:pending_car_images': 'Chưa đăng kí hình ảnh',
+    'pending_application:pending_car_caveat': 'Chưa đăng kí giấy tờ xe',
+    'pending_application:pending_price': 'Chưa đăng kí thông tin giá cả',
+};
 
 export default function DetailScreen() {
     const router = useRouter();
@@ -55,23 +98,25 @@ export default function DetailScreen() {
     const token = authCtx.access_token;
 
     // const [detailCar, setDetailCar] = useState<CarDetail>({CarDetail});
-    const [detailCar, setDetailCar] = useState<CarDetail>({
-        images: [],
-        total_trip: 0,
-        status: '',
-        fuel: '',
-        motion: ''
-    });
+    const [detailCar, setDetailCar] = useState<CarDetail | undefined>(undefined);
     const [isLoading, setLoading] = useState(true);
+    const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+
+    const [offset, setOffset] = useState(0);
+    const limit = 20; // Adjust the limit as needed
+    const [hasMoreFeedbacks, setHasMoreFeedbacks] = useState(true);
 
     useEffect(() => {
         getDetailCar();
-    }, []);
+        getFeedbackByCar();
+    }, [slug]);
 
     const getDetailCar = async () => {
         try {
             const response = await axios.get(`https://minhhungcar.xyz/car/${slug}`);
             setDetailCar(response.data.data);
+            // setStatus(response.data.data.status)
+            // console.log("status detail: ", response.data.data.status)
             console.log('Fetch successfully: ', response.data.message);
             setLoading(false);
         } catch (error: any) {
@@ -83,6 +128,38 @@ export default function DetailScreen() {
         }
     };
 
+    //get feeback by car
+    const getFeedbackByCar = async (newOffset = offset) => {
+        try {
+            const response = await axios.get(`https://minhhungcar.xyz/partner/feedbacks/car?car_id=${slug}&offset=${newOffset}&limit=${limit}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            });
+
+            if (response.data.data.feedbacks.length < limit) {
+                setHasMoreFeedbacks(false); // No more feedbacks to load
+            }
+
+            setFeedbacks((prevFeedbacks) => [
+                ...prevFeedbacks,
+                ...response.data.data.feedbacks
+            ]);
+            console.log(feedbacks)
+            setOffset(newOffset + limit);
+
+        } catch (error: any) {
+            if (error.response.data.error_code === 10078) {
+                Alert.alert('', 'Tạm thời không thể xem được đánh giá!');
+                console.log('Error get feedback: ', error.response.data.message);
+            } else {
+                Alert.alert('', 'Có vài lỗi xảy ra. Vui lòng thử lại sau!');
+                console.log("Error getDetail: ", error.response.data.message);
+            }
+        }
+    };
+
+
     return (
         <View style={{ flex: 1 }}>
             <StatusBar barStyle="dark-content" />
@@ -93,127 +170,149 @@ export default function DetailScreen() {
             ) : (
                 <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
                     <View style={styles.container}>
-                        <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-                            <View style={styles.photos}>
-                                {Array.isArray(detailCar.images) && detailCar.images.length > 0 ? (
-                                    <Swiper
-                                        renderPagination={(index, total) => (
-                                            <View style={styles.photosPagination}>
-                                                <Text style={styles.photosPaginationText}>
-                                                    {index + 1} of {total}
-                                                </Text>
-                                            </View>
-                                        )}
-                                    >
-                                        {detailCar.images.map((src, index) => (
-                                            <Image
-                                                key={index}
-                                                source={{ uri: src }}
-                                                style={styles.photosImg}
-                                                resizeMode="cover"
-                                            />
-                                        ))}
-                                    </Swiper>
-                                ) : (
-                                    <Text style={styles.errorText}>Không có hình ảnh xe</Text>
-                                )}
-                            </View>
+                        {detailCar ? (
+                            <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
 
-                            <View style={styles.info}>
-                                <View>
-                                    <Text style={styles.infoTitle}>
-                                        {detailCar.car_model?.brand + ' ' + detailCar.car_model?.model + ' ' + detailCar.car_model?.year}
-                                    </Text>
+                                <View style={styles.photos}>
+                                    {Array.isArray(detailCar.images) && detailCar.images.length > 0 ? (
+                                        <Swiper
+                                            renderPagination={(index, total) => (
+                                                <View style={styles.photosPagination}>
+                                                    <Text style={styles.photosPaginationText}>
+                                                        {index + 1} of {total}
+                                                    </Text>
+                                                </View>
+                                            )}
+                                        >
+                                            {detailCar.images.map((src, index) => (
+                                                <Image
+                                                    key={index}
+                                                    source={{ uri: src }}
+                                                    style={styles.photosImg}
+                                                    resizeMode="cover"
+                                                />
+                                            ))}
+                                        </Swiper>
+                                    ) : (
+                                        <Text style={styles.errorText}>Không có hình ảnh xe</Text>
+                                    )}
+                                </View>
 
-                                    <View style={styles.infoRating}>
-
-                                        <TabBarIcon name='star' size={26} color="#F3CA52" style={{ marginRight: 5 }} />
-                                        <Text style={styles.infoRatingLabel}>5.0</Text>
-
-
-                                        <TabBarIcon name='history' size={26} color='green' style={{ marginRight: 5, marginLeft: 25 }} />
-                                        <Text style={styles.infoRatingLabel}>{detailCar.total_trip} chuyến</Text>
-                                    </View>
-
+                                <View style={styles.info}>
                                     <View>
-                                        {(detailCar.status === 'approved' || detailCar.status === 'active' || detailCar.status === 'waiting_car_delivery') && (
-                                            <View style={{ flexDirection: 'row' }}>
-                                                <TouchableOpacity style={styles.button} onPress={() =>
-                                                    router.push({ pathname: "/contract", params: { carId: slug } })}>
-                                                    <Text style={styles.buttonText}>Xem hợp đồng</Text>
-                                                </TouchableOpacity>
-                                                <TouchableOpacity style={styles.buttonCancel} onPress={() => { }}>
-                                                    <Text style={{ padding: 5, textAlign: 'center', color: 'white' }}>Hủy</Text>
-                                                </TouchableOpacity>
-                                            </View>
-                                        )}
-                                    </View>
-                                </View>
-                            </View>
-
-                            <Divider style={{ marginTop: 20 }} />
-                            <View style={styles.character}>
-                                <Text style={styles.characterTitle}>Đặc điểm</Text>
-                                <View style={styles.characterContent}>
-                                    <View style={styles.card}>
-                                        {/* <Image source={require('../assets/transmission.png')} style={styles.cardImg} /> */}
-                                        <TabBarIcon name='car-shift-pattern' style={styles.cardImg} />
-                                        <Text style={styles.cardLabel}>Truyền động</Text>
-                                        <Text style={styles.cardContent}>
-                                            {detailCar.motion === 'automatic_transmission' ? 'Số tự động' : 'Số sàn'}
+                                        <Text style={styles.infoTitle}>
+                                            {detailCar.car_model?.brand + ' ' + detailCar.car_model?.model + ' ' + detailCar.car_model?.year}
                                         </Text>
-                                    </View>
 
-                                    <View style={styles.card}>
-                                        <TabBarIcon name='seat' style={styles.cardImg} />
-                                        <Text style={styles.cardLabel}>Số ghế</Text>
-                                        <Text style={styles.cardContent}>{detailCar.car_model?.number_of_seats} chỗ </Text>
-                                    </View>
+                                        <View style={styles.infoRating}>
 
-                                    <View style={styles.card}>
-                                        <TabBarIcon name='gas-station-outline' style={styles.cardImg} />
-                                        <Text style={styles.cardLabel}>Nhiên liệu</Text>
-                                        <Text style={styles.cardContent}>
-                                            {detailCar.fuel === 'electricity' ? 'Điện' : (detailCar.fuel === 'oil' ? 'Dầu' : 'Xăng')}
-                                        </Text>
-                                    </View>
-                                </View>
-                            </View>
+                                            <TabBarIcon name='star' size={26} color="#F3CA52" style={{ marginRight: 5 }} />
+                                            <Text style={styles.infoRatingLabel}>{detailCar.rating}</Text>
 
-                            <Divider style={{ marginTop: 20, marginBottom: 5 }} />
-                            <View style={styles.comment}>
-                                <Text style={styles.commentTitle}>Đánh giá</Text>
-                                <View>
-                                    {comments.map((item) => (
-                                        <View key={item.id.toString()} style={styles.commentContainer}>
-                                            <Image source={{ uri: item.authorAvatar }} style={styles.commentAvatar} />
-                                            <View style={styles.commentTextContainer}>
-                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                                    <Text style={styles.commentAuthor}>{item.author}</Text>
-                                                    <Text style={styles.commentDate}>19/05/2024</Text>
-                                                </View>
 
-                                                <View style={styles.commentRating}>
-                                                    <TabBarIcon name='star' color='#F3CA52' style={{ width: 20, height: 20 }} />
-                                                    <Text>5</Text>
-                                                </View>
-                                                <Text style={styles.commentText}>{item.text}</Text>
-                                            </View>
+                                            <TabBarIcon name='history' size={26} color='green' style={{ marginRight: 5, marginLeft: 25 }} />
+                                            <Text style={styles.infoRatingLabel}>{detailCar.total_trip} chuyến</Text>
                                         </View>
-                                    ))}
-                                    <TouchableOpacity
-                                        style={styles.seeMoreContainer}
-                                        onPress={() => {
 
-                                        }}>
 
-                                        <Text style={styles.seeMore}>Xem thêm</Text>
+                                        <View >
+                                            <Text style={[styles.statusText, getStatusStyles(detailCar?.status)]}>
+                                                {statusConvert[detailCar?.status]}
+                                            </Text>
+                                        </View>
 
-                                    </TouchableOpacity>
+
+                                        <View>
+                                            {(detailCar.status === 'approved' || detailCar.status === 'active' || detailCar.status === 'waiting_car_delivery') && (
+                                                <View style={{ flexDirection: 'row' }}>
+                                                    <TouchableOpacity style={styles.button} onPress={() =>
+                                                        router.push({ pathname: "/contract", params: { carId: slug } })}>
+                                                        <Text style={styles.buttonText}>Xem hợp đồng</Text>
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity style={styles.buttonCancel} onPress={() => { }}>
+                                                        <Text style={{ padding: 5, textAlign: 'center', color: 'white' }}>Hủy</Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            )}
+                                        </View>
+                                    </View>
                                 </View>
-                            </View>
 
-                        </ScrollView>
+                                <Divider style={{ marginTop: 20 }} />
+                                <View style={styles.character}>
+                                    <Text style={styles.characterTitle}>Đặc điểm</Text>
+                                    <View style={styles.characterContent}>
+                                        <View style={styles.card}>
+                                            {/* <Image source={require('../assets/transmission.png')} style={styles.cardImg} /> */}
+                                            <TabBarIcon name='car-shift-pattern' style={styles.cardImg} />
+                                            <Text style={styles.cardLabel}>Truyền động</Text>
+                                            <Text style={styles.cardContent}>
+                                                {detailCar.motion === 'automatic_transmission' ? 'Số tự động' : 'Số sàn'}
+                                            </Text>
+                                        </View>
+
+                                        <View style={styles.card}>
+                                            <TabBarIcon name='seat' style={styles.cardImg} />
+                                            <Text style={styles.cardLabel}>Số ghế</Text>
+                                            <Text style={styles.cardContent}>{detailCar.car_model?.number_of_seats} chỗ </Text>
+                                        </View>
+
+                                        <View style={styles.card}>
+                                            <TabBarIcon name='gas-station-outline' style={styles.cardImg} />
+                                            <Text style={styles.cardLabel}>Nhiên liệu</Text>
+                                            <Text style={styles.cardContent}>
+                                                {detailCar.fuel === 'electricity' ? 'Điện' : (detailCar.fuel === 'oil' ? 'Dầu' : 'Xăng')}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                </View>
+
+                                <View>
+                                    {feedbacks.length > 0 && (
+                                        <>
+                                            <Divider style={{ marginTop: 12, marginBottom: 22 }} />
+                                            <Text style={styles.commentTitle}>Đánh giá</Text>
+                                        </>
+                                    )}
+                                    {feedbacks.map((item) => (
+                                        (item.feedback_content && item.feedback_rating) && (
+                                            <View key={item.id.toString()} style={styles.comment}>
+                                                <View style={styles.commentContainer}>
+                                                    {item.customer.avatar_url ?
+                                                        <Image source={{ uri: item.customer.avatar_url }} style={styles.commentAvatar} />
+                                                        :
+                                                        <TabBarIcon name='account-circle' size={40} style={styles.commentAvatar} />
+                                                    }
+                                                    <View style={styles.commentTextContainer}>
+                                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                            <Text style={styles.commentAuthor}>{item.customer.first_name + ' ' + item.customer.last_name}</Text>
+                                                            <Text style={styles.commentDate}>{formatDate(item.created_at)}</Text>
+                                                        </View>
+                                                        <View style={styles.commentRating}>
+                                                            <TabBarIcon name='star' size={19} color='#F4CE14' style={{ marginRight: 3 }} />
+                                                            <Text>{item.feedback_rating}</Text>
+                                                        </View>
+                                                        <Text style={styles.commentText}>{item.feedback_content}</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        )
+                                    ))}
+                                    {hasMoreFeedbacks && (
+                                        <TouchableOpacity
+                                            style={styles.seeMoreContainer}
+                                            onPress={() => getFeedbackByCar(offset)}
+                                        >
+                                            <Text style={styles.seeMore}>Xem thêm</Text>
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
+
+
+                            </ScrollView>
+                        ) : (
+                            <Text style={{ color: '#B4B4B8', textAlign: 'center', marginTop: 100 }}>No data available</Text>
+                        )}
                     </View>
                 </SafeAreaView>
             )}
@@ -290,9 +389,9 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         paddingHorizontal: 20,
         borderRadius: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
+        // flexDirection: 'row',
+        // justifyContent: 'space-between',
+        // alignItems: 'center'
     },
     infoTitle: {
         fontSize: 20,
@@ -434,8 +533,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 8,
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: 'flex-end',
+        justifyContent: 'flex-end',
         borderWidth: 1,
         backgroundColor: '#773BFF',
         borderColor: '#773BFF',
@@ -472,5 +571,14 @@ const styles = StyleSheet.create({
     errorText: {
         textAlign: 'center',
         justifyContent: 'center'
-    }
+    },
+    statusText: {
+        fontWeight: 'bold',
+        marginBottom: 15,
+        padding: 5,
+        paddingHorizontal: 10,
+        width: 180,
+        textAlign: 'center'
+    },
+
 });

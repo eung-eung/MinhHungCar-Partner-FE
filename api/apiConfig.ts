@@ -42,3 +42,7 @@ export const apiPayment = {
     //method: put
     updatePaymentInfo: `${endpoint}/payment_info`,
 }
+
+export const apiExpoToken = {
+    expoPushToken: `${endpoint}/partner/expo_push_token`,
+}

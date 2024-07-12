@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "MinhHungCar-Partner-FE",
-    "slug": "MinhHungCar-Partner-FE",
+    "slug": "minhhungcar-partner-fe",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -31,6 +31,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "206990e6-ffc1-4934-a48c-c07aa4a91a3a"
+      }
+    },
+    "owner": "trangchang"
   }
 }
