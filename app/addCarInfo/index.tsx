@@ -84,9 +84,16 @@ const AddCarInformationScreen: React.FC = () => {
         fetchPeriodData();
         fetchFuelData();
         fetchMotionData();
-        fetchParkingLotData();
-        fetchParkingLotMetadata();
+
     }, []);
+
+    useEffect(() => {
+        fetchParkingLotData();
+    }, []);
+
+    useEffect(() => {
+        fetchParkingLotMetadata();
+    }, [selectedSeat]);
 
     useEffect(() => {
         if (id && basePrice) {
@@ -154,26 +161,33 @@ const AddCarInformationScreen: React.FC = () => {
 
     const fetchParkingLotMetadata = async () => {
         if (selectedSeat) {
+            console.log("Fetching parking lot metadata for seat:", selectedSeat);
             try {
                 const response = await axios.get(`https://minhhungcar.xyz/register_car_metadata/parking_lot?seat_type=${selectedSeat}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+                console.log("API Response:", response.data);
                 const parking_lot: ParkingLotData[] = response.data.data;
                 setParkingLotMetadata(parking_lot);
                 setLoading(false);
             } catch (error: any) {
-                if (error.response.data.error_code === 10044) {
+                console.error("Error fetching parking lot metadata:", error);
+                if (error.response?.data?.error_code === 10044) {
                     Alert.alert('Lỗi', 'Không thể lấy dữ liệu của chỗ để xe');
                 } else {
                     Alert.alert('Lỗi hệ thống', 'Không thể lấy dữ liệu của chỗ để xe');
                 }
             }
         } else {
+            console.log("Selected seat is not set, using parkingLotData");
             setParkingLotMetadata(parkingLotData);
         }
     };
+
+
+
 
     const fetchYearData = async () => {
         try {
@@ -268,41 +282,25 @@ const AddCarInformationScreen: React.FC = () => {
     };
 
     const getCarModelIdAndBasePrice = (model: string, seat: string) => {
-        const selectedCarModel = carList.find(
-            (m) =>
-                m.year.toString() === selectedYear &&
-                m.brand === selectedBrand &&
-                m.model === model &&
-                m.number_of_seats.toString() === seat
+        const filteredCar = carList.find(
+            (car) =>
+                car.year.toString() === selectedYear &&
+                car.brand === selectedBrand &&
+                car.model === model &&
+                car.number_of_seats.toString() === seat
         );
-
-        if (selectedCarModel) {
-            setCarModelId(selectedCarModel.id);
-            setBasePrice(selectedCarModel.based_price.toString());
+        if (filteredCar) {
+            setCarModelId(filteredCar.id);
+            setBasePrice(filteredCar.based_price.toString());
         }
     };
 
-    const handleSeatChange = (seat: string) => {
+    const handleSeatChange = async (seat: string) => {
         setSelectedSeat(seat);
-        fetchParkingLotMetadata();
+        await fetchParkingLotMetadata();
         getCarModelIdAndBasePrice(selectedModel, seat);
     };
 
-    const handleMotionChange = (motionCode: string) => {
-        setSelectedMotionCode(motionCode);
-    };
-
-    const handleFuelChange = (fuelCode: string) => {
-        setSelectedFuelCode(fuelCode);
-    };
-
-    const handleParkingChange = (parkingCode: string) => {
-        setSelectedParking(parkingCode);
-    };
-
-    const handlePeriodChange = (periodCode: string) => {
-        setSelectedPeriodCode(periodCode);
-    };
     const validateLicensePlate = (licensePlate: any) => {
         licensePlate = licensePlate.trim();
 
@@ -317,7 +315,6 @@ const AddCarInformationScreen: React.FC = () => {
 
         return true;
     };
-
     const handleSubmit = async () => {
         if (
             !licensePlate ||
@@ -481,11 +478,11 @@ const AddCarInformationScreen: React.FC = () => {
                                         color: '#9EA0A4',
                                     }}
                                     value={selectedBrand}
-                                    items={brands.map((brand, index) => ({
+                                    items={brands ? brands.map((brand, index) => ({
                                         key: index.toString(),
                                         label: brand,
                                         value: brand,
-                                    }))}
+                                    })) : []}
                                     style={pickerSelectStyles}
                                     Icon={() => {
                                         return <TabBarIcon name='chevron-down' size={24} style={{ paddingRight: 7, paddingTop: 8 }} />
@@ -500,24 +497,24 @@ const AddCarInformationScreen: React.FC = () => {
 
                                 <RNPickerSelect
                                     onValueChange={(model) => handleModelChange(model)}
-
                                     placeholder={{
                                         label: "Chọn mẫu xe",
                                         value: null,
                                         color: '#9EA0A4',
                                     }}
                                     value={selectedModel}
-                                    items={models.map((model, index) => ({
+                                    items={models ? models.map((model, index) => ({
                                         key: index.toString(),
                                         label: model,
                                         value: model,
-                                    }))}
+                                    })) : []}
                                     style={pickerSelectStyles}
                                     Icon={() => {
                                         return <TabBarIcon name='chevron-down' size={24} style={{ paddingRight: 7, paddingTop: 8 }} />
                                     }}
                                 />
                             </View>
+
 
                             <View style={styles.input}>
                                 <Text style={styles.inputLabel}>
@@ -533,11 +530,11 @@ const AddCarInformationScreen: React.FC = () => {
                                         color: 'black',
                                     }}
                                     value={selectedSeat}
-                                    items={seats.map((seat, index) => ({
+                                    items={seats ? seats.map((seat, index) => ({
                                         key: index.toString(),
                                         label: seat,
                                         value: seat,
-                                    }))}
+                                    })) : []}
                                     style={pickerSelectStyles}
                                     Icon={() => {
                                         return <TabBarIcon name='chevron-down' size={24} style={{ paddingRight: 7, paddingTop: 8 }} />
@@ -554,7 +551,7 @@ const AddCarInformationScreen: React.FC = () => {
 
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={styles.radioButtonGroup}>
-                                        {motionData.map((motion) => (
+                                        {motionData ? motionData.map((motion) => (
                                             <TouchableOpacity
                                                 key={motion.code}
                                                 onPress={() => setSelectedMotionCode(motion.code)}
@@ -570,7 +567,7 @@ const AddCarInformationScreen: React.FC = () => {
                                                 </View>
                                                 <Text style={styles.radioText}>{motion.text}</Text>
                                             </TouchableOpacity>
-                                        ))}
+                                        )) : []}
                                     </View>
                                 </View>
                             </View>
@@ -581,7 +578,7 @@ const AddCarInformationScreen: React.FC = () => {
                                 </Text>
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={styles.radioButtonGroup}>
-                                        {fuelData.map((fuel) => (
+                                        {fuelData ? fuelData.map((fuel) => (
                                             <TouchableOpacity
                                                 key={fuel.code}
                                                 onPress={() => setSelectedFuelCode(fuel.code)}
@@ -597,7 +594,7 @@ const AddCarInformationScreen: React.FC = () => {
                                                 </View>
                                                 <Text style={styles.radioText}>{fuel.text}</Text>
                                             </TouchableOpacity>
-                                        ))}
+                                        )) : []}
                                     </View>
                                 </View>
 
@@ -611,7 +608,7 @@ const AddCarInformationScreen: React.FC = () => {
                                 <View style={{ flexDirection: 'row' }}>
                                     <View style={styles.radioButtonGroup}>
                                         {!selectedSeat ? (
-                                            parkingLotData.map((lot) => (
+                                            parkingLotData.length > 0 ? parkingLotData.map((lot) => (
                                                 <TouchableOpacity
                                                     key={lot.code}
                                                     onPress={() => setSelectedParking(lot.code)}
@@ -627,9 +624,9 @@ const AddCarInformationScreen: React.FC = () => {
                                                     </View>
                                                     <Text style={styles.radioText}>{lot.text}</Text>
                                                 </TouchableOpacity>
-                                            ))
+                                            )) : <Text style={styles.noDataText}>No parking data available</Text>
                                         ) : (
-                                            parkingLotMetadata.map((lot) => (
+                                            parkingLotMetadata.length > 0 ? parkingLotMetadata.map((lot) => (
                                                 <TouchableOpacity
                                                     key={lot.code}
                                                     onPress={() => setSelectedParking(lot.code)}
@@ -645,13 +642,13 @@ const AddCarInformationScreen: React.FC = () => {
                                                     </View>
                                                     <Text style={styles.radioText}>{lot.text}</Text>
                                                 </TouchableOpacity>
-                                            ))
+                                            )) : <Text style={styles.noDataText}>No parking data available</Text>
                                         )}
-
-
                                     </View>
                                 </View>
                             </View>
+
+
 
                             <View style={styles.input}>
                                 <Text style={styles.inputLabel}>Kỳ hạn cho thuê xe
@@ -665,11 +662,11 @@ const AddCarInformationScreen: React.FC = () => {
                                         value: null,
                                         color: '#9EA0A4',
                                     }}
-                                    items={periodData.map((period) => ({
+                                    items={periodData ? periodData.map((period) => ({
                                         key: period.code,
                                         label: period.text,
                                         value: period.code,
-                                    }))}
+                                    })) : []}
                                     style={pickerSelectStyles}
                                     Icon={() => {
                                         return <TabBarIcon name='chevron-down' size={24} style={{ paddingRight: 7, paddingTop: 8 }} />
@@ -908,6 +905,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
     },
     radioText: {
+        fontSize: 16,
+    },
+    noDataText: {
+        color: '#B4B4B8',
         fontSize: 16,
     },
 })
