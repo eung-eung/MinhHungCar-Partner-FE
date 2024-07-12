@@ -15,6 +15,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { AuthConText } from '@/store/AuthContext';
 import axios from 'axios';
+import { ActivityIndicator } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -48,6 +49,9 @@ const ChatScreen: React.FC = () => {
     const [newMessage, setNewMessage] = useState<string>('');
     const [conversationId, setConversationId] = useState<number>(-1);
     const socketRef = useRef<WebSocket | null>(null);
+
+    const [isLoading, setLoading] = useState(true)
+
 
     useEffect(() => {
         if (conversationId !== -1) {
@@ -106,10 +110,12 @@ const ChatScreen: React.FC = () => {
                 ]);
 
                 setNewMessage('');
+            } else {
+                Alert.alert('Lỗi', 'Không thể gửi tin nhắn trống');
             }
         } catch (error) {
             console.error('Error sending message:', error);
-            Alert.alert('Error', 'Failed to send message');
+            Alert.alert('Lỗi', 'Gửi tin nhắn thất bại');
         }
     };
 
@@ -148,6 +154,7 @@ const ChatScreen: React.FC = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setMessages(response.data.data);
+            setLoading(false);
         } catch (error: any) {
             console.log(error.response.data.message);
         }
@@ -180,43 +187,54 @@ const ChatScreen: React.FC = () => {
     };
 
     return (
-        <KeyboardAvoidingView
-            style={styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-        >
-            <FlatList
-                contentContainerStyle={{ paddingBottom: 10 }}
-                data={messages}
-                keyExtractor={(item, index) => `${item.sender}-${index}`}
-                renderItem={renderItem}
-                inverted
-            />
+        <>
+            {isLoading ? (
+                <View style={styles.loaderStyle}>
+                    <ActivityIndicator size="large" color="#aaa" />
+                </View>
+            ) : (
+                <KeyboardAvoidingView
+                    style={styles.container}
+                    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+                >
+                    <FlatList
+                        contentContainerStyle={{ paddingBottom: 10 }}
+                        data={messages}
+                        keyExtractor={(item, index) => `${item.sender}-${index}`}
+                        renderItem={renderItem}
+                        inverted
+                    />
 
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    placeholderTextColor="#696969"
-                    onChangeText={setNewMessage}
-                    blurOnSubmit={false}
-                    onSubmitEditing={sendMessage}
-                    placeholder="Type a message"
-                    returnKeyType="send"
-                    value={newMessage}
-                />
-                <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
-                    <Text style={styles.sendButtonText}>Gửi</Text>
-                </TouchableOpacity>
-            </View>
-        </KeyboardAvoidingView>
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            placeholderTextColor="#696969"
+                            onChangeText={setNewMessage}
+                            blurOnSubmit={false}
+                            onSubmitEditing={sendMessage}
+                            placeholder="Type a message"
+                            returnKeyType="send"
+                            value={newMessage}
+                        />
+                        <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+                            <Text style={styles.sendButtonText}>Gửi</Text>
+                        </TouchableOpacity>
+                    </View>
+                </KeyboardAvoidingView>
+            )}
+        </>
     );
 };
 
-// Styles for components
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f1f1f1',
+    },
+    loaderStyle: {
+        marginTop: 100,
+        alignItems: 'center',
     },
     inputContainer: {
         flexDirection: 'row',
