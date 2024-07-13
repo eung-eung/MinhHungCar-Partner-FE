@@ -129,8 +129,8 @@ export default function NotificationScreen() {
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.5}
             ListEmptyComponent={() => (
-                <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyMessage}>Hiện tại chưa có thông báo nào</Text>
+                <View style={styles.emptyChatContainer}>
+                    <Text style={styles.emptyChatText}>Hiện tại chưa có thông báo nào</Text>
                 </View>
             )}
         />
@@ -225,6 +225,16 @@ const styles = StyleSheet.create({
         marginTop: 4,
         alignItems: 'flex-end',
         textAlign: 'right',
+    },
+    emptyChatContainer: {
+        flex: 1,
+        marginTop: 300,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    emptyChatText: {
+        fontSize: 16,
+        color: '#696969',
     },
 });
 

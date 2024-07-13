@@ -49,7 +49,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={{ paddingHorizontal: 24, marginTop: 20 }}>
-                <View style={styles.select}>
+                {/* <View style={styles.select}>
                     <RNPickerSelect
                         onValueChange={(value) => setSelectedValue(value)}
                         placeholder={placeholder}
@@ -62,9 +62,9 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         Icon={() => <TabBarIcon name="chevron-down" size={24} color="black" style={styles.icon} />}
                     />
 
-                </View>
+                </View> */}
                 <View style={styles.totalAvenue}>
-                    <Text style={{ fontSize: 16, fontWeight: '600' }}>Tổng doanh thu</Text>
+                    <Text style={{ fontSize: 16, fontWeight: '600' }}>Tổng thu nhập các tháng</Text>
                     <Text style={{ fontSize: 16 }}>{total.toLocaleString()}</Text>
                 </View>
                 <View style={styles.barChart}>

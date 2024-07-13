@@ -6,6 +6,7 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { AuthConText } from '@/store/AuthContext';
 import { useRouter } from 'expo-router';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+import { apiAccount, apiPayment } from '@/api/apiConfig';
 
 interface Car {
     id: number;
@@ -65,6 +66,30 @@ const TabConvert: Record<string, string> = {
     pending_application: 'Đợi hoàn thành thông tin',
 };
 
+const getStatusStyles = (status: any) => {
+    switch (status) {
+        case 'pending_approval':
+            return { borderColor: '#F89F36', color: '#F89F36' };
+        case 'approved':
+            return { borderColor: '#773BFF', color: '#773BFF' };
+        case 'rejected':
+            return { borderColor: '#FF4040', color: '#FF4040' };
+        case 'active':
+            return { borderColor: '#53D23E', color: '#53D23E' };
+        case 'waiting_car_delivery':
+            return { borderColor: '#56AEFF', color: '#56AEFF' };
+        default:
+            return { borderColor: 'gray', color: 'gray' };
+    }
+};
+
+const getStatusDisplay = (status: any) => {
+    if (status.startsWith('pending_application:')) {
+        return statusConvert[status];
+    }
+    return statusConvert[status];
+};
+
 const MyCar: React.FC = () => {
     const authCtx = useContext(AuthConText);
     const token = authCtx.access_token;
@@ -73,6 +98,12 @@ const MyCar: React.FC = () => {
     const [activeTab, setActiveTab] = useState<string>('no_filter');
     const [isLoading, setLoading] = useState<boolean>(true);
     const [page, setPage] = useState<number>(1); // State for pagination
+
+    const [IdNum, setIdNum] = useState<string>('');
+    const [bankName, setBankName] = useState<string>('');
+    const [bankNum, setBankNum] = useState<string>('');
+    const [bankOwner, setBankOwner] = useState<string>('');
+    const [paymentUrl, setPaymentUrl] = useState<string>('');
 
     const isFocused = useIsFocused();
 
@@ -86,10 +117,16 @@ const MyCar: React.FC = () => {
         }, [activeTab, page, isFocused])
     );
 
+
     console.log(isFocused);
     // const loadMoreItem = () => {
     //   setPage(page => page + 1)
     // }
+    useEffect(() => {
+        getProfile();
+        getPaymentInfo();
+    }, [IdNum, bankNum, bankName, isFocused])
+
 
     const getRegisteredCar = async () => {
         // if(!isLoading){}
@@ -121,6 +158,91 @@ const MyCar: React.FC = () => {
         }
     };
 
+    const getProfile = async () => {
+        try {
+            const response = await axios.get(apiAccount.getProfile, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+
+            setIdNum(response.data.data.identification_card_number);
+
+            console.log('Fetch profile successfully ', response.data.data);
+            setLoading(false);
+        } catch (error: any) {
+            if (error.response?.data?.error_code === 10039) {
+                Alert.alert('', 'Không thể lấy thông tin tài khoản');
+            } else {
+                console.log('Error: ', error.response?.data?.message);
+            }
+        }
+    };
+
+    const getPaymentInfo = async () => {
+        try {
+            const response = await axios.get(apiPayment.getPaymentInfo, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            })
+            setBankName(response.data.data.bank_name);
+            setBankNum(response.data.data.bank_number);
+            setBankOwner(response.data.data.bank_owner);
+            setPaymentUrl(response.data.data.qr_code_url);
+
+        } catch (error: any) {
+            console.log("error fetch paymeny info: ", error.response.data.message)
+        }
+    }
+
+    const handleAddCar = async () => {
+        console.log("paymenturl:", paymentUrl)
+        console.log("bankNum:", bankNum)
+        if (IdNum === "") {
+            Alert.alert(
+                'Yêu cầu cập nhật',
+                'Bạn chưa cập nhật thông tin tài khoản. Tiến hành cập nhật ngay!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            router.push('/profile');
+                        },
+                    },
+                    {
+                        text: 'Hủy',
+                        style: 'cancel',
+                    },
+                ]
+            );
+            return;
+        }
+        if (!paymentUrl && (!bankNum || !bankName)) {
+            Alert.alert(
+                'Yêu cầu cập nhật',
+                'Bạn chưa cập nhật thông tin thanh toán. Tiến hành cập nhật ngay!',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            router.push('/payInfo');
+                        },
+                    },
+                    {
+                        text: 'Hủy',
+                        style: 'cancel',
+                    },
+                ]
+            );
+            return;
+        } else {
+            router.replace("/addCarInfo")
+        }
+
+    }
+
     const handleTabPress = (tabName: any) => {
         setActiveTab(tabName);
         setPage(1);
@@ -128,22 +250,7 @@ const MyCar: React.FC = () => {
         setLoading(true)
     };
 
-    const getStatusStyles = (status: any) => {
-        switch (status) {
-            case 'pending_approval':
-                return { borderColor: '#F89F36', color: '#F89F36' };
-            case 'approved':
-                return { borderColor: '#773BFF', color: '#773BFF' };
-            case 'rejected':
-                return { borderColor: '#FF4040', color: '#FF4040' };
-            case 'active':
-                return { borderColor: '#53D23E', color: '#53D23E' };
-            case 'waiting_car_delivery':
-                return { borderColor: '#56AEFF', color: '#56AEFF' };
-            default:
-                return { borderColor: 'gray', color: 'gray' };
-        }
-    };
+
 
     const navigateToScreen = (car: any) => {
         if (car && car.status === 'pending_application:pending_car_images') {
@@ -157,12 +264,8 @@ const MyCar: React.FC = () => {
 
         }
     };
-    const getStatusDisplay = (status: any) => {
-        if (status.startsWith('pending_application:')) {
-            return statusConvert[status];
-        }
-        return statusConvert[status];
-    };
+
+
 
     const renderItem = ({ item }: { item: Car }) => (
         <TouchableOpacity onPress={() => navigateToScreen(item)}>
@@ -245,7 +348,7 @@ const MyCar: React.FC = () => {
                     {registeredCars.length > 0 && (
                         <>
                             <View style={{ flex: 1, alignItems: 'flex-end', paddingRight: 15, marginBottom: 60 }}>
-                                <TouchableOpacity style={styles.addCar} onPress={() => router.replace('/addCarInfo')}>
+                                <TouchableOpacity style={styles.addCar} onPress={() => { router.replace("/addCarInfo") }}>
                                     <TabBarIcon name='plus' size={24} />
                                     <Text style={{ fontWeight: 600 }}>{' '} Thêm xe</Text>
                                 </TouchableOpacity>
@@ -270,7 +373,7 @@ const MyCar: React.FC = () => {
                         <View >
                             <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 30 }}>
                                 <Text style={{ fontSize: 16, color: '#686D76', marginBottom: 20 }}>Chưa có xe nào {statusConvert[activeTab]}</Text>
-                                <TouchableOpacity style={styles.addCar} onPress={() => router.replace("/addCarInfo")}>
+                                <TouchableOpacity style={styles.addCar} onPress={handleAddCar}>
                                     <TabBarIcon name='plus' size={24} />
                                     <Text style={{ fontWeight: 600 }}>{' '} Thêm xe</Text>
                                 </TouchableOpacity>

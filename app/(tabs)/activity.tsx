@@ -90,7 +90,7 @@ const ActivityScreen: React.FC = () => {
     };
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor: '#F2F2F2' }}>
             <StatusBar barStyle="dark-content" />
             <SafeAreaView style={{ flex: 1 }}>
                 {isLoading ? (
@@ -143,9 +143,9 @@ const ActivityScreen: React.FC = () => {
                                         ))}
                                     </>
                                     :
-                                    // <View>
-                                    <Text style={{ textAlign: 'center', marginTop: 40, color: '#B4B4B8', fontSize: 20 }}>Chưa có hoạt động nào</Text>
-                                    // </View>
+                                    <View style={styles.emptyChatContainer}>
+                                        <Text style={styles.emptyChatText}>Chưa có hoạt động nào</Text>
+                                    </View>
                                 }
                             </View>
                         </View>
@@ -223,6 +223,16 @@ const styles = StyleSheet.create({
     tabText: {
         fontSize: 16,
         color: 'black',
+    },
+    emptyChatContainer: {
+        flex: 1,
+        marginTop: 300,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    emptyChatText: {
+        fontSize: 16,
+        color: '#696969',
     },
 });
 
