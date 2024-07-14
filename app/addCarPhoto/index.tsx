@@ -122,7 +122,7 @@ const AddCarPhotoScreen: React.FC = () => {
                             <View style={styles.tabItemIcon}>
                                 <TabBarIcon name='clipboard-list-outline' color='#773BFF' style={styles.tabImage} />
                             </View>
-                            <Text style={styles.tabTextActive}>Thông tin xe</Text>
+                            <Text style={styles.tabText}>Thông tin xe</Text>
                         </View>
                         <Divider style={styles.divider} />
                     </View>
@@ -133,7 +133,7 @@ const AddCarPhotoScreen: React.FC = () => {
                                 {/* <Image style={styles.tabImage} source={require('../assets/image_purple.png')} /> */}
                                 <TabBarIcon name='file-image-outline' color='white' style={styles.tabImage} />
                             </View>
-                            <Text style={styles.tabText}>Hình ảnh</Text>
+                            <Text style={styles.tabTextActive}>Hình ảnh</Text>
                         </View>
                         <Divider style={styles.divider} />
                     </View>

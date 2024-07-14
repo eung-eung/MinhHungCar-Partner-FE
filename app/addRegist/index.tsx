@@ -96,7 +96,7 @@ export default function AddCarRegistrationScreen() {
                             <View style={styles.tabItemIcon}>
                                 <TabBarIcon name='clipboard-list-outline' color='#773BFF' style={styles.tabImage} />
                             </View>
-                            <Text style={styles.tabTextActive}>Thông tin xe</Text>
+                            <Text style={styles.tabText}>Thông tin xe</Text>
                         </View>
                         <Divider style={styles.divider} />
                     </View>
@@ -118,7 +118,7 @@ export default function AddCarRegistrationScreen() {
                                 {/* <Image style={styles.tabImage} source={require('../assets/vehicle_regsister_purple.png')} /> */}
                                 <TabBarIcon name='file-document-multiple-outline' color='white' style={styles.tabImage} />
                             </View>
-                            <Text style={styles.tabText}>Giấy tờ xe</Text>
+                            <Text style={styles.tabTextActive}>Giấy tờ xe</Text>
                         </View>
                         <Divider style={styles.divider} />
                     </View>

@@ -78,7 +78,7 @@ const RentingFeeScreen: React.FC = () => {
                             <View style={styles.tabItemIcon}>
                                 <TabBarIcon name='clipboard-list-outline' color='#773BFF' style={styles.tabImage} />
                             </View>
-                            <Text style={styles.tabTextActive}>Thông tin xe</Text>
+                            <Text style={styles.tabText}>Thông tin xe</Text>
                         </View>
                         <Divider style={styles.divider} />
                     </View>
@@ -108,7 +108,7 @@ const RentingFeeScreen: React.FC = () => {
                             <View style={styles.tabItemIconActive}>
                                 <TabBarIcon name='currency-usd' color='white' style={styles.tabImage} />
                             </View>
-                            <Text style={styles.tabText}>Giá cho thuê</Text>
+                            <Text style={styles.tabTextActive}>Giá cho thuê</Text>
                         </View>
                     </View>
                 </View>
