@@ -6,8 +6,8 @@ import { router } from 'expo-router';
 interface SignUpCredentials {
     email?: string;
     password: string;
-    last_name?: string;
     first_name?: string;
+    last_name?: string;
     phone_number: string;
     confirmPassword?: string;
 }
@@ -22,8 +22,8 @@ const AuthContent: React.FC<AuthContentProps> = ({ isLogin, onAuthenticate }) =>
         email: false,
         password: false,
         confirmPassword: false,
-        last_name: false,
         first_name: false,
+        last_name: false,
         phone_number: false,
     });
 
