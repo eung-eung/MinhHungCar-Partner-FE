@@ -161,7 +161,7 @@ const HistoryScreen: React.FC = () => {
           <View style={styles.container}>
             {/* Info */}
             <View style={{ width: '100%', height: 'auto', backgroundColor: 'white', marginBottom: 10, paddingVertical: 20, justifyContent: 'center', paddingLeft: 28 }}>
-              <Text style={{ fontSize: 20, fontWeight: 'bold', textTransform: 'uppercase' }}>{detailCar?.car_model.brand + '' + detailCar?.car_model.model + '' + detailCar?.car_model.year}</Text>
+              <Text style={{ fontSize: 20, fontWeight: 'bold', textTransform: 'uppercase' }}>{detailCar?.car_model.brand + ' ' + detailCar?.car_model.model + ' ' + detailCar?.car_model.year}</Text>
               <Text style={{ fontSize: 14, color: '#939393', marginBottom: 9, marginTop: 8, fontWeight: '600', textTransform: 'uppercase' }}>Biển số xe: {detailCar?.license_plate}</Text>
               {/* <View style={{ flexDirection: 'row', paddingVertical: 5 }}>
                 <Text style={{ fontSize: 14, marginRight: 5 }}>Hoạt động mới nhất:</Text>

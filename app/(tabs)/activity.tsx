@@ -125,7 +125,7 @@ const ActivityScreen: React.FC = () => {
                                                     />
                                                     <View style={styles.cardBody}>
                                                         <Text style={styles.cardTag}>Biển số xe: {car.license_plate}</Text>
-                                                        <Text style={styles.cardTitle}>{car.car_model.brand + '' + car.car_model.model + ' ' + car.car_model.year}</Text>
+                                                        <Text style={styles.cardTitle}>{car.car_model.brand + ' ' + car.car_model.model + ' ' + car.car_model.year}</Text>
                                                         <View style={styles.cardRow}>
                                                             <View style={styles.cardRowItem}>
                                                                 {/* <Text style={{ color: getStatusColor(car.status), fontWeight: '600', fontSize: 15 }}>{car.status}</Text> */}
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: '#939393',
         marginBottom: 9,
-        textTransform: 'capitalize',
+        textTransform: 'uppercase',
     },
     cardTitle: {
         fontSize: 20,

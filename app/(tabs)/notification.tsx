@@ -4,6 +4,8 @@ import axios from 'axios';
 import { router } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, SectionList } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
+import { FontAwesome6 } from '@expo/vector-icons';
 
 interface Notification {
     id: number;
@@ -129,8 +131,10 @@ export default function NotificationScreen() {
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.5}
             ListEmptyComponent={() => (
-                <View style={styles.emptyChatContainer}>
-                    <Text style={styles.emptyChatText}>Hiện tại chưa có thông báo nào</Text>
+                <View style={styles.emptyContainer}>
+                    {/* <AntDesign name="inbox" size={50} color="#B4B4B8" /> */}
+                    <FontAwesome6 name="folder-open" size={40} color="#B4B4B8" />
+                    <Text style={styles.emptyMessage}>Hiện tại chưa có thông báo nào</Text>
                 </View>
             )}
         />
@@ -183,12 +187,13 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        marginTop: 300
     },
     emptyMessage: {
-        fontSize: 18,
-        fontWeight: '600',
+        fontSize: 16,
         color: '#B4B4B8',
         textAlign: 'center',
+        marginTop: 15
     },
     loader: {
         marginVertical: 16,
