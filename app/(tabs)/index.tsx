@@ -6,6 +6,7 @@ import { FontAwesome, FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
 import { apiAvenue } from '@/api/apiConfig';
 import { AuthConText } from '@/store/AuthContext';
+import AreaChart from '@/components/AreaChart';
 
 interface Payment {
     id: number;
@@ -27,7 +28,7 @@ const statusConvert: Record<string, string> = {
 const formatDateICT = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString('vi-VN', {
-        timeZone: 'Asia/Bangkok', // ICT timezone
+        timeZone: 'Asia/Bangkok',
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
@@ -120,15 +121,19 @@ const HomeScreen: React.FC = () => {
                             <Text style={{ color: 'black', fontSize: 16, fontWeight: 'bold', margin: 20, textAlign: 'center' }}>
                                 Theo tháng
                             </Text>
-                            <BarChart
+                            <Text style={{ color: 'gray', fontSize: 12, textAlign: 'right' }}>
+                                Tỉ lệ: 1:10000
+                            </Text>
+                            {/* <BarChart
                                 // showFractionalValues
                                 // showYAxisIndices
                                 hideRules
                                 noOfSections={5}
-                                maxValue={totalAvenue} // Adjust maxValue dynamically
+                                maxValue={totalAvenue > 0 ? totalAvenue : 1}// Adjust maxValue dynamically
                                 data={barData}
                             // isAnimated
-                            />
+                            /> */}
+                            <AreaChart ptData={payments} />
                         </View>
                         <View style={styles.historyList}>
                             <Text style={{ color: '#858585', fontWeight: '600', fontSize: 18, marginVertical: 10, marginTop: 15 }}>LỊCH SỬ</Text>

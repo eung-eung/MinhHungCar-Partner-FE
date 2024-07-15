@@ -46,3 +46,7 @@ export const apiPayment = {
 export const apiExpoToken = {
     expoPushToken: `${endpoint}/partner/expo_push_token`,
 }
+
+export const apiAvenue = {
+    getAvenue: `${endpoint}/partner/revenue`,
+}

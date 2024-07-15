@@ -19,7 +19,7 @@ export default function TabLayout() {
         name="index"
         options={{
           tabBarLabel: 'Trang chủ',
-          headerShown: false,
+          title: 'Trang chủ',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
           ),
