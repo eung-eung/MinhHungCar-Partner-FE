@@ -79,6 +79,21 @@ const AddCarInformationScreen: React.FC = () => {
 
     const [id, setId] = useState<string>('');
 
+    const isDisabled = (
+        !licensePlate ||
+        !carModelId ||
+        !selectedMotionCode ||
+        !selectedFuelCode ||
+        !selectedParking ||
+        !selectedPeriodCode ||
+        !description ||
+        !selectedBrand ||
+        !selectedModel ||
+        !selectedYear ||
+        !selectedSeat ||
+        isLoadButton
+    );
+
     useEffect(() => {
         fetchYearData();
         fetchPeriodData();
@@ -316,6 +331,7 @@ const AddCarInformationScreen: React.FC = () => {
         return true;
     };
     const handleSubmit = async () => {
+        // Check if user has filled in all required fields
         if (
             !licensePlate ||
             !carModelId ||
@@ -335,6 +351,26 @@ const AddCarInformationScreen: React.FC = () => {
 
         if (!validateLicensePlate(licensePlate)) {
             return;
+        }
+
+        // Check config in MinhHungCar garage if selectedParking is 'garage'
+        if (selectedParking === 'garage') {
+            await fetchParkingLotMetadata();
+            if (parkingLotMetadata.length !== 1) {
+                Alert.alert(
+                    'Lỗi',
+                    'Bãi đổ MinhHungCar không còn chỗ. Vui lòng chọn để xe tại nhà!',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => {
+                                setSelectedParking('home');
+                            }
+                        }
+                    ]
+                );
+                return; // Prevent form submission
+            }
         }
 
         try {
@@ -360,14 +396,16 @@ const AddCarInformationScreen: React.FC = () => {
 
             setId(response.data.data.car.id);
             setBasePrice(response.data.data.car.car_model.based_price);
-            console.log("id: ", response.data.data.car.id)
-            console.log("basePrice: ", response.data.data.car.car_model.based_price)
+            console.log("id: ", response.data.data.car.id);
+            console.log("basePrice: ", response.data.data.car.car_model.based_price);
         } catch (error) {
             Alert.alert('Lỗi', 'Thêm xe thất bại. Vui lòng thử lại!');
         } finally {
             setLoadButton(false);
         }
     };
+
+
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
@@ -624,7 +662,7 @@ const AddCarInformationScreen: React.FC = () => {
                                                     </View>
                                                     <Text style={styles.radioText}>{lot.text}</Text>
                                                 </TouchableOpacity>
-                                            )) : <Text style={styles.noDataText}>No parking data available</Text>
+                                            )) : <Text style={styles.noDataText}>Không có dữ liệu bãi đỗ xe</Text>
                                         ) : (
                                             parkingLotMetadata.length > 0 ? parkingLotMetadata.map((lot) => (
                                                 <TouchableOpacity
@@ -642,7 +680,7 @@ const AddCarInformationScreen: React.FC = () => {
                                                     </View>
                                                     <Text style={styles.radioText}>{lot.text}</Text>
                                                 </TouchableOpacity>
-                                            )) : <Text style={styles.noDataText}>No parking data available</Text>
+                                            )) : <Text style={styles.noDataText}>Không có dữ liệu bãi đỗ xe</Text>
                                         )}
                                     </View>
                                 </View>
@@ -692,8 +730,8 @@ const AddCarInformationScreen: React.FC = () => {
                             <View style={styles.formAction}>
                                 <TouchableOpacity
                                     onPress={handleSubmit}
-                                    disabled={isLoadButton}
-                                    style={[styles.btn, isLoadButton && styles.btnDisabled]}
+                                    disabled={isDisabled}
+                                    style={[styles.btn, isDisabled && styles.btnDisabled]}
                                 >
                                     <View>
                                         {isLoadButton ? (

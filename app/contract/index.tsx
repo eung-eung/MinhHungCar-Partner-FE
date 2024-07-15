@@ -94,10 +94,12 @@ export default function ContractScreen() {
             if (error.response.data.error_code === 10060) {
                 Alert.alert('Lỗi', 'Không thể ký hợp đồng lúc này. Vui lòng thử lại sau');
                 console.log("Error sign contract: ", error.response.data.message)
-
+            } else if (error.response.data.error_code === 10031) {
+                Alert.alert('Lỗi', 'Bãi đổ MinhHungCar không còn chỗ!');
+                console.log("Error sign contract: ", error.response.data.message)
             } else {
-                console.log('Sign contract error: ', error.response.data.message);
-                Alert.alert('Lỗi', error.response.data.message);
+                console.log('Error sign contract: ', error.response.data.message);
+                Alert.alert('Error', error.response.data.message);
             }
         }
     };
@@ -142,7 +144,7 @@ export default function ContractScreen() {
                                 onPress={handleSignContract}
                                 disabled={!isChecked}
                             >
-                                <Text style={styles.buttonText}>Ký hợp đồng</Text>
+                                <Text style={styles.buttonText}>Chấp thuận hợp đồng</Text>
                             </TouchableOpacity>
                         </>
                     }

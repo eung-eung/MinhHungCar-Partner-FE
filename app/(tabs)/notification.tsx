@@ -104,19 +104,26 @@ export default function NotificationScreen() {
     );
 
     const renderItem = ({ item }: { item: Notification }) => (
-        <TouchableOpacity style={styles.itemContainer} onPress={() => router.push({ pathname: item.url })}>
-            <View style={styles.iconContainer}>
-                <TabBarIcon name='bell-outline' size={24} color="#555555" />
+        loading ? (
+            <View style={styles.loader}>
+                <ActivityIndicator size="large" />
             </View>
-            <View style={styles.notificationContent}>
-                <Text style={styles.notificationTitle}>{item.title}</Text>
-                <Text numberOfLines={2} style={styles.notificationText}>{item.content}</Text>
-                <View style={styles.timeContainer}>
-                    <Text style={styles.notificationTime}>{formatTime(item.created_at)}</Text>
+        ) : (
+            <TouchableOpacity style={styles.itemContainer} onPress={() => router.push({ pathname: item.url })}>
+                <View style={styles.iconContainer}>
+                    <TabBarIcon name='bell-outline' size={24} color="#555555" />
                 </View>
-            </View>
-        </TouchableOpacity>
+                <View style={styles.notificationContent}>
+                    <Text style={styles.notificationTitle}>{item.title}</Text>
+                    <Text numberOfLines={2} style={styles.notificationText}>{item.content}</Text>
+                    <View style={styles.timeContainer}>
+                        <Text style={styles.notificationTime}>{formatTime(item.created_at)}</Text>
+                    </View>
+                </View>
+            </TouchableOpacity>
+        )
     );
+
 
 
 
@@ -127,7 +134,7 @@ export default function NotificationScreen() {
             renderItem={renderItem}
             renderSectionHeader={renderSectionHeader}
             keyExtractor={(item) => item.id.toString()}
-            ListFooterComponent={renderFooter}
+            // ListFooterComponent={renderFooter}
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.5}
             ListEmptyComponent={() => (
