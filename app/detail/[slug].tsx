@@ -32,6 +32,7 @@ interface CarDetail {
     fuel: string;
     rating: number;
     license_plate: string;
+    description: string;
 }
 
 interface Feedback {
@@ -204,6 +205,10 @@ export default function DetailScreen() {
                                             {detailCar.car_model?.brand + ' ' + detailCar.car_model?.model + ' ' + detailCar.car_model?.year}
                                         </Text>
 
+                                        <Text style={{ fontSize: 13, color: '#B4B4B8', textTransform: 'uppercase', marginTop: 5, marginBottom: 10 }}>
+                                            Biển số xe: {detailCar.license_plate}
+                                        </Text>
+
                                         <View style={styles.infoRating}>
 
                                             <TabBarIcon name='star' size={26} color="#F3CA52" style={{ marginRight: 5 }} />
@@ -229,9 +234,9 @@ export default function DetailScreen() {
                                                         router.push({ pathname: "/contract", params: { carId: slug } })}>
                                                         <Text style={styles.buttonText}>Xem hợp đồng</Text>
                                                     </TouchableOpacity>
-                                                    <TouchableOpacity style={styles.buttonCancel} onPress={() => { }}>
+                                                    {/* <TouchableOpacity style={styles.buttonCancel} onPress={() => { }}>
                                                         <Text style={{ padding: 5, textAlign: 'center', color: 'white' }}>Hủy</Text>
-                                                    </TouchableOpacity>
+                                                    </TouchableOpacity> */}
                                                 </View>
                                             )}
                                         </View>
@@ -264,6 +269,30 @@ export default function DetailScreen() {
                                                 {detailCar.fuel === 'electricity' ? 'Điện' : (detailCar.fuel === 'oil' ? 'Dầu' : 'Xăng')}
                                             </Text>
                                         </View>
+                                    </View>
+                                </View>
+
+                                <Divider style={{ marginTop: 20 }} />
+                                <View style={styles.character}>
+                                    <Text style={styles.characterTitle}>Mô tả</Text>
+                                    <View style={styles.containerRegulation}>
+                                        <View style={styles.bulletTextContainer}>
+                                            <Text style={{
+                                                lineHeight: 20,
+                                                fontSize: 13,
+                                                marginBottom: 15,
+                                                marginTop: 3,
+                                                marginHorizontal: 8,
+                                                fontWeight: '500',
+                                                color: '#838383',
+                                            }}>
+                                                {detailCar.description}
+                                            </Text>
+                                        </View>
+
+
+
+
                                     </View>
                                 </View>
 
@@ -580,5 +609,13 @@ const styles = StyleSheet.create({
         width: 180,
         textAlign: 'center'
     },
-
+    bulletTextContainer: {
+        flex: 1,
+        paddingLeft: 5,
+    },
+    containerRegulation: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginVertical: 2,
+    },
 });
