@@ -79,20 +79,20 @@ const styles = StyleSheet.create({
     },
     container: {
         paddingHorizontal: 5,
-        paddingVertical: 100,
+        paddingVertical: 90,
         backgroundColor: 'white',
     },
     gradient: {
         flex: 1,
     },
     header: {
-        paddingTop: 80,
+        paddingTop: 90,
     },
     title: {
         fontSize: 32,
         fontWeight: 'bold',
         color: 'white',
-        marginBottom: 6,
+        marginBottom: 10,
         textAlign: 'center',
     },
     form: {

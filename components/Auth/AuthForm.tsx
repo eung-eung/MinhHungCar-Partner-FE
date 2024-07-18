@@ -173,17 +173,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isLogin, onSubmit, credentialsInval
                                 </TouchableOpacity>
                             </View>
 
-                            {isLogin && (
-                                <>
-                                    <Text style={styles.formActionSpacer}>hoặc tiếp tục với</Text>
-                                    <TouchableOpacity onPress={() => { /* handle onPress */ }}>
-                                        <View style={styles.btnSecondary}>
-                                            <Text style={styles.btnSecondaryText}>Google</Text>
-                                            <View style={{ width: 15 }} />
-                                        </View>
-                                    </TouchableOpacity>
-                                </>
-                            )}
+
                         </View>
                     </KeyboardAwareScrollView>
                 </View>
@@ -194,7 +184,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ isLogin, onSubmit, credentialsInval
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: 24,
+        paddingVertical: 50,
+        // marginVertical: 70,
         paddingHorizontal: 0,
         flexGrow: 1,
         flexShrink: 1,
@@ -221,7 +212,7 @@ const styles = StyleSheet.create({
         marginBottom: 36
     },
     form: {
-        marginBottom: 24,
+        marginBottom: 120,
         paddingHorizontal: 0,
         flexGrow: 1,
         flexShrink: 1,
