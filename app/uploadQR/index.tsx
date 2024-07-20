@@ -45,6 +45,7 @@ const UploadQR: React.FC = () => {
     const [isLoading, setLoading] = useState(true);
     const [isImageChanged, setIsImageChanged] = useState(false);
     const [imageLoading, setImageLoading] = useState(false);
+    const router = useRouter()
 
     useEffect(() => {
         getPaymentInfo();
@@ -112,7 +113,12 @@ const UploadQR: React.FC = () => {
             });
             if (response.status === 200 || response.status === 201) {
                 setQRUrl(response.data.data.qr_code_url);
-                Alert.alert('Thành công', 'Bạn đã cập nhật thông tin thành công');
+                Alert.alert('Thành công', 'Bạn đã cập nhật thông tin thành công!', [
+                    {
+                        text: 'OK',
+                        onPress: () => router.back(),
+                    },
+                ]);
 
                 console.log('Upload image successfully: ', response.data.message);
             } else {

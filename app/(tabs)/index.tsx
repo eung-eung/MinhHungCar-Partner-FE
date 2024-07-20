@@ -4,9 +4,10 @@ import { BarChart } from 'react-native-gifted-charts';
 import axios from 'axios';
 import { FontAwesome, FontAwesome6, MaterialIcons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
-import { apiAvenue } from '@/api/apiConfig';
+import { apiAccount, apiAvenue, apiPayment } from '@/api/apiConfig';
 import { AuthConText } from '@/store/AuthContext';
 import AreaChart from '@/components/AreaChart';
+import { useRouter } from 'expo-router';
 
 interface Payment {
     id: number;
@@ -54,6 +55,57 @@ const HomeScreen: React.FC = () => {
 
     const authContext = useContext(AuthConText);
     const token = authContext.access_token;
+    const router = useRouter()
+
+    useEffect(() => {
+        if (token) {
+            fetchAndValidateUserInfo();
+        }
+    }, []);
+
+    const fetchAndValidateUserInfo = async () => {
+        try {
+            // Fetch profile information
+            const profileResponse = await axios.get(apiAccount.getProfile, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            ;
+
+            // Fetch payment information
+            const paymentResponse = await axios.get(apiPayment.getPaymentInfo, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+
+            // Validate information and prompt user if necessary
+            if (profileResponse.data.data.identification_card_number === "" ||
+                (!paymentResponse.data.data.qr_code_url && !paymentResponse.data.data.bank_name)) {
+                Alert.alert(
+                    'Yêu cầu cập nhật',
+                    'Vui lòng cập nhật đầy đủ thông tin tài khoản, giấy phép lái xe và thông tin thanh toán!',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => {
+                                router.push('/setting');
+                            },
+                        },
+                        {
+                            text: 'Để sau',
+                            style: 'cancel',
+                        },
+                    ]
+                );
+            }
+
+        } catch (error: any) {
+            if (error.response?.data?.error_code === 10039) {
+                Alert.alert('', 'Không thể lấy thông tin tài khoản');
+            } else {
+                console.log('Error: ', error.response?.data?.message);
+            }
+        }
+    };
 
     const getAvenue = async () => {
         try {

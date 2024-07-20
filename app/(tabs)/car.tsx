@@ -169,7 +169,7 @@ const MyCar: React.FC = () => {
 
             setIdNum(response.data.data.identification_card_number);
 
-            console.log('Fetch profile successfully ', response.data.data);
+            console.log('Fetch profile successfully ', response.data.message);
             setLoading(false);
         } catch (error: any) {
             if (error.response?.data?.error_code === 10039) {

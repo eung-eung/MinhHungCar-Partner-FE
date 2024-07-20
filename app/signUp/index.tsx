@@ -55,20 +55,25 @@ const SignUpScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-            {isLoading && <LoadingOverlay message='' />}
-            <ScrollView>
-                <View style={styles.container}>
-                    <KeyboardAwareScrollView>
-                        <View style={styles.header}>
-                            <Text style={styles.title}>Bắt đầu nào!</Text>
-                            <Text style={styles.subtitle}>
-                                Điền đầy đủ thông tin để tạo mới một tài khoản
-                            </Text>
-                        </View>
-                        <AuthContent isLogin={false} onAuthenticate={signUpHandler} />
-                    </KeyboardAwareScrollView>
+            {isLoading ? (
+                <View style={styles.loadingContainer}>
+                    <LoadingOverlay message='' />
                 </View>
-            </ScrollView>
+            ) : (
+                <ScrollView>
+                    <View style={styles.container}>
+                        <KeyboardAwareScrollView>
+                            <View style={styles.header}>
+                                <Text style={styles.title}>Bắt đầu nào!</Text>
+                                <Text style={styles.subtitle}>
+                                    Điền đầy đủ thông tin để tạo mới một tài khoản
+                                </Text>
+                            </View>
+                            <AuthContent isLogin={false} onAuthenticate={signUpHandler} />
+                        </KeyboardAwareScrollView>
+                    </View>
+                </ScrollView>
+            )}
         </SafeAreaView>
     );
 }
@@ -80,6 +85,11 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         flexShrink: 1,
         flexBasis: 0,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     title: {
         fontSize: 32,

@@ -137,7 +137,12 @@ const PaymentInformationScreen: React.FC = () => {
                 }
             );
 
-            Alert.alert('Thành công', 'Bạn đã cập nhật thông tin thành công');
+            Alert.alert('Thành công', 'Bạn đã cập nhật thông tin thành công!', [
+                {
+                    text: 'OK',
+                    onPress: () => router.back(),
+                },
+            ]);
             console.log('Update success: ', response.data.message);
         } catch (error: any) {
             if (error.response.data.error_code === 10022) {
