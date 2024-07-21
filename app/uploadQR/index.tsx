@@ -61,7 +61,7 @@ const UploadQR: React.FC = () => {
 
             if (response.data.data) {
                 setQRUrl(response.data.data.qr_code_url || null);
-                console.log('Fetch success: ', response.data);
+                // console.log('Fetch success: ', response.data);
             } else {
                 console.log('No data returned for payment info.');
             }
@@ -80,7 +80,7 @@ const UploadQR: React.FC = () => {
             quality: 1,
         });
 
-        console.log(result);
+        // console.log(result);
 
         if (!result.canceled) {
             const imageUri = result.assets[0].uri;
@@ -89,7 +89,7 @@ const UploadQR: React.FC = () => {
                 avatarURL: imageUri, // Update avatarURL when an image is picked
             });
             setIsImageChanged(true); // Set flag to true when image is changed
-            console.log('Picked image URI: ', imageUri);
+            // console.log('Picked image URI: ', imageUri);
             setImageLoading(false);
         }
     };
@@ -120,7 +120,7 @@ const UploadQR: React.FC = () => {
                     },
                 ]);
 
-                console.log('Upload image successfully: ', response.data.message);
+                // console.log('Upload image successfully: ', response.data.message);
             } else {
                 console.log('Unexpected response status for image upload:', response.status);
                 Alert.alert('Lỗi', 'Đã xảy ra lỗi khi tải lên hình ảnh.');

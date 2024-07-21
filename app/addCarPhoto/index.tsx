@@ -95,7 +95,7 @@ const AddCarPhotoScreen: React.FC = () => {
                 },
             });
             route.replace({ pathname: "/addRegist", params: { carId: carId, based_price: based_price } });
-            console.log('Images uploaded:', response.data.message);
+            // console.log('Images uploaded:', response.data.message);
 
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.error_code === 10023) {

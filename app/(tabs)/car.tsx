@@ -118,7 +118,7 @@ const MyCar: React.FC = () => {
     );
 
 
-    console.log(isFocused);
+    // console.log(isFocused);
     // const loadMoreItem = () => {
     //   setPage(page => page + 1)
     // }
@@ -134,7 +134,7 @@ const MyCar: React.FC = () => {
 
         try {
 
-            console.log('PAGE: ', page);
+            // console.log('PAGE: ', page);
             const response = await axios.get(
                 `https://minhhungcar.xyz/partner/cars?offset=${(page - 1) * 2}&limit=100&car_status=${activeTab}`,
                 {
@@ -169,7 +169,7 @@ const MyCar: React.FC = () => {
 
             setIdNum(response.data.data.identification_card_number);
 
-            console.log('Fetch profile successfully ', response.data.message);
+            // console.log('Fetch profile successfully ', response.data.message);
             setLoading(false);
         } catch (error: any) {
             if (error.response?.data?.error_code === 10039) {
@@ -198,8 +198,6 @@ const MyCar: React.FC = () => {
     }
 
     const handleAddCar = async () => {
-        console.log("paymenturl:", paymentUrl)
-        console.log("bankNum:", bankNum)
         if (IdNum === "") {
             Alert.alert(
                 'Yêu cầu cập nhật',

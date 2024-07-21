@@ -183,12 +183,12 @@ const AddCarInformationScreen: React.FC = () => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                console.log("API Response:", response.data);
+                // console.log("API Response:", response.data);
                 const parking_lot: ParkingLotData[] = response.data.data;
                 setParkingLotMetadata(parking_lot);
                 setLoading(false);
             } catch (error: any) {
-                console.error("Error fetching parking lot metadata:", error);
+                console.log("Error fetching parking lot metadata:", error);
                 if (error.response?.data?.error_code === 10044) {
                     Alert.alert('Lỗi', 'Không thể lấy dữ liệu của chỗ để xe');
                 } else {
@@ -196,7 +196,7 @@ const AddCarInformationScreen: React.FC = () => {
                 }
             }
         } else {
-            console.log("Selected seat is not set, using parkingLotData");
+            // console.log("Selected seat is not set, using parkingLotData");
             setParkingLotMetadata(parkingLotData);
         }
     };
@@ -396,8 +396,8 @@ const AddCarInformationScreen: React.FC = () => {
 
             setId(response.data.data.car.id);
             setBasePrice(response.data.data.car.car_model.based_price);
-            console.log("id: ", response.data.data.car.id);
-            console.log("basePrice: ", response.data.data.car.car_model.based_price);
+            // console.log("id: ", response.data.data.car.id);
+            // console.log("basePrice: ", response.data.data.car.car_model.based_price);
         } catch (error) {
             Alert.alert('Lỗi', 'Thêm xe thất bại. Vui lòng thử lại!');
         } finally {

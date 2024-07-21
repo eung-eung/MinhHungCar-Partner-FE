@@ -25,7 +25,7 @@ export default function ContractScreen() {
     const carIdNumber = carId ? Number(carId) : 0;
 
 
-    console.log("carID", carId)
+    // console.log("carID", carId)
 
     useEffect(() => {
         getDetailContract();
@@ -41,7 +41,7 @@ export default function ContractScreen() {
             setPdfURL(response.data.data.url);
             setContractStatus(response.data.data.status);
 
-            console.log('Fetch contract successfully!');
+            // console.log('Fetch contract successfully!');
             setTimeout(() => {
                 setLoading(false);
             }, 2000);
@@ -79,7 +79,7 @@ export default function ContractScreen() {
                         Authorization: `Bearer ${token}`
                     }
                 });
-            console.log('Sign contract successfully!: ', response.data.message);
+            // console.log('Sign contract successfully!: ', response.data.message);
             Alert.alert(
                 'Chúc mừng',
                 'Bạn đã ký hợp đồng thành công! Vui lòng đợi phản hồi từ MinhHungCar',

@@ -71,7 +71,7 @@ export default function AddCarRegistrationScreen() {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log('Caveat uploaded:', response.data.message);
+            // console.log('Caveat uploaded:', response.data.message);
             route.replace({ pathname: "/rentingFee", params: { carId, based_price } });
         } catch (error: any) {
             console.log('Error uploading caveat:', error.response?.data?.error_code);

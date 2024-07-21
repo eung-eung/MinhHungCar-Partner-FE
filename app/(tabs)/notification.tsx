@@ -46,7 +46,7 @@ export default function NotificationScreen() {
                 page === 1 ? newNotifications : [...prevNotifications, ...newNotifications]
             );
             setHasMore(newNotifications.length === PAGE_SIZE);
-            console.log("Fetch notification successfully: ", response.data.message);
+            // console.log("Fetch notification successfully: ", response.data.message);
         } catch (error: any) {
             console.log("Fetch notification failed: ", error.response?.data?.message || error.message);
         } finally {

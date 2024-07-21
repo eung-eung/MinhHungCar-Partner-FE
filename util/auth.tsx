@@ -10,17 +10,16 @@ export async function getUser(phone_number: string, password: string) {
             password: password
         });
 
-        // Log response for debugging
-        console.log('Login Response:', response.data);
+        // console.log('Login Response:', response.data);
 
         // Check if the response is as expected
         if (response.data && response.data.data && response.data.data.access_token) {
             const token = response.data.data.access_token;
             const role = response.data.data.user.role;
-            console.log("tokennn: ", token)
-            console.log("role: ", role)
-            if(role === "customer") {
-                Alert.alert('Tài khoản này không thể đăng nhập', 'Vui lòng tạo tài khoản mới') 
+            // console.log("tokennn: ", token)
+            // console.log("role: ", role)
+            if (role === "customer") {
+                Alert.alert('Tài khoản này không thể đăng nhập', 'Vui lòng tạo tài khoản mới')
             } else {
                 return { token };
 

@@ -24,7 +24,7 @@ interface SignUpCredentials {
 export default function SignInScreen() {
     const [isAuthenticating, setIsAuthenticating] = useState<boolean>(false);
     const authCtx = useContext(AuthConText);
-    console.log('aaaaa: ', authCtx);
+    // console.log('aaaaa: ', authCtx);
 
     const signInHandler = async ({ phone_number, password }: SignUpCredentials) => {
         if (!phone_number || !password) {
@@ -34,7 +34,7 @@ export default function SignInScreen() {
         setIsAuthenticating(true);
         try {
             const user = await getUser(phone_number, password);
-            console.log('user: ', user);
+            // console.log('user: ', user);
 
             if (user && user.token) {
                 authCtx.authenticate(user.token);

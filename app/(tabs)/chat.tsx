@@ -78,13 +78,13 @@ const ChatScreen: React.FC = () => {
 
             webSocket.onmessage = (e) => {
                 const data = JSON.parse(e.data);
-                console.log('Received message:', e.data);
+                // console.log('Received message:', e.data);
                 handleResponse(data);
             };
 
             webSocket.onerror = (error) => {
-                console.error('WebSocket error:', error);
-                Alert.alert('Error', 'WebSocket connection error');
+                console.log('WebSocket error:', error);
+                Alert.alert('Lỗi', 'Mất kết nối hệ thống');
             };
 
             webSocket.onclose = () => {
@@ -105,7 +105,7 @@ const ChatScreen: React.FC = () => {
                     access_token: `Bearer ${token}`,
                 };
 
-                console.log('Sending message:', message);
+                // console.log('Sending message:', message);
                 socketRef.current.send(JSON.stringify(message));
 
                 // Add the new message to the messages state
@@ -119,7 +119,7 @@ const ChatScreen: React.FC = () => {
                 Alert.alert('Lỗi', 'Không thể gửi tin nhắn trống');
             }
         } catch (error) {
-            console.error('Error sending message:', error);
+            console.log('Error sending message:', error);
             Alert.alert('Lỗi', 'Gửi tin nhắn thất bại');
         }
     };

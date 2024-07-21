@@ -67,7 +67,7 @@ const PaymentInformationScreen: React.FC = () => {
                 setBankNum(response.data.data.bank_number || '');
                 setSelectedBank(response.data.data.bank_name || '');
                 setQRUrl(response.data.data.qr_code_url || null);
-                console.log('Fetch success: ', response.data);
+                // console.log('Fetch success: ', response.data);
             } else {
                 console.log('No data returned for payment info.');
             }
@@ -88,7 +88,7 @@ const PaymentInformationScreen: React.FC = () => {
 
             if (response.data.data && response.data.data.banks) {
                 setBanks(response.data.data.banks);
-                console.log('Fetch success: ', response.data.data.banks);
+                // console.log('Fetch success: ', response.data.data.banks);
             } else {
                 console.log('No data returned for bank list.');
             }
@@ -107,7 +107,7 @@ const PaymentInformationScreen: React.FC = () => {
             quality: 1,
         });
 
-        console.log(result);
+        // console.log(result);
 
         if (!result.canceled) {
             const imageUri = result.assets[0].uri;
@@ -116,7 +116,7 @@ const PaymentInformationScreen: React.FC = () => {
                 avatarURL: imageUri,
             });
             setIsImageChanged(true);
-            console.log('Picked image URI: ', imageUri);
+            // console.log('Picked image URI: ', imageUri);
             setImageLoading(false);
         }
     };
@@ -143,7 +143,7 @@ const PaymentInformationScreen: React.FC = () => {
                     onPress: () => router.back(),
                 },
             ]);
-            console.log('Update success: ', response.data.message);
+            // console.log('Update success: ', response.data.message);
         } catch (error: any) {
             if (error.response.data.error_code === 10022) {
                 Alert.alert('Thất bại', 'Không thể cập nhật thông tin. Vui lòng thử lại');

@@ -109,7 +109,7 @@ const HistoryScreen: React.FC = () => {
   const [detailCar, setDetailCar] = useState<CarDetail>();
   const isFocused = useIsFocused();
 
-  console.log("carID: ", carID)
+  // console.log("carID: ", carID)
 
   useEffect(() => {
     getActivity();
@@ -124,7 +124,7 @@ const HistoryScreen: React.FC = () => {
         }
       })
       setActivityHistory(response.data.data);
-      console.log("Fetch activity history: ", response.data.message)
+      // console.log("Fetch activity history: ", response.data.message)
       setLoading(false);
     } catch (error: any) {
       console.log("Error get Activity history: ", error.response.data.message)
@@ -135,7 +135,7 @@ const HistoryScreen: React.FC = () => {
     try {
       const response = await axios.get(`https://minhhungcar.xyz/car/${carID}`);
       setDetailCar(response.data.data);
-      console.log('Fetch successfully: ', response.data.message);
+      // console.log('Fetch successfully: ', response.data.message);
     } catch (error: any) {
       if (error.response.data.error_code === 10027) {
         Alert.alert('Lỗi', 'Không thể xem được chi tiết xe lúc này. Vui lòng thử lại sau!');

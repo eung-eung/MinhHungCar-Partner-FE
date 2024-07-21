@@ -74,7 +74,7 @@ const ProfileScreen: React.FC = () => {
             setDriveLicense(response.data.data.driving_license || '');
             setAvatarURL(response.data.data.avatar_url || null);
 
-            console.log('Fetch profile successfully ', response.data.data);
+            // console.log('Fetch profile successfully ', response.data.data);
             setLoading(false);
         } catch (error: any) {
             if (error.response?.data?.error_code === 10039) {
@@ -93,7 +93,7 @@ const ProfileScreen: React.FC = () => {
             quality: 1,
         });
 
-        console.log(result);
+        // console.log(result);
 
         if (!result.canceled) {
             const imageUri = result.assets[0].uri;
@@ -101,7 +101,7 @@ const ProfileScreen: React.FC = () => {
                 selectedImage: imageUri,
                 avatarURL: imageUri, // Update avatarURL when an image is picked
             });
-            console.log('Picked image URI: ', imageUri);
+            // console.log('Picked image URI: ', imageUri);
         }
     };
 
@@ -171,7 +171,7 @@ const ProfileScreen: React.FC = () => {
             });
 
             if (response.status === 200 || response.status === 201) {
-                console.log('Update successfully: ', response.data.data);
+                // console.log('Update successfully: ', response.data.data);
                 if (image.selectedImage) {
                     await uploadImage();
                 }
@@ -211,7 +211,7 @@ const ProfileScreen: React.FC = () => {
 
             if (response.status === 200 || response.status === 201) {
                 setAvatarURL(response.data.data.url);
-                console.log('Upload image successfully: ', response.data.data);
+                // console.log('Upload image successfully: ', response.data.data);
             } else {
                 console.log('Unexpected response status for image upload:', response.status);
                 Alert.alert('Lỗi', 'Đã xảy ra lỗi khi tải lên hình ảnh.');

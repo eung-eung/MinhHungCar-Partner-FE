@@ -121,9 +121,9 @@ const HomeScreen: React.FC = () => {
             setPayments(receivedPayments);
             setTotalAvenue(responseData.total_revenue || 0);
 
-            console.log('Get avenue successfully: ', response.data.message);
-            console.log('Received payments:', receivedPayments);
-            console.log('API response:', responseData);
+            // console.log('Get avenue successfully: ', response.data.message);
+            // console.log('Received payments:', receivedPayments);
+            // console.log('API response:', responseData);
         } catch (error: any) {
             console.log('Error getting avenue: ', error.response?.data?.message);
             setPayments([]);

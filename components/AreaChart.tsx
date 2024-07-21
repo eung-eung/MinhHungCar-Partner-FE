@@ -22,7 +22,6 @@ interface AreaChartProps {
 }
 
 const AreaChart: React.FC<AreaChartProps> = ({ ptData }) => {
-    console.log('ptDt: ', ptData)
 
 
     const formatDateICT = (dateString: string): string => {

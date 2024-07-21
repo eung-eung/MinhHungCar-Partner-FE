@@ -26,7 +26,7 @@ export default function NotificationHandler({ children }: { children: React.Reac
     useEffect(() => {
         registerForPushNotificationsAsync()
             .then(expToken => {
-                console.log('Push token:', expToken);
+                // console.log('Push token:', expToken);
                 setExpoPushToken(expToken ?? null);
                 if (expToken && authCtx.isAuthenticated) {
                     // Send token to backend
@@ -44,9 +44,9 @@ export default function NotificationHandler({ children }: { children: React.Reac
 
     useEffect(() => {
         const responseListener = Notifications.addNotificationResponseReceivedListener(notification => {
-            console.log('Notification response received:', notification);
+            // console.log('Notification response received:', notification);
             if (notification.notification.request.content.data) {
-                console.log('Navigating to:', notification.notification.request.content.data.screen);
+                // console.log('Navigating to:', notification.notification.request.content.data.screen);
                 router.navigate(notification.notification.request.content.data.screen);
             }
         });

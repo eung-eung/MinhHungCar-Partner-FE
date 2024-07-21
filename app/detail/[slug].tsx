@@ -146,7 +146,7 @@ export default function DetailScreen() {
                 ...prevFeedbacks,
                 ...response.data.data.feedbacks
             ]);
-            console.log(feedbacks)
+            // console.log(feedbacks)
             setOffset(newOffset + limit);
 
         } catch (error: any) {

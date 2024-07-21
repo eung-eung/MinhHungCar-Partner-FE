@@ -66,7 +66,7 @@ const ActivityScreen: React.FC = () => {
         setLoading(true);
 
         try {
-            console.log('PAGE: ', page);
+            // console.log('PAGE: ', page);
             const response = await axios.get(
                 `https://minhhungcar.xyz/partner/cars?offset=${(page - 1) * 2}&limit=100`,
                 {

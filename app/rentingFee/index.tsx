@@ -45,7 +45,7 @@ const RentingFeeScreen: React.FC = () => {
                     Authorization: `Bearer ${token}`
                 }
             });
-            console.log('Price updated:', response.data.data);
+            // console.log('Price updated:', response.data.data);
             setIsPriceUpdated(true);
             route.replace("/success");
         } catch (error: any) {
