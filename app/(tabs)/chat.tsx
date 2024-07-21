@@ -108,7 +108,7 @@ const ChatScreen: React.FC = () => {
                 console.log('Sending message:', message);
                 socketRef.current.send(JSON.stringify(message));
 
-
+                // Add the new message to the messages state
                 setMessages((prevMessages) => [
                     { content: newMessage, sender: 0 },
                     ...prevMessages,
@@ -232,9 +232,9 @@ const ChatScreen: React.FC = () => {
                                 value={newMessage}
                             />
                             <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
-                                {/* <Text style={styles.sendButtonText}> */}
+
                                 <TabBarIcon name='send' color='#773BFF' />
-                                {/* </Text> */}
+
                             </TouchableOpacity>
                         </View>
                     </KeyboardAvoidingView>
