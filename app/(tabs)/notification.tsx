@@ -15,7 +15,7 @@ interface Notification {
     created_at: string;
 }
 
-const PAGE_SIZE = 10; // Number of notifications to fetch per page
+const PAGE_SIZE = 10;
 
 export default function NotificationScreen() {
     const authCtx = useContext(AuthConText);
