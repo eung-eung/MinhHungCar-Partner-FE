@@ -197,7 +197,8 @@ const ChatScreen: React.FC = () => {
                     <ActivityIndicator size="large" color="#aaa" />
                 </View>
             ) : (
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <SafeAreaView style={{ flex: 1 }}>
+                    {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
                     <KeyboardAvoidingView
                         style={styles.container}
                         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -236,8 +237,8 @@ const ChatScreen: React.FC = () => {
                             </TouchableOpacity>
                         </View>
                     </KeyboardAvoidingView>
-                </TouchableWithoutFeedback>
-
+                    {/* </TouchableWithoutFeedback> */}
+                </SafeAreaView>
             )}
         </>
     );
