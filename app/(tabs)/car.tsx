@@ -283,7 +283,13 @@ const MyCar: React.FC = () => {
                         />
                     )}
                     <View style={styles.cardBody}>
-                        <Text style={styles.cardTitle}>{`${item.car_model.brand} ${item.car_model.model}`}</Text>
+                        <Text
+                            style={styles.cardTitle}
+                            numberOfLines={1}
+                            ellipsizeMode='tail'
+                        >
+                            {`${item.car_model.brand} ${item.car_model.model}`}
+                        </Text>
                         <Text style={styles.cardTag}>{`Biển số xe: ${item.license_plate}`}</Text>
                         <View style={styles.cardRow}>
                             <View style={[styles.statusContainer, getStatusStyles(item.status)]}>
@@ -408,7 +414,7 @@ const styles = StyleSheet.create({
     },
     cardImg: {
         width: 160,
-        height: '100%',
+        height: 135,
         borderRadius: 5,
     },
     cardBody: {
