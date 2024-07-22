@@ -1,5 +1,5 @@
-import { View, Text, SafeAreaView, ScrollView, StyleSheet, Image } from 'react-native';
-import React from 'react';
+import { View, Text, SafeAreaView, ScrollView, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { Divider } from 'react-native-paper';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { useLocalSearchParams } from 'expo-router';
@@ -7,72 +7,96 @@ import { useLocalSearchParams } from 'expo-router';
 export default function ActivityDetailScreen() {
     const params = useLocalSearchParams()
     const { licensePlate, carName, startDate, endDate, feebackRating, feebackContent, rentPrice, customerName, avatarUrl, net_receive } = params
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // Simulate data fetching or any async operation
+        const fetchData = async () => {
+            try {
+                // Simulate a network request
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     const formatNumber = (number: any) => {
         return new Intl.NumberFormat('vi-VN').format(number);
     };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-            <ScrollView>
-                <View style={styles.container}>
-                    {/* Info */}
-                    <View>
-                        <Text style={styles.date}>{startDate} → {endDate}</Text>
-                        <Text style={styles.name}>{carName}</Text>
-                        <Text style={styles.plate}>Biển số xe: {licensePlate}</Text>
-                        <Text style={styles.price}>Giá thuê: {formatNumber(rentPrice)} đ</Text>
-                        <Text style={styles.price}>Thực nhận: {formatNumber(net_receive)} đ</Text>
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" />
+                </View>
+            ) : (
+                <ScrollView>
+                    <View style={styles.container}>
+                        {/* Info */}
+                        <View>
+                            <Text style={styles.date}>{startDate} → {endDate}</Text>
+                            <Text style={styles.name}>{carName}</Text>
+                            <Text style={styles.plate}>Biển số xe: {licensePlate}</Text>
+                            <Text style={styles.price}>Giá thuê: {formatNumber(rentPrice)} đ</Text>
+                            <Text style={styles.price}>Thực nhận: {formatNumber(net_receive)} đ</Text>
 
+                            {(feebackRating && feebackContent) ?
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Text style={styles.ratingText}>Đánh giá: </Text>
+                                    <TabBarIcon name='star' color='orange' size={24} />
+                                    <Text style={styles.ratingText}>{feebackRating}</Text>
+                                </View>
+                                : ""}
+                        </View>
+
+                        <Divider style={{ marginVertical: 20 }} />
+
+                        {/* Feedback */}
                         {(feebackRating && feebackContent) ?
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={styles.ratingText}>Đánh giá: </Text>
-                                <TabBarIcon name='star' color='orange' size={24} />
-                                <Text style={styles.ratingText}>{feebackRating}</Text>
-                            </View>
-                            : ""}
-                    </View>
+                            <View style={{ marginTop: 5 }}>
+                                <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Đánh giá của khách hàng</Text>
+                                <View style={styles.commentContainer}>
+                                    {avatarUrl && typeof avatarUrl === 'string' ? (
+                                        <Image source={{ uri: avatarUrl }} style={styles.commentAvatar} />
+                                    ) : (
+                                        <TabBarIcon name='account-circle' size={40} style={{ borderRadius: 20, marginRight: 10 }} />
+                                    )}
 
-                    <Divider style={{ marginVertical: 20 }} />
+                                    <View style={styles.commentTextContainer}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <Text style={styles.commentAuthor}>{customerName}</Text>
+                                            {/* <Text style={styles.commentDate}>19/05/2024</Text> */}
+                                        </View>
 
-                    {/* Feedback */}
-                    {(feebackRating && feebackContent) ?
-                        <View style={{ marginTop: 5 }}>
-                            <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Đánh giá của khách hàng</Text>
-                            <View style={styles.commentContainer}>
-                                {avatarUrl && typeof avatarUrl === 'string' ? (
-                                    <Image source={{ uri: avatarUrl }} style={styles.commentAvatar} />
-                                ) : (
-                                    <TabBarIcon name='account-circle' size={40} style={{ borderRadius: 20, marginRight: 10 }} />
-                                )}
-
-                                <View style={styles.commentTextContainer}>
-                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                        <Text style={styles.commentAuthor}>{customerName}</Text>
-                                        {/* <Text style={styles.commentDate}>19/05/2024</Text> */}
+                                        <View style={styles.commentRating}>
+                                            <TabBarIcon name='star' color='orange' size={18} style={{ marginLeft: 3 }} />
+                                            <Text>5</Text>
+                                        </View>
+                                        <Text style={styles.commentText}>{feebackContent}</Text>
                                     </View>
-
-                                    <View style={styles.commentRating}>
-                                        <TabBarIcon name='star' color='orange' size={18} style={{ marginLeft: 3 }} />
-                                        <Text>5</Text>
-                                    </View>
-                                    <Text style={styles.commentText}>{feebackContent}</Text>
                                 </View>
                             </View>
-                        </View>
-                        : ""}
-                    {/* Note */}
-                    <View style={{ marginTop: 10 }}>
-                        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Ghi chú</Text>
-                        <Text style={styles.noteContent}>Móp đầu xe 10%, hư xi nhan, hư đèn pha</Text>
-                        <Image style={styles.mainImageNote} source={{ uri: 'https://baogiaothong.mediacdn.vn/files/news/2018/04/07/170456-img_8945.jpg' }} />
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Image style={styles.extraImageNote} source={{ uri: 'https://shitekdetailing.com/uploads/images/bai-viet/gia-sua-xe-o-to-bi-mop-bao-nhieu.jpg' }} />
-                            <Image style={styles.extraImageNote} source={{ uri: 'https://thegioiphuongtien.vn/uploaded/files/50b5149712b35373823b20877a917d4d.jpg' }} />
-                            <Image style={styles.extraImageNote} source={{ uri: 'https://danhbongoto.vn/kcfinder/upload/images/Xe-o-to-bi-tray-xuoc-son.jpg' }} />
+                            : ""}
+                        {/* Note */}
+                        <View style={{ marginTop: 10 }}>
+                            <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Ghi chú</Text>
+                            <Text style={styles.noteContent}>Móp đầu xe 10%, hư xi nhan, hư đèn pha</Text>
+                            <Image style={styles.mainImageNote} source={{ uri: 'https://baogiaothong.mediacdn.vn/files/news/2018/04/07/170456-img_8945.jpg' }} />
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <Image style={styles.extraImageNote} source={{ uri: 'https://shitekdetailing.com/uploads/images/bai-viet/gia-sua-xe-o-to-bi-mop-bao-nhieu.jpg' }} />
+                                <Image style={styles.extraImageNote} source={{ uri: 'https://thegioiphuongtien.vn/uploaded/files/50b5149712b35373823b20877a917d4d.jpg' }} />
+                                <Image style={styles.extraImageNote} source={{ uri: 'https://danhbongoto.vn/kcfinder/upload/images/Xe-o-to-bi-tray-xuoc-son.jpg' }} />
+                            </View>
                         </View>
                     </View>
-                </View>
-            </ScrollView>
+                </ScrollView>
+            )}
         </SafeAreaView>
     );
 }
@@ -81,6 +105,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 30
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     date: {
         color: '#5A5A5A',

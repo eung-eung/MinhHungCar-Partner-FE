@@ -8,6 +8,7 @@ import { apiAccount, apiAvenue, apiPayment } from '@/api/apiConfig';
 import { AuthConText } from '@/store/AuthContext';
 import AreaChart from '@/components/AreaChart';
 import { useRouter } from 'expo-router';
+import { ActivityIndicator } from 'react-native';
 
 interface Payment {
     id: number;
@@ -52,6 +53,7 @@ const HomeScreen: React.FC = () => {
     const [payments1, setPayments1] = useState<Payment>();
     const [totalAvenue, setTotalAvenue] = useState<number>(0);
     const isFocused = useIsFocused();
+    const [loading, setLoading] = useState(true);
 
     const authContext = useContext(AuthConText);
     const token = authContext.access_token;
@@ -120,7 +122,7 @@ const HomeScreen: React.FC = () => {
 
             setPayments(receivedPayments);
             setTotalAvenue(responseData.total_revenue || 0);
-
+            setLoading(false);
             // console.log('Get avenue successfully: ', response.data.message);
             // console.log('Received payments:', receivedPayments);
             // console.log('API response:', responseData);
@@ -162,21 +164,26 @@ const HomeScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView style={{ paddingHorizontal: 24, marginTop: 20 }}>
-                {payments.length > 0 ?
-                    <>
-                        <View style={styles.totalAvenue}>
-                            <Text style={{ fontSize: 16, fontWeight: '600' }}>Tổng thu nhập các tháng</Text>
-                            <Text style={{ fontSize: 16 }}>{totalAvenue.toLocaleString()}</Text>
-                        </View>
-                        <View style={styles.barChart}>
-                            <Text style={{ color: 'black', fontSize: 16, fontWeight: 'bold', margin: 20, textAlign: 'center' }}>
-                                Theo tháng
-                            </Text>
-                            <Text style={{ color: 'gray', fontSize: 12, textAlign: 'right' }}>
-                                Tỉ lệ: 1:10000
-                            </Text>
-                            {/* <BarChart
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" />
+                </View>
+            ) : (
+                <ScrollView style={{ paddingHorizontal: 24, marginTop: 20 }}>
+                    {payments.length > 0 ?
+                        <>
+                            <View style={styles.totalAvenue}>
+                                <Text style={{ fontSize: 16, fontWeight: '600' }}>Tổng thu nhập các tháng</Text>
+                                <Text style={{ fontSize: 16 }}>{totalAvenue.toLocaleString()}</Text>
+                            </View>
+                            <View style={styles.barChart}>
+                                <Text style={{ color: 'black', fontSize: 16, fontWeight: 'bold', margin: 20, textAlign: 'center' }}>
+                                    Theo tháng
+                                </Text>
+                                <Text style={{ color: 'gray', fontSize: 12, textAlign: 'right' }}>
+                                    Tỉ lệ: 1:10000
+                                </Text>
+                                {/* <BarChart
                                 // showFractionalValues
                                 // showYAxisIndices
                                 hideRules
@@ -185,33 +192,34 @@ const HomeScreen: React.FC = () => {
                                 data={barData}
                             // isAnimated
                             /> */}
-                            <AreaChart ptData={payments} />
-                        </View>
-                        <View style={styles.historyList}>
-                            <Text style={{ color: '#858585', fontWeight: '600', fontSize: 18, marginVertical: 10, marginTop: 15 }}>LỊCH SỬ</Text>
+                                <AreaChart ptData={payments} />
+                            </View>
+                            <View style={styles.historyList}>
+                                <Text style={{ color: '#858585', fontWeight: '600', fontSize: 18, marginVertical: 10, marginTop: 15 }}>LỊCH SỬ</Text>
 
-                            {payments.map((item, index) => (
-                                <View key={index} style={styles.historyItem}>
-                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
-                                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Tháng {new Date(item.start_date).getMonth() + 1}</Text>
-                                        <View style={[{ width: 113, height: 21, borderWidth: 1, borderRadius: 10, justifyContent: 'center' }, item.status === 'paid' ? { borderColor: 'green' } : { borderColor: 'orange' }]}>
-                                            <Text style={[{ textAlign: 'center' }, item.status === 'paid' ? { color: 'green' } : { color: 'orange' }]}>{statusConvert[item.status]}</Text>
+                                {payments.map((item, index) => (
+                                    <View key={index} style={styles.historyItem}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                                            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Tháng {new Date(item.start_date).getMonth() + 1}</Text>
+                                            <View style={[{ width: 113, height: 21, borderWidth: 1, borderRadius: 10, justifyContent: 'center' }, item.status === 'paid' ? { borderColor: 'green' } : { borderColor: 'orange' }]}>
+                                                <Text style={[{ textAlign: 'center' }, item.status === 'paid' ? { color: 'green' } : { color: 'orange' }]}>{statusConvert[item.status]}</Text>
+                                            </View>
+                                        </View>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <Text style={{ fontSize: 16, color: '#858585' }}>{formatDateICT(item.created_at)}</Text>
+                                            <Text style={{ fontWeight: 'bold', color: '#333333', fontSize: 15 }}>{item.amount.toLocaleString('vi-VN')} VNĐ</Text>
                                         </View>
                                     </View>
-                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                        <Text style={{ fontSize: 16, color: '#858585' }}>{formatDateICT(item.created_at)}</Text>
-                                        <Text style={{ fontWeight: 'bold', color: '#333333', fontSize: 15 }}>{item.amount.toLocaleString('vi-VN')} VNĐ</Text>
-                                    </View>
-                                </View>
-                            ))}
+                                ))}
 
-                        </View>
-                    </> :
-                    <View style={styles.emptyContainer}>
-                        <MaterialIcons name="history" size={40} color="#B4B4B8" />
-                        <Text style={styles.emptyMessage}>Hiện tại chưa có lịch sử thu nhập nào</Text>
-                    </View>}
-            </ScrollView>
+                            </View>
+                        </> :
+                        <View style={styles.emptyContainer}>
+                            <MaterialIcons name="history" size={40} color="#B4B4B8" />
+                            <Text style={styles.emptyMessage}>Hiện tại chưa có lịch sử thu nhập nào</Text>
+                        </View>}
+                </ScrollView>
+            )}
         </SafeAreaView>
     );
 }
@@ -220,6 +228,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'white',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     barChart: {
         marginTop: 20

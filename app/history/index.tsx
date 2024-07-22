@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native'
+import { View, Text, StatusBar, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { Image } from 'react-native'
 import { Divider } from 'react-native-paper';
@@ -157,102 +157,108 @@ const HistoryScreen: React.FC = () => {
       <StatusBar barStyle="dark-content" />
 
       <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView>
-          <View style={styles.container}>
-            {/* Info */}
-            <View style={{ width: '100%', height: 'auto', backgroundColor: 'white', marginBottom: 10, paddingVertical: 20, justifyContent: 'center', paddingLeft: 28 }}>
-              <Text style={{ fontSize: 20, fontWeight: 'bold', textTransform: 'uppercase' }}>{detailCar?.car_model.brand + ' ' + detailCar?.car_model.model + ' ' + detailCar?.car_model.year}</Text>
-              <Text style={{ fontSize: 14, color: '#939393', marginBottom: 9, marginTop: 8, fontWeight: '600', textTransform: 'uppercase' }}>Biển số xe: {detailCar?.license_plate}</Text>
-              {/* <View style={{ flexDirection: 'row', paddingVertical: 5 }}>
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" />
+          </View>
+        ) : (
+          <ScrollView>
+            <View style={styles.container}>
+              {/* Info */}
+              <View style={{ width: '100%', height: 'auto', backgroundColor: 'white', marginBottom: 10, paddingVertical: 20, justifyContent: 'center', paddingLeft: 28 }}>
+                <Text style={{ fontSize: 20, fontWeight: 'bold', textTransform: 'uppercase' }}>{detailCar?.car_model.brand + ' ' + detailCar?.car_model.model + ' ' + detailCar?.car_model.year}</Text>
+                <Text style={{ fontSize: 14, color: '#939393', marginBottom: 9, marginTop: 8, fontWeight: '600', textTransform: 'uppercase' }}>Biển số xe: {detailCar?.license_plate}</Text>
+                {/* <View style={{ flexDirection: 'row', paddingVertical: 5 }}>
                 <Text style={{ fontSize: 14, marginRight: 5 }}>Hoạt động mới nhất:</Text>
                 <Text style={{ fontSize: 14, color: '#24D02B', fontWeight: 'bold' }}>---</Text>
               </View> */}
-            </View>
+              </View>
 
-            {/* Tab */}
-            <View style={styles.tabContainer}>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollViewContent}>
-                <TouchableOpacity onPress={() => handleTabPress('no_filter')} style={[styles.tabItem, activeTab === 'no_filter' && styles.activeTabItem]}>
-                  <Text style={[styles.tabText, activeTab === 'no_filter' && { color: '#773BFF', fontWeight: '600' }]}>Tất cả</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleTabPress('ordered')} style={[styles.tabItem, activeTab === 'ordered' && styles.activeTabItem]}>
-                  <Text style={[styles.tabText, activeTab === 'ordered' && { color: '#773BFF', fontWeight: '600' }]}>Đã đặt</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleTabPress('renting')} style={[styles.tabItem, activeTab === 'renting' && styles.activeTabItem]}>
-                  <Text style={[styles.tabText, activeTab === 'renting' && { color: '#773BFF', fontWeight: '600' }]}>Đang thuê</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleTabPress('completed')} style={[styles.tabItem, activeTab === 'completed' && styles.activeTabItem]}>
-                  <Text style={[styles.tabText, activeTab === 'completed' && { color: '#773BFF', fontWeight: '600' }]}>Hoàn thành</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleTabPress('waiting_for_agreement')} style={[styles.tabItem, activeTab === 'waiting_for_agreement' && styles.activeTabItem]}>
-                  <Text style={[styles.tabText, activeTab === 'waiting_for_agreement' && { color: '#773BFF', fontWeight: '600' }]}>Chờ chấp thuận</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleTabPress('waiting_contract_payment')} style={[styles.tabItem, activeTab === 'waiting_contract_payment' && styles.activeTabItem]}>
-                  <Text style={[styles.tabText, activeTab === 'waiting_contract_payment' && { color: '#773BFF', fontWeight: '600' }]}>Chờ thanh toán</Text>
-                </TouchableOpacity>
-              </ScrollView>
-            </View>
+              {/* Tab */}
+              <View style={styles.tabContainer}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollViewContent}>
+                  <TouchableOpacity onPress={() => handleTabPress('no_filter')} style={[styles.tabItem, activeTab === 'no_filter' && styles.activeTabItem]}>
+                    <Text style={[styles.tabText, activeTab === 'no_filter' && { color: '#773BFF', fontWeight: '600' }]}>Tất cả</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleTabPress('ordered')} style={[styles.tabItem, activeTab === 'ordered' && styles.activeTabItem]}>
+                    <Text style={[styles.tabText, activeTab === 'ordered' && { color: '#773BFF', fontWeight: '600' }]}>Đã đặt</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleTabPress('renting')} style={[styles.tabItem, activeTab === 'renting' && styles.activeTabItem]}>
+                    <Text style={[styles.tabText, activeTab === 'renting' && { color: '#773BFF', fontWeight: '600' }]}>Đang thuê</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleTabPress('completed')} style={[styles.tabItem, activeTab === 'completed' && styles.activeTabItem]}>
+                    <Text style={[styles.tabText, activeTab === 'completed' && { color: '#773BFF', fontWeight: '600' }]}>Hoàn thành</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleTabPress('waiting_for_agreement')} style={[styles.tabItem, activeTab === 'waiting_for_agreement' && styles.activeTabItem]}>
+                    <Text style={[styles.tabText, activeTab === 'waiting_for_agreement' && { color: '#773BFF', fontWeight: '600' }]}>Chờ chấp thuận</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleTabPress('waiting_contract_payment')} style={[styles.tabItem, activeTab === 'waiting_contract_payment' && styles.activeTabItem]}>
+                    <Text style={[styles.tabText, activeTab === 'waiting_contract_payment' && { color: '#773BFF', fontWeight: '600' }]}>Chờ thanh toán</Text>
+                  </TouchableOpacity>
+                </ScrollView>
+              </View>
 
-            {/* Card */}
-            <View>
-              {activityHistory.length > 0 ?
-                <>
-                  {activityHistory.map((act, index) => {
-                    const startDate = formatDateToDDMMYYYY(convertUTCToICT(act.start_date));
-                    const endDate = formatDateToDDMMYYYY(convertUTCToICT(act.end_date));
+              {/* Card */}
+              <View>
+                {activityHistory.length > 0 ?
+                  <>
+                    {activityHistory.map((act, index) => {
+                      const startDate = formatDateToDDMMYYYY(convertUTCToICT(act.start_date));
+                      const endDate = formatDateToDDMMYYYY(convertUTCToICT(act.end_date));
 
-                    return (
-                      <View key={index} style={styles.card}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
-                          <View style={{ flexDirection: 'row' }}>
-                            <Text style={{ fontWeight: '600', marginLeft: 8 }}>{startDate}</Text>
-                            <Text style={{ fontWeight: 'bold', marginHorizontal: 5 }}>→</Text>
-                            <Text style={{ fontWeight: '600' }}>{endDate}</Text>
+                      return (
+                        <View key={index} style={styles.card}>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
+                            <View style={{ flexDirection: 'row' }}>
+                              <Text style={{ fontWeight: '600', marginLeft: 8 }}>{startDate}</Text>
+                              <Text style={{ fontWeight: 'bold', marginHorizontal: 5 }}>→</Text>
+                              <Text style={{ fontWeight: '600' }}>{endDate}</Text>
+                            </View>
+                            <Text style={{ color: getStatusStyles(act.status).color, fontWeight: 'bold' }}>{statusConvert[act.status]}</Text>
                           </View>
-                          <Text style={{ color: getStatusStyles(act.status).color, fontWeight: 'bold' }}>{statusConvert[act.status]}</Text>
-                        </View>
-                        <Divider style={{ marginBottom: 10, marginTop: -5 }} />
-                        <View style={{ flexDirection: 'row' }}>
-                          <View style={styles.cardBody}>
-                            {/* <Text style={styles.cardTitle}>HUYNDAI I10 2023</Text> */}
-                            <View style={styles.cardRow}>
-                              <Text style={styles.cardTag}>Thành tiền:  {(act.rent_price + act.insurance_amount).toLocaleString()} VNĐ</Text>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  router.push({
-                                    pathname: '/activityDetail', params: {
-                                      licensePlate: act.car.license_plate,
-                                      carName: `${act.car.car_model.brand} ${act.car.car_model.model} ${act.car.car_model.year}`,
-                                      startDate: startDate,
-                                      endDate: endDate,
-                                      feebackRating: act.feedback_rating,
-                                      feebackContent: act.feedback_content,
-                                      rentPrice: act.rent_price,
-                                      customerName: act.customer.first_name + ' ' + act.customer.last_name,
-                                      avatarUrl: act.customer.avatar_url,
-                                      net_receive: act.net_receive
-                                    }
-                                  })
-                                }}
-                                style={styles.button}>
-                                <Text style={{ color: 'white', fontSize: 14 }}>Chi tiết</Text>
-                              </TouchableOpacity>
+                          <Divider style={{ marginBottom: 10, marginTop: -5 }} />
+                          <View style={{ flexDirection: 'row' }}>
+                            <View style={styles.cardBody}>
+                              {/* <Text style={styles.cardTitle}>HUYNDAI I10 2023</Text> */}
+                              <View style={styles.cardRow}>
+                                <Text style={styles.cardTag}>Thành tiền:  {(act.rent_price + act.insurance_amount).toLocaleString()} VNĐ</Text>
+                                <TouchableOpacity
+                                  onPress={() => {
+                                    router.push({
+                                      pathname: '/activityDetail', params: {
+                                        licensePlate: act.car.license_plate,
+                                        carName: `${act.car.car_model.brand} ${act.car.car_model.model} ${act.car.car_model.year}`,
+                                        startDate: startDate,
+                                        endDate: endDate,
+                                        feebackRating: act.feedback_rating,
+                                        feebackContent: act.feedback_content,
+                                        rentPrice: act.rent_price,
+                                        customerName: act.customer.first_name + ' ' + act.customer.last_name,
+                                        avatarUrl: act.customer.avatar_url,
+                                        net_receive: act.net_receive
+                                      }
+                                    })
+                                  }}
+                                  style={styles.button}>
+                                  <Text style={{ color: 'white', fontSize: 14 }}>Chi tiết</Text>
+                                </TouchableOpacity>
+                              </View>
                             </View>
                           </View>
                         </View>
-                      </View>
-                    );
-                  })}
-                </>
-                :
-                <Text style={{ fontSize: 16, color: '#B4B4B8', textAlign: 'center', marginTop: 30, marginHorizontal: 30 }}>
-                  Không có hoạt động nào
-                  trong trạng thái {statusConvert[activeTab]}
-                </Text>
-              }
+                      );
+                    })}
+                  </>
+                  :
+                  <Text style={{ fontSize: 16, color: '#B4B4B8', textAlign: 'center', marginTop: 30, marginHorizontal: 30 }}>
+                    Không có hoạt động nào
+                    trong trạng thái {statusConvert[activeTab]}
+                  </Text>
+                }
+              </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        )}
       </SafeAreaView>
     </View>
   )
@@ -262,6 +268,11 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 0,
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   card: {
     marginBottom: 10,

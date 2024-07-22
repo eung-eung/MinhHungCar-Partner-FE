@@ -194,7 +194,7 @@ const ChatScreen: React.FC = () => {
     return (
         <>
             {isLoading ? (
-                <View style={styles.loaderStyle}>
+                <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#aaa" />
                 </View>
             ) : (
@@ -250,8 +250,9 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
     },
-    loaderStyle: {
-        marginTop: 100,
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
     },
     inputContainer: {
