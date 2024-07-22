@@ -353,28 +353,28 @@ const AddCarInformationScreen: React.FC = () => {
             return;
         }
 
-        // Check config in MinhHungCar garage if selectedParking is 'garage'
-        if (selectedParking === 'garage') {
-            await fetchParkingLotMetadata();
-            if (parkingLotMetadata.length !== 1) {
-                Alert.alert(
-                    'Lỗi',
-                    'Bãi đổ MinhHungCar không còn chỗ. Vui lòng chọn để xe tại nhà!',
-                    [
-                        {
-                            text: 'OK',
-                            onPress: () => {
-                                setSelectedParking('home');
-                            }
-                        }
-                    ]
-                );
-                return; // Prevent form submission
-            }
-        }
-
         try {
             setLoadButton(true);
+
+            // Check config in MinhHungCar garage if selectedParking is 'garage'
+            if (selectedParking === 'garage') {
+                await fetchParkingLotMetadata();
+                if (parkingLotMetadata.length === 1) {
+                    Alert.alert(
+                        'Lỗi',
+                        'Bãi đổ MinhHungCar không còn chỗ. Vui lòng chọn để xe tại nhà!',
+                        [
+                            {
+                                text: 'OK',
+                                onPress: () => {
+                                    setSelectedParking('home');
+                                }
+                            }
+                        ]
+                    );
+                    return; // Prevent form submission
+                }
+            }
 
             const response = await axios.post(
                 apiCar.registerCar,
@@ -396,10 +396,17 @@ const AddCarInformationScreen: React.FC = () => {
 
             setId(response.data.data.car.id);
             setBasePrice(response.data.data.car.car_model.based_price);
+
             // console.log("id: ", response.data.data.car.id);
             // console.log("basePrice: ", response.data.data.car.car_model.based_price);
-        } catch (error) {
-            Alert.alert('Lỗi', 'Thêm xe thất bại. Vui lòng thử lại!');
+        } catch (error: any) {
+            if (error.response?.data?.error_code === 10062) {
+                Alert.alert('Lỗi', 'Biển số xe này đã tồn tại!');
+                console.log("Error register car: ", error.response.data.message)
+            } else {
+                Alert.alert('Lỗi', 'Thêm xe thất bại. Vui lòng thử lại!');
+                console.log("Error register car: ", error.response.data.message)
+            }
         } finally {
             setLoadButton(false);
         }
