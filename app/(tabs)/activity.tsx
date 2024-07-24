@@ -76,8 +76,9 @@ const ActivityScreen: React.FC = () => {
                 });
 
             const newCars = response.data.data.cars;
-            if (newCars.length > 0) {
-                setRegisteredCars(newCars)
+            const filteredCars = newCars.filter((car: Car) => car.status !== 'rejected');
+            if (filteredCars.length > 0) {
+                setRegisteredCars(filteredCars)
             }
             setLoading(false)
         } catch (error: any) {
