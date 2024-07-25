@@ -1,5 +1,6 @@
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { AuthConText } from '@/store/AuthContext';
+import { AntDesign } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
@@ -91,7 +92,7 @@ const ActivityScreen: React.FC = () => {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#F2F2F2' }}>
+        <View style={{ flex: 1, backgroundColor: '#F9F9F9' }}>
             <StatusBar barStyle="dark-content" />
             <SafeAreaView style={{ flex: 1 }}>
                 {isLoading ? (
@@ -145,6 +146,7 @@ const ActivityScreen: React.FC = () => {
                                     </>
                                     :
                                     <View style={styles.emptyChatContainer}>
+                                        <AntDesign name="inbox" size={50} color="#B4B4B8" />
                                         <Text style={styles.emptyChatText}>Chưa có hoạt động nào</Text>
                                     </View>
                                 }
@@ -234,6 +236,7 @@ const styles = StyleSheet.create({
     emptyChatText: {
         fontSize: 16,
         color: '#696969',
+        marginTop: 10
     },
 });
 
