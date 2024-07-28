@@ -250,20 +250,10 @@ const ProfileScreen: React.FC = () => {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.form}>
-                                <View style={styles.input}>
-                                    <Text style={styles.inputLabel}>Họ</Text>
-                                    <TextInput
-                                        clearButtonMode="while-editing"
-                                        onChangeText={(firstName) => setFirstName(firstName)}
-                                        placeholder="abc"
-                                        placeholderTextColor="#6b7280"
-                                        style={styles.inputControl}
-                                        value={firstName}
-                                    />
-                                </View>
+
 
                                 <View style={styles.input}>
-                                    <Text style={styles.inputLabel}>Tên</Text>
+                                    <Text style={styles.inputLabel}>Họ</Text>
                                     <TextInput
                                         clearButtonMode="while-editing"
                                         onChangeText={(lastName) => setLastName(lastName)}
@@ -271,6 +261,18 @@ const ProfileScreen: React.FC = () => {
                                         placeholderTextColor="#6b7280"
                                         style={styles.inputControl}
                                         value={lastName}
+                                    />
+                                </View>
+
+                                <View style={styles.input}>
+                                    <Text style={styles.inputLabel}>Tên</Text>
+                                    <TextInput
+                                        clearButtonMode="while-editing"
+                                        onChangeText={(firstName) => setFirstName(firstName)}
+                                        placeholder="abc"
+                                        placeholderTextColor="#6b7280"
+                                        style={styles.inputControl}
+                                        value={firstName}
                                     />
                                 </View>
 
