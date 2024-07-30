@@ -331,6 +331,7 @@ const AddCarInformationScreen: React.FC = () => {
         return true;
     };
     const handleSubmit = async () => {
+        console.log("selectedPeriodCode: ", selectedPeriodCode)
         // Check if user has filled in all required fields
         if (
             !licensePlate ||
