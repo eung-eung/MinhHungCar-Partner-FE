@@ -38,6 +38,7 @@ const statusMessages: Record<string, string> = {
     approved: 'Xe đã được duyệt thành công. Bạn có thể tiến hành kí hợp đồng',
     rejected: 'Thông tin xe bị từ chối. Vui lòng kiểm tra và đăng kí lại',
     active: 'Xe đang được sử dụng bởi MinhHungCar',
+    inactive: 'Xe đã dừng hoạt động. Muốn biết thêm chi tiết vui lòng liên hệ MinhHungCar!',
     waiting_car_delivery: 'Chủ xe phải tới trung tâm để kiểm chứng giấy tờ',
     'pending_application:pending_car_images': 'Đang chờ hoàn thành thông tin ảnh xe',
     'pending_application:pending_car_caveat': 'Đang chờ hoàn thành thông tin giấy tờ xe',
@@ -50,6 +51,7 @@ const statusConvert: Record<string, string> = {
     approved: 'Đã duyệt',
     rejected: 'Đã từ chối',
     active: 'Đang hoạt động',
+    inactive: 'Dừng hoạt động',
     waiting_car_delivery: 'Đợi giao xe',
     'pending_application:pending_car_images': 'Chưa đăng kí hình ảnh',
     'pending_application:pending_car_caveat': 'Chưa đăng kí giấy tờ xe',
@@ -60,9 +62,10 @@ const TabConvert: Record<string, string> = {
     no_filter: 'Tất cả',
     pending_approval: 'Chờ duyệt',
     approved: 'Đã duyệt',
+    waiting_car_delivery: 'Đợi giao xe',
     rejected: 'Đã từ chối',
     active: 'Đang hoạt động',
-    waiting_car_delivery: 'Đợi giao xe',
+    inactive: 'Dừng hoạt động',
     pending_application: 'Đợi hoàn thành thông tin',
 };
 
@@ -76,6 +79,8 @@ const getStatusStyles = (status: any) => {
             return { borderColor: '#FF4040', color: '#FF4040' };
         case 'active':
             return { borderColor: '#53D23E', color: '#53D23E' };
+        case 'inactive':
+            return { borderColor: '#A91D3A', color: '#A91D3A' };
         case 'waiting_car_delivery':
             return { borderColor: '#56AEFF', color: '#56AEFF' };
         default:

@@ -72,6 +72,8 @@ const getStatusStyles = (status: any) => {
             return { borderColor: '#FF4040', color: '#FF4040', borderRadius: 15, borderWidth: 1 };
         case 'active':
             return { borderColor: '#53D23E', color: '#53D23E', borderRadius: 15, borderWidth: 1 };
+        case 'inactive':
+            return { borderColor: '#A91D3A', color: '#A91D3A', borderRadius: 15, borderWidth: 1 };
         case 'waiting_car_delivery':
             return { borderColor: '#56AEFF', color: '#56AEFF', borderRadius: 15, borderWidth: 1 };
         default:
@@ -85,6 +87,7 @@ const statusConvert: Record<string, string> = {
     approved: 'Đã duyệt',
     rejected: 'Đã từ chối',
     active: 'Đang hoạt động',
+    inactive: 'Dừng hoạt động',
     waiting_car_delivery: 'Đợi giao xe',
     'pending_application:pending_car_images': 'Chưa đăng kí hình ảnh',
     'pending_application:pending_car_caveat': 'Chưa đăng kí giấy tờ xe',
