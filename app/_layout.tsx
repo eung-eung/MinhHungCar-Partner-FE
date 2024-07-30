@@ -56,7 +56,7 @@ export default function RootLayout() {
                 title: 'Đăng kí xe',
                 gestureEnabled: false,
                 headerLeft: (props) => <BackButton title="Bạn có muốn trở về?"
-                  subTitle="Bạn đang ở màn hình nhập thông xin xe. Bạn có muốn hủy và trở về?"
+                  subTitle="Bạn đang ở màn hình nhập thông tin xe. Bạn có muốn hủy và trở về?"
                   callBack={() => router.replace("/car")}
                 />
               }} />
@@ -66,7 +66,7 @@ export default function RootLayout() {
                 title: 'Đăng kí xe',
                 gestureEnabled: false,
                 headerLeft: (props) => <BackButton title="Bạn có muốn trở về?"
-                  subTitle="Bạn đang ở màn hình nhập thông xin xe. Bạn có muốn hủy và trở về?"
+                  subTitle="Bạn đang ở màn hình nhập thông tin xe. Bạn có muốn hủy và trở về?"
                   callBack={() => router.replace("/car")}
                 />
               }} />
@@ -76,7 +76,7 @@ export default function RootLayout() {
                 title: 'Đăng kí xe',
                 gestureEnabled: false,
                 headerLeft: (props) => <BackButton title="Bạn có muốn trở về?"
-                  subTitle="Bạn đang ở màn hình nhập thông xin xe. Bạn có muốn hủy và trở về?"
+                  subTitle="Bạn đang ở màn hình nhập thông tin xe. Bạn có muốn hủy và trở về?"
                   callBack={() => router.replace("/car")}
                 />
               }} />
@@ -86,7 +86,7 @@ export default function RootLayout() {
                 title: 'Đăng kí xe',
                 gestureEnabled: false,
                 headerLeft: (props) => <BackButton title="Bạn có muốn trở về?"
-                  subTitle="Bạn đang ở màn hình nhập thông xin xe. Bạn có muốn hủy và trở về?"
+                  subTitle="Bạn đang ở màn hình nhập thông tin xe. Bạn có muốn hủy và trở về?"
                   callBack={() => router.replace("/car")}
                 />
               }} />

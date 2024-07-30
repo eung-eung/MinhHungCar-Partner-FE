@@ -116,7 +116,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isLogin, onSubmit, credentialsInval
                                 </View>
                             )}
 
-                            {!isLogin && (
+                            {/* {!isLogin && (
                                 <View style={styles.input}>
                                     <Text style={styles.inputLabel}>Tên
                                         <Text style={{ color: 'red' }}>*</Text>
@@ -128,7 +128,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isLogin, onSubmit, credentialsInval
                                         placeholder='Văn A'
                                     />
                                 </View>
-                            )}
+                            )} */}
 
 
 
