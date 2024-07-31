@@ -367,9 +367,7 @@ const MyCar: React.FC = () => {
                             <FlatList
                                 data={registeredCars}
                                 renderItem={renderItem}
-                                keyExtractor={(item) => {
-                                    return item.id.toString()
-                                }}
+                                keyExtractor={(item, index) => index.toString()}
                                 ListFooterComponent={renderFooter}
                                 // onEndReached={!isLoading && loadMoreItem}
                                 // onEndReachedThreshold={0}

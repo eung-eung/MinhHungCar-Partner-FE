@@ -156,7 +156,7 @@ const HistoryScreen: React.FC = () => {
     <View style={{ flex: 1 }}>
       <StatusBar barStyle="dark-content" />
 
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#F9F9F9', }}>
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" />
