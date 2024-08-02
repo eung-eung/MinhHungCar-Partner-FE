@@ -83,6 +83,8 @@ const getStatusStyles = (status: string) => {
             return { borderColor: '#24D02B', color: '#24D02B' };
         case 'completed':
             return { borderColor: '#15891A', color: '#15891A' };
+        case 'canceled':
+            return { borderColor: '#C80036', color: '#C80036' };
         default:
             return {};
     }
@@ -95,6 +97,7 @@ const statusConvert: Record<string, string> = {
     ordered: 'Đã đặt',
     renting: 'Đang thuê',
     completed: 'Hoàn thành',
+    canceled: 'Đã hủy'
 };
 export default function ActivityDetailScreen() {
     const params = useLocalSearchParams()
