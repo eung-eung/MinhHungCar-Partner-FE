@@ -84,7 +84,7 @@ const getStatusStyles = (status: string) => {
         case 'completed':
             return { borderColor: '#15891A', color: '#15891A' };
         case 'canceled':
-            return { borderColor: '#C80036', color: '#C80036' };
+            return { borderColor: '#D21312', color: '#D21312' };
         default:
             return {};
     }
