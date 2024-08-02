@@ -1,33 +1,165 @@
 import { View, Text, SafeAreaView, ScrollView, StyleSheet, Image, ActivityIndicator } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Divider } from 'react-native-paper';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { useLocalSearchParams } from 'expo-router';
+import axios from 'axios';
+import { AuthConText } from '@/store/AuthContext';
+import Swiper from 'react-native-swiper';
+import { AntDesign } from '@expo/vector-icons';
 
+interface Activity {
+    id: number;
+    car_id: number;
+    customer: {
+        id: number;
+        first_name: string;
+        last_name: string;
+        avatar_url: string
+    };
+    car: {
+        id: number;
+        car_model: {
+            brand: string;
+            model: string;
+            year: number;
+        };
+        license_plate: string;
+        price: number;
+        status: string;
+    };
+    start_date: string;
+    end_date: string;
+    status: string;
+    reason: string;
+    rent_price: number;
+    insurance_amount: number;
+    feedback_rating: number;
+    feedback_content: string;
+    net_receive: number;
+
+}
+
+interface CarDetail {
+    id: number;
+    car_model: {
+        brand: string;
+        model: string;
+        year: number;
+    };
+    license_plate: string;
+    rating: number;
+    images: string[];
+}
+
+const convertUTCToICT = (utcDateStr: string) => {
+    const utcDate = new Date(utcDateStr);
+    const ictOffset = 7 * 60;
+    const ictDate = new Date(utcDate.getTime() + (ictOffset * 60 * 1000));
+    return ictDate;
+};
+
+const formatDateToDDMMYYYY = (date: Date) => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-based
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+};
+const formatNumber = (number: any) => {
+    return new Intl.NumberFormat('vi-VN').format(number);
+};
+
+const getStatusStyles = (status: string) => {
+    switch (status) {
+        case 'no_filter':
+            return { borderColor: '#F89F36', color: '#F89F36' };
+        case 'waiting_contract_payment':
+            return { borderColor: '#56AEFF', color: '#56AEFF' };
+        case 'waiting_for_agreement':
+            return { borderColor: 'gray', color: 'gray' };
+        case 'ordered':
+            return { borderColor: '#F4BB4C', color: '#F4BB4C' };
+        case 'renting':
+            return { borderColor: '#24D02B', color: '#24D02B' };
+        case 'completed':
+            return { borderColor: '#15891A', color: '#15891A' };
+        default:
+            return {};
+    }
+};
+
+const statusConvert: Record<string, string> = {
+    no_filter: 'Tất cả',
+    waiting_for_agreement: 'Chờ chấp thuận',
+    waiting_contract_payment: 'Chờ thanh toán',
+    ordered: 'Đã đặt',
+    renting: 'Đang thuê',
+    completed: 'Hoàn thành',
+};
 export default function ActivityDetailScreen() {
     const params = useLocalSearchParams()
-    const { licensePlate, carName, startDate, endDate, feebackRating, feebackContent, rentPrice, customerName, avatarUrl, net_receive } = params
+    const { carID, activityID } = params;
+    const authCtx = useContext(AuthConText);
+    const token = authCtx.access_token;
+
+    // const { licensePlate, carName, startDate, endDate, feebackRating, feebackContent, rentPrice, customerName, avatarUrl, net_receive } = params
     const [loading, setLoading] = useState(true);
+    const [activityHistory, setActivityHistory] = useState<Activity[]>([]);
+    const [detailActivity, setDetailActivity] = useState<Activity>();
+    const [detailCar, setDetailCar] = useState<CarDetail>();
+
+    // useEffect(() => {
+    //     // Simulate data fetching or any async operation
+    //     const fetchData = async () => {
+    //         try {
+    //             // Simulate a network request
+    //             await new Promise(resolve => setTimeout(resolve, 2000));
+    //         } catch (error) {
+    //             console.error('Error fetching data:', error);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+
+    //     fetchData();
+    // }, []);
 
     useEffect(() => {
-        // Simulate data fetching or any async operation
-        const fetchData = async () => {
-            try {
-                // Simulate a network request
-                await new Promise(resolve => setTimeout(resolve, 2000));
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+        getActivity();
+        getDetailCar();
+    }, [activityID, carID]);
 
-        fetchData();
-    }, []);
-
-    const formatNumber = (number: any) => {
-        return new Intl.NumberFormat('vi-VN').format(number);
+    const getActivity = async () => {
+        try {
+            const response = await axios.get(`https://minhhungcar.xyz/partner/activity?car_id=${carID}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setActivityHistory(response.data.data);
+            const detailActivity = response.data.data.find((act: Activity) => act.id === Number(activityID));
+            setDetailActivity(detailActivity);
+            console.log("status: ", detailActivity.status)
+            setLoading(false);
+        } catch (error: any) {
+            console.log('Error get Activity history: ', error.response.data.message);
+        }
     };
+
+    const getDetailCar = async () => {
+        try {
+            const response = await axios.get(`https://minhhungcar.xyz/car/${carID}`);
+            setDetailCar(response.data.data);
+            // console.log('Fetch successfully: ', response.data.message);
+        } catch (error: any) {
+            if (error.response.data.error_code === 10027) {
+                console.log('Erro get detail car at history: ', error.response.data.message);
+            } else {
+                console.log('Error getDetailCar: ', error.response.data.message);
+            }
+        }
+    };
+
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -37,64 +169,114 @@ export default function ActivityDetailScreen() {
                 </View>
             ) : (
                 <ScrollView>
-                    <View style={styles.container}>
-                        {/* Info */}
-                        <View>
-                            <Text style={styles.date}>{startDate} → {endDate}</Text>
-                            <Text style={styles.name}>{carName}</Text>
-                            <Text style={styles.plate}>Biển số xe: {licensePlate}</Text>
-                            <Text style={styles.price}>Giá thuê: {formatNumber(rentPrice)} đ</Text>
-                            <Text style={styles.price}>Thực nhận: {formatNumber(net_receive)} đ</Text>
+                    {detailActivity ? (
+                        <View style={styles.container}>
+                            {/* Info */}
+                            <View>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
+                                    <Text style={styles.date}>{formatDateToDDMMYYYY(convertUTCToICT(detailActivity.start_date))} → {formatDateToDDMMYYYY(convertUTCToICT(detailActivity.start_date))}</Text>
 
-                            {(feebackRating && feebackContent) ?
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={styles.ratingText}>Đánh giá: </Text>
-                                    <TabBarIcon name='star' color='orange' size={24} />
-                                    <Text style={styles.ratingText}>{feebackRating}</Text>
+                                    {/* <View style={{ borderColor: getStatusStyles(detailActivity.status).borderColor, borderWidth: 1, paddingVertical: 5, paddingHorizontal: 35, borderRadius: 20 }}> */}
+                                    <Text style={{ color: getStatusStyles(detailActivity.status).color, fontWeight: 'bold', fontSize: 14 }}>{statusConvert[detailActivity.status]}</Text>
+                                    {/* </View> */}
+                                </View>
+                                <Text style={styles.name}>{`${detailActivity.car.car_model.brand} ${detailActivity.car.car_model.model} ${detailActivity.car.car_model.year}`}</Text>
+                                <Text style={styles.plate}>Biển số xe: {detailActivity.car.license_plate}</Text>
+
+                                <Text style={styles.price}>Giá thuê: {formatNumber(detailActivity.rent_price)} đ</Text>
+                                <Text style={styles.price}>Thực nhận: {formatNumber(detailActivity.net_receive)} đ</Text>
+
+                                {(detailActivity.feedback_rating && detailActivity.feedback_content) ?
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Text style={styles.ratingText}>Đánh giá: </Text>
+                                        <TabBarIcon name='star' color='orange' size={24} />
+                                        <Text style={styles.ratingText}>{detailActivity.feedback_content}</Text>
+                                    </View>
+                                    : ""}
+
+                                <View style={styles.photos}>
+                                    {Array.isArray(detailCar?.images) && detailCar.images.length > 0 ? (
+                                        <View style={styles.photos}>
+                                            <Swiper
+                                                renderPagination={(index, total) => (
+                                                    <View style={styles.photosPagination}>
+                                                        <Text style={styles.photosPaginationText}>
+                                                            {index + 1} of {total}
+                                                        </Text>
+                                                    </View>
+                                                )}
+                                            >
+                                                {detailCar.images.map((src, index) => (
+                                                    <Image
+                                                        key={index}
+                                                        source={{ uri: src }}
+                                                        style={styles.photosImg}
+                                                        resizeMode="cover"
+                                                    />
+                                                ))}
+                                            </Swiper>
+                                        </View>
+                                    ) : (
+                                        <Text style={styles.errorText}>Không có hình ảnh xe</Text>
+                                    )}
+                                </View>
+
+                            </View>
+
+
+                            {/* Feedback */}
+                            {(detailActivity.feedback_rating && detailActivity.feedback_content) ?
+                                <View>
+                                    <Divider style={{ marginVertical: 20 }} />
+
+                                    <View style={{ marginTop: 5 }}>
+                                        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Đánh giá của khách hàng</Text>
+                                        <View style={styles.commentContainer}>
+                                            {detailActivity.customer.avatar_url && typeof detailActivity.customer.avatar_url === 'string' ? (
+                                                <Image source={{ uri: detailActivity.customer.avatar_url }} style={styles.commentAvatar} />
+                                            ) : (
+                                                <TabBarIcon name='account-circle' size={40} style={{ borderRadius: 20, marginRight: 10 }} />
+                                            )}
+
+                                            <View style={styles.commentTextContainer}>
+                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                    <Text style={styles.commentAuthor}>{detailActivity.customer.first_name + " " + detailActivity.customer.last_name}</Text>
+                                                    {/* <Text style={styles.commentDate}>19/05/2024</Text> */}
+                                                </View>
+
+                                                <View style={styles.commentRating}>
+                                                    <TabBarIcon name='star' color='orange' size={18} style={{ marginLeft: 3 }} />
+                                                    <Text>{detailActivity.feedback_rating}</Text>
+                                                </View>
+                                                <Text style={styles.commentText}>{detailActivity.feedback_content}</Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+                                : ""}
+                            {/* Note */}
+                            {detailActivity.reason ?
+                                <View>
+                                    <Divider style={{ marginVertical: 20 }} />
+                                    <View style={{ marginTop: 10 }}>
+                                        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Ghi chú</Text>
+                                        <Text style={styles.noteContent}>Móp đầu xe 10%, hư xi nhan, hư đèn pha</Text>
+                                        <Image style={styles.mainImageNote} source={{ uri: 'https://baogiaothong.mediacdn.vn/files/news/2018/04/07/170456-img_8945.jpg' }} />
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <Image style={styles.extraImageNote} source={{ uri: 'https://shitekdetailing.com/uploads/images/bai-viet/gia-sua-xe-o-to-bi-mop-bao-nhieu.jpg' }} />
+                                            <Image style={styles.extraImageNote} source={{ uri: 'https://thegioiphuongtien.vn/uploaded/files/50b5149712b35373823b20877a917d4d.jpg' }} />
+                                            <Image style={styles.extraImageNote} source={{ uri: 'https://danhbongoto.vn/kcfinder/upload/images/Xe-o-to-bi-tray-xuoc-son.jpg' }} />
+                                        </View>
+                                    </View>
                                 </View>
                                 : ""}
                         </View>
-
-                        <Divider style={{ marginVertical: 20 }} />
-
-                        {/* Feedback */}
-                        {(feebackRating && feebackContent) ?
-                            <View style={{ marginTop: 5 }}>
-                                <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Đánh giá của khách hàng</Text>
-                                <View style={styles.commentContainer}>
-                                    {avatarUrl && typeof avatarUrl === 'string' ? (
-                                        <Image source={{ uri: avatarUrl }} style={styles.commentAvatar} />
-                                    ) : (
-                                        <TabBarIcon name='account-circle' size={40} style={{ borderRadius: 20, marginRight: 10 }} />
-                                    )}
-
-                                    <View style={styles.commentTextContainer}>
-                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                            <Text style={styles.commentAuthor}>{customerName}</Text>
-                                            {/* <Text style={styles.commentDate}>19/05/2024</Text> */}
-                                        </View>
-
-                                        <View style={styles.commentRating}>
-                                            <TabBarIcon name='star' color='orange' size={18} style={{ marginLeft: 3 }} />
-                                            <Text>5</Text>
-                                        </View>
-                                        <Text style={styles.commentText}>{feebackContent}</Text>
-                                    </View>
-                                </View>
-                            </View>
-                            : ""}
-                        {/* Note */}
-                        <View style={{ marginTop: 10 }}>
-                            <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Ghi chú</Text>
-                            <Text style={styles.noteContent}>Móp đầu xe 10%, hư xi nhan, hư đèn pha</Text>
-                            <Image style={styles.mainImageNote} source={{ uri: 'https://baogiaothong.mediacdn.vn/files/news/2018/04/07/170456-img_8945.jpg' }} />
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Image style={styles.extraImageNote} source={{ uri: 'https://shitekdetailing.com/uploads/images/bai-viet/gia-sua-xe-o-to-bi-mop-bao-nhieu.jpg' }} />
-                                <Image style={styles.extraImageNote} source={{ uri: 'https://thegioiphuongtien.vn/uploaded/files/50b5149712b35373823b20877a917d4d.jpg' }} />
-                                <Image style={styles.extraImageNote} source={{ uri: 'https://danhbongoto.vn/kcfinder/upload/images/Xe-o-to-bi-tray-xuoc-son.jpg' }} />
-                            </View>
+                    ) : (
+                        <View style={styles.emptyChatContainer}>
+                            <AntDesign name="inbox" size={50} color="#B4B4B8" />
+                            <Text style={styles.emptyChatText}>Chưa có hoạt động nào</Text>
                         </View>
-                    </View>
+                    )}
                 </ScrollView>
             )}
         </SafeAreaView>
@@ -220,5 +402,60 @@ const styles = StyleSheet.create({
         height: 100,
         marginVertical: 15,
         borderRadius: 8
-    }
+    },
+    statusText: {
+        fontWeight: 'bold',
+        marginBottom: 15,
+        padding: 5,
+        paddingHorizontal: 10,
+        width: 180,
+        textAlign: 'center'
+    },
+    /** Photos */
+    photos: {
+        marginTop: 10,
+        position: 'relative',
+        height: 240,
+        overflow: 'hidden',
+        borderRadius: 12,
+    },
+    photosPagination: {
+        position: 'absolute',
+        bottom: 25,
+        right: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        backgroundColor: '#000',
+        borderRadius: 12,
+    },
+    photosPaginationText: {
+        fontWeight: '600',
+        fontSize: 14,
+        color: '#fbfbfb',
+    },
+    photosImg: {
+        flexGrow: 1,
+        flexShrink: 1,
+        flexBasis: 0,
+        width: '100%',
+        height: 240,
+    },
+    errorText: {
+        textAlign: 'center',
+        justifyContent: 'center'
+    },
+    emptyChatContainer: {
+        flex: 1,
+        marginTop: 300,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    emptyChatText: {
+        fontSize: 16,
+        color: '#696969',
+        marginTop: 10
+    },
 });

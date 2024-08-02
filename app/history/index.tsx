@@ -109,6 +109,7 @@ const HistoryScreen: React.FC = () => {
   const [detailCar, setDetailCar] = useState<CarDetail>();
   const isFocused = useIsFocused();
 
+
   // console.log("carID: ", carID)
 
   useEffect(() => {
@@ -138,7 +139,7 @@ const HistoryScreen: React.FC = () => {
       // console.log('Fetch successfully: ', response.data.message);
     } catch (error: any) {
       if (error.response.data.error_code === 10027) {
-        Alert.alert('Lỗi', 'Không thể xem được chi tiết xe lúc này. Vui lòng thử lại sau!');
+        console.log('Erro get detail car at history: ', error.response.data.message);
       } else {
         console.log('Error getDetailCar: ', error.response.data.message);
       }
@@ -226,16 +227,18 @@ const HistoryScreen: React.FC = () => {
                                   onPress={() => {
                                     router.push({
                                       pathname: '/activityDetail', params: {
-                                        licensePlate: act.car.license_plate,
-                                        carName: `${act.car.car_model.brand} ${act.car.car_model.model} ${act.car.car_model.year}`,
-                                        startDate: startDate,
-                                        endDate: endDate,
-                                        feebackRating: act.feedback_rating,
-                                        feebackContent: act.feedback_content,
-                                        rentPrice: act.rent_price,
-                                        customerName: act.customer.first_name + ' ' + act.customer.last_name,
-                                        avatarUrl: act.customer.avatar_url,
-                                        net_receive: act.net_receive
+                                        // licensePlate: act.car.license_plate,
+                                        // carName: `${act.car.car_model.brand} ${act.car.car_model.model} ${act.car.car_model.year}`,
+                                        // startDate: startDate,
+                                        // endDate: endDate,
+                                        // feebackRating: act.feedback_rating,
+                                        // feebackContent: act.feedback_content,
+                                        // rentPrice: act.rent_price,
+                                        // customerName: act.customer.first_name + ' ' + act.customer.last_name,
+                                        // avatarUrl: act.customer.avatar_url,
+                                        // net_receive: act.net_receive
+                                        carID: carID,
+                                        activityID: act.id
                                       }
                                     })
                                   }}
