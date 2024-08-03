@@ -1,5 +1,5 @@
-import { View, Text, StatusBar, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
+import { View, Text, StatusBar, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, RefreshControl } from 'react-native'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Image } from 'react-native'
 import { Divider } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -50,12 +50,7 @@ interface CarDetail {
   rating: number
 }
 
-const convertUTCToICT = (utcDateStr: string) => {
-  const utcDate = new Date(utcDateStr);
-  const ictOffset = 7 * 60;
-  const ictDate = new Date(utcDate.getTime() + (ictOffset * 60 * 1000));
-  return ictDate;
-};
+
 
 const formatDateWithTime = (date: Date): string => {
   const hours = date.getHours().toString().padStart(2, '0');
@@ -108,19 +103,18 @@ const HistoryScreen: React.FC = () => {
   const { carID } = params
   const [activityHistory, setActivityHistory] = useState<Activity[]>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
-  const [page, setPage] = useState<number>(1);
 
-  const [newestStatus, setNewestStatus] = useState()
   const [detailCar, setDetailCar] = useState<CarDetail>();
   const isFocused = useIsFocused();
 
+  const [refreshing, setRefreshing] = useState(false);
 
   // console.log("carID: ", carID)
 
   useEffect(() => {
     getActivity();
     getDetailCar();
-  }, [activeTab, page, isFocused, carID])
+  }, [activeTab, isFocused, carID])
 
   const getActivity = async () => {
     try {
@@ -156,7 +150,14 @@ const HistoryScreen: React.FC = () => {
     setActiveTab(tabName);
   };
 
-
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([
+      getActivity(),
+      getDetailCar(),
+    ]);
+    setRefreshing(false);
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -168,16 +169,15 @@ const HistoryScreen: React.FC = () => {
             <ActivityIndicator size="large" />
           </View>
         ) : (
-          <ScrollView>
+          <ScrollView
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }>
             <View style={styles.container}>
               {/* Info */}
               <View style={{ width: '100%', height: 'auto', backgroundColor: 'white', marginBottom: 10, paddingVertical: 20, justifyContent: 'center', paddingLeft: 28 }}>
                 <Text style={{ fontSize: 20, fontWeight: 'bold', textTransform: 'uppercase' }}>{detailCar?.car_model.brand + ' ' + detailCar?.car_model.model + ' ' + detailCar?.car_model.year}</Text>
                 <Text style={{ fontSize: 14, color: '#939393', marginBottom: 9, marginTop: 8, fontWeight: '600', textTransform: 'uppercase' }}>Biển số xe: {detailCar?.license_plate}</Text>
-                {/* <View style={{ flexDirection: 'row', paddingVertical: 5 }}>
-                <Text style={{ fontSize: 14, marginRight: 5 }}>Hoạt động mới nhất:</Text>
-                <Text style={{ fontSize: 14, color: '#24D02B', fontWeight: 'bold' }}>---</Text>
-              </View> */}
               </View>
 
               {/* Tab */}
@@ -222,23 +222,12 @@ const HistoryScreen: React.FC = () => {
                           <Divider style={{ marginBottom: 10, marginTop: -5 }} />
                           <View style={{ flexDirection: 'row' }}>
                             <View style={styles.cardBody}>
-                              {/* <Text style={styles.cardTitle}>HUYNDAI I10 2023</Text> */}
                               <View style={styles.cardRow}>
                                 <Text style={styles.cardTag}>Thành tiền:  {(act.rent_price + act.insurance_amount).toLocaleString()} VNĐ</Text>
                                 <TouchableOpacity
                                   onPress={() => {
                                     router.push({
                                       pathname: '/activityDetail', params: {
-                                        // licensePlate: act.car.license_plate,
-                                        // carName: `${act.car.car_model.brand} ${act.car.car_model.model} ${act.car.car_model.year}`,
-                                        // startDate: startDate,
-                                        // endDate: endDate,
-                                        // feebackRating: act.feedback_rating,
-                                        // feebackContent: act.feedback_content,
-                                        // rentPrice: act.rent_price,
-                                        // customerName: act.customer.first_name + ' ' + act.customer.last_name,
-                                        // avatarUrl: act.customer.avatar_url,
-                                        // net_receive: act.net_receive
                                         carID: carID,
                                         activityID: act.id
                                       }

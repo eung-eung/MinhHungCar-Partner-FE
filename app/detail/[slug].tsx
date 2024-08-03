@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
     StyleSheet,
     View,
@@ -17,6 +17,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { AuthConText } from '@/store/AuthContext';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+import { RefreshControl } from 'react-native';
 
 interface CarDetail {
     car_model?: {
@@ -110,10 +111,21 @@ export default function DetailScreen() {
     const limit = 20; // Adjust the limit as needed
     const [hasMoreFeedbacks, setHasMoreFeedbacks] = useState(true);
 
+    const [refreshing, setRefreshing] = useState(false);
+
     useEffect(() => {
         getDetailCar();
         getFeedbackByCar();
     }, [slug]);
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await Promise.all([
+            getDetailCar(),
+            getFeedbackByCar(),
+        ]);
+        setRefreshing(false);
+    }, []);
 
     const getDetailCar = async () => {
         try {
@@ -175,7 +187,10 @@ export default function DetailScreen() {
                 <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
                     <View style={styles.container}>
                         {detailCar ? (
-                            <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+                            <ScrollView contentContainerStyle={{ paddingBottom: 100 }}
+                                refreshControl={
+                                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                                }>
 
                                 <View style={styles.photos}>
                                     {Array.isArray(detailCar.images) && detailCar.images.length > 0 ? (
@@ -306,9 +321,9 @@ export default function DetailScreen() {
                                             <Text style={styles.commentTitle}>Đánh giá</Text>
                                         </>
                                     )}
-                                    {feedbacks.map((item) => (
+                                    {feedbacks.map((item, index) => (
                                         (item.feedback_content && item.feedback_rating) && (
-                                            <View key={item.id.toString()} style={styles.comment}>
+                                            <View key={index} style={styles.comment}>
                                                 <View style={styles.commentContainer}>
                                                     {item.customer.avatar_url ?
                                                         <Image source={{ uri: item.customer.avatar_url }} style={styles.commentAvatar} />

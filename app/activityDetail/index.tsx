@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, ScrollView, StyleSheet, Image, ActivityIndicator } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Divider } from 'react-native-paper';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { useLocalSearchParams } from 'expo-router';
@@ -7,6 +7,7 @@ import axios from 'axios';
 import { AuthConText } from '@/store/AuthContext';
 import Swiper from 'react-native-swiper';
 import { AntDesign } from '@expo/vector-icons';
+import { RefreshControl } from 'react-native';
 
 interface Activity {
     id: number;
@@ -110,6 +111,7 @@ export default function ActivityDetailScreen() {
     const [activityHistory, setActivityHistory] = useState<Activity[]>([]);
     const [detailActivity, setDetailActivity] = useState<Activity>();
     const [detailCar, setDetailCar] = useState<CarDetail>();
+    const [refreshing, setRefreshing] = useState(false);
 
     // useEffect(() => {
     //     // Simulate data fetching or any async operation
@@ -162,7 +164,14 @@ export default function ActivityDetailScreen() {
             }
         }
     };
-
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await Promise.all([
+            getActivity(),
+            getDetailCar()
+        ]);
+        setRefreshing(false);
+    }, []);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -171,7 +180,10 @@ export default function ActivityDetailScreen() {
                     <ActivityIndicator size="large" />
                 </View>
             ) : (
-                <ScrollView>
+                <ScrollView
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    }>
                     {detailActivity ? (
                         <View style={styles.container}>
                             {/* Info */}

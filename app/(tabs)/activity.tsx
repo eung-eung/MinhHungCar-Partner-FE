@@ -5,7 +5,7 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { View, Text, StatusBar, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, StatusBar, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Image, Alert, RefreshControl } from 'react-native';
 
 interface Car {
     id: number;
@@ -46,6 +46,17 @@ const ActivityScreen: React.FC = () => {
     const [page, setPage] = useState<number>(1); // State for pagination
 
     const isFocused = useIsFocused();
+
+    const [refreshing, setRefreshing] = useState(false);
+
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await Promise.all([
+            getRegisteredCar(),
+        ]);
+        setRefreshing(false);
+    }, []);
 
 
     const handleTabPress = (tabName: string) => {
@@ -100,7 +111,10 @@ const ActivityScreen: React.FC = () => {
                         <LoadingOverlay message='' />
                     </View>
                 ) : (
-                    <ScrollView>
+                    <ScrollView
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                        }>
                         <View style={styles.container}>
                             {/* Tab */}
                             {/* <View style={styles.tabContainer}>

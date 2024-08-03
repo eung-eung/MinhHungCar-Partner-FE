@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { Tooltip } from '@rneui/themed';
 import axios from 'axios';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -111,6 +111,8 @@ const MyCar: React.FC = () => {
     const [paymentUrl, setPaymentUrl] = useState<string>('');
 
     const isFocused = useIsFocused();
+    const [refreshing, setRefreshing] = useState<boolean>(false);
+
 
     useEffect(() => {
         getRegisteredCar();
@@ -154,13 +156,22 @@ const MyCar: React.FC = () => {
                 setRegisteredCars(newCars)
             }
             setLoading(false)
+            setRefreshing(false);
+
         } catch (error: any) {
+            setRefreshing(false);
             if (error.response.data.error_code === 10026) {
                 Alert.alert('Lỗi', 'Hiện giờ thể lấy dữ liệu các chiếc xe')
             } else {
                 console.log("Error: ", error.response.data.message)
             }
         }
+    };
+
+    const onRefresh = () => {
+        setRefreshing(true); // Start the refreshing animation
+        setPage(1); // Optionally reset the page number
+        getRegisteredCar(); // Fetch new data
     };
 
     const getProfile = async () => {
@@ -372,6 +383,12 @@ const MyCar: React.FC = () => {
                                 // onEndReached={!isLoading && loadMoreItem}
                                 // onEndReachedThreshold={0}
                                 contentContainerStyle={styles.listContainer}
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={refreshing}
+                                        onRefresh={onRefresh}
+                                    />
+                                }
                             />
                         </>
                     )}
