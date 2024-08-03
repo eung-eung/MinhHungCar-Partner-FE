@@ -107,47 +107,49 @@ export default function NotificationScreen() {
     );
 
     const renderItem = ({ item }: { item: Notification }) => (
-        loading ? (
-            <View style={styles.loader}>
-                <ActivityIndicator size="large" />
+
+        <TouchableOpacity style={styles.itemContainer} onPress={() => router.push({ pathname: item.url })}>
+            <View style={styles.iconContainer}>
+                <TabBarIcon name='bell-outline' size={24} color="#555555" />
             </View>
-        ) : (
-            <TouchableOpacity style={styles.itemContainer} onPress={() => router.push({ pathname: item.url })}>
-                <View style={styles.iconContainer}>
-                    <TabBarIcon name='bell-outline' size={24} color="#555555" />
+            <View style={styles.notificationContent}>
+                <Text style={styles.notificationTitle}>{item.title}</Text>
+                <Text numberOfLines={2} style={styles.notificationText}>{item.content}</Text>
+                <View style={styles.timeContainer}>
+                    <Text style={styles.notificationTime}>{formatTime(item.created_at)}</Text>
                 </View>
-                <View style={styles.notificationContent}>
-                    <Text style={styles.notificationTitle}>{item.title}</Text>
-                    <Text numberOfLines={2} style={styles.notificationText}>{item.content}</Text>
-                    <View style={styles.timeContainer}>
-                        <Text style={styles.notificationTime}>{formatTime(item.created_at)}</Text>
-                    </View>
-                </View>
-            </TouchableOpacity>
-        )
+            </View>
+        </TouchableOpacity>
+
     );
 
 
 
 
     return (
-        <SectionList
-            style={styles.root}
-            sections={groupNotificationsByDate(notifications)}
-            renderItem={renderItem}
-            renderSectionHeader={renderSectionHeader}
-            keyExtractor={(item, index) => index.toString()}
-            // ListFooterComponent={renderFooter}
-            onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.5}
-            ListEmptyComponent={() => (
-                <View style={styles.emptyContainer}>
-                    {/* <AntDesign name="inbox" size={50} color="#B4B4B8" /> */}
-                    <FontAwesome6 name="folder-open" size={40} color="#B4B4B8" />
-                    <Text style={styles.emptyMessage}>Hiện tại chưa có thông báo nào</Text>
-                </View>
-            )}
-        />
+        loading ? (
+            <View style={styles.loader}>
+                <ActivityIndicator size="large" />
+            </View>
+        ) : (
+            <SectionList
+                style={styles.root}
+                sections={groupNotificationsByDate(notifications)}
+                renderItem={renderItem}
+                renderSectionHeader={renderSectionHeader}
+                keyExtractor={(item, index) => index.toString()}
+                // ListFooterComponent={renderFooter}
+                onEndReached={handleLoadMore}
+                onEndReachedThreshold={0.5}
+                ListEmptyComponent={() => (
+                    <View style={styles.emptyContainer}>
+                        {/* <AntDesign name="inbox" size={50} color="#B4B4B8" /> */}
+                        <FontAwesome6 name="folder-open" size={40} color="#B4B4B8" />
+                        <Text style={styles.emptyMessage}>Hiện tại chưa có thông báo nào</Text>
+                    </View>
+                )}
+            />
+        )
     );
 }
 
@@ -206,7 +208,8 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     loader: {
-        marginVertical: 16,
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
     },
     sectionHeader: {

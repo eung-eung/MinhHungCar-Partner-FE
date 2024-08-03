@@ -52,19 +52,17 @@ interface CarDetail {
     images: string[];
 }
 
-const convertUTCToICT = (utcDateStr: string) => {
-    const utcDate = new Date(utcDateStr);
-    const ictOffset = 7 * 60;
-    const ictDate = new Date(utcDate.getTime() + (ictOffset * 60 * 1000));
-    return ictDate;
-};
 
-const formatDateToDDMMYYYY = (date: Date) => {
+
+const formatDateWithTime = (date: Date): string => {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-based
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+    const year = date.getFullYear().toString().slice(-2);
+    return `${hours}:${minutes} ${day}/${month}/${year}`;
 };
+
 const formatNumber = (number: any) => {
     return new Intl.NumberFormat('vi-VN').format(number);
 };
@@ -104,6 +102,8 @@ export default function ActivityDetailScreen() {
     const { carID, activityID } = params;
     const authCtx = useContext(AuthConText);
     const token = authCtx.access_token;
+
+    console.log("activityID: ", activityID)
 
     // const { licensePlate, carName, startDate, endDate, feebackRating, feebackContent, rentPrice, customerName, avatarUrl, net_receive } = params
     const [loading, setLoading] = useState(true);
@@ -177,7 +177,7 @@ export default function ActivityDetailScreen() {
                             {/* Info */}
                             <View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
-                                    <Text style={styles.date}>{formatDateToDDMMYYYY(convertUTCToICT(detailActivity.start_date))} → {formatDateToDDMMYYYY(convertUTCToICT(detailActivity.start_date))}</Text>
+                                    <Text style={styles.date}> {formatDateWithTime(new Date(detailActivity.start_date))} → {formatDateWithTime(new Date(detailActivity.end_date))}</Text>
 
                                     {/* <View style={{ borderColor: getStatusStyles(detailActivity.status).borderColor, borderWidth: 1, paddingVertical: 5, paddingHorizontal: 35, borderRadius: 20 }}> */}
                                     <Text style={{ color: getStatusStyles(detailActivity.status).color, fontWeight: 'bold', fontSize: 14 }}>{statusConvert[detailActivity.status]}</Text>
@@ -189,13 +189,13 @@ export default function ActivityDetailScreen() {
                                 <Text style={styles.price}>Giá thuê: {formatNumber(detailActivity.rent_price)} đ</Text>
                                 <Text style={styles.price}>Thực nhận: {formatNumber(detailActivity.net_receive)} đ</Text>
 
-                                {(detailActivity.feedback_rating && detailActivity.feedback_content) ?
+                                {/* {(detailActivity.feedback_rating && detailActivity.feedback_content) ?
                                     <View style={{ flexDirection: 'row' }}>
                                         <Text style={styles.ratingText}>Đánh giá: </Text>
                                         <TabBarIcon name='star' color='orange' size={24} />
                                         <Text style={styles.ratingText}>{detailActivity.feedback_content}</Text>
                                     </View>
-                                    : ""}
+                                    : ""} */}
 
                                 <View style={styles.photos}>
                                     {Array.isArray(detailCar?.images) && detailCar.images.length > 0 ? (
@@ -243,7 +243,7 @@ export default function ActivityDetailScreen() {
 
                                             <View style={styles.commentTextContainer}>
                                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                                    <Text style={styles.commentAuthor}>{detailActivity.customer.first_name + " " + detailActivity.customer.last_name}</Text>
+                                                    <Text style={styles.commentAuthor}>{detailActivity.customer.last_name + " " + detailActivity.customer.first_name}</Text>
                                                     {/* <Text style={styles.commentDate}>19/05/2024</Text> */}
                                                 </View>
 

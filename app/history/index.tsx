@@ -57,11 +57,13 @@ const convertUTCToICT = (utcDateStr: string) => {
   return ictDate;
 };
 
-const formatDateToDDMMYYYY = (date: Date) => {
+const formatDateWithTime = (date: Date): string => {
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
   const day = date.getDate().toString().padStart(2, '0');
   const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-based
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
+  const year = date.getFullYear().toString().slice(-2);
+  return `${hours}:${minutes} ${day}/${month}/${year}`;
 };
 
 const getStatusStyles = (status: string) => {
@@ -193,11 +195,8 @@ const HistoryScreen: React.FC = () => {
                   <TouchableOpacity onPress={() => handleTabPress('completed')} style={[styles.tabItem, activeTab === 'completed' && styles.activeTabItem]}>
                     <Text style={[styles.tabText, activeTab === 'completed' && { color: '#773BFF', fontWeight: '600' }]}>Hoàn thành</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleTabPress('waiting_for_agreement')} style={[styles.tabItem, activeTab === 'waiting_for_agreement' && styles.activeTabItem]}>
-                    <Text style={[styles.tabText, activeTab === 'waiting_for_agreement' && { color: '#773BFF', fontWeight: '600' }]}>Chờ chấp thuận</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleTabPress('waiting_contract_payment')} style={[styles.tabItem, activeTab === 'waiting_contract_payment' && styles.activeTabItem]}>
-                    <Text style={[styles.tabText, activeTab === 'waiting_contract_payment' && { color: '#773BFF', fontWeight: '600' }]}>Chờ thanh toán</Text>
+                  <TouchableOpacity onPress={() => handleTabPress('canceled')} style={[styles.tabItem, activeTab === 'canceled' && styles.activeTabItem]}>
+                    <Text style={[styles.tabText, activeTab === 'canceled' && { color: '#773BFF', fontWeight: '600' }]}>Đã hủy</Text>
                   </TouchableOpacity>
                 </ScrollView>
               </View>
@@ -207,8 +206,8 @@ const HistoryScreen: React.FC = () => {
                 {activityHistory.length > 0 ?
                   <>
                     {activityHistory.map((act, index) => {
-                      const startDate = formatDateToDDMMYYYY(convertUTCToICT(act.start_date));
-                      const endDate = formatDateToDDMMYYYY(convertUTCToICT(act.end_date));
+                      const startDate = formatDateWithTime(new Date(act.start_date));
+                      const endDate = formatDateWithTime(new Date(act.end_date));
 
                       return (
                         <View key={index} style={styles.card}>
