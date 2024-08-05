@@ -119,10 +119,10 @@ const ProfileScreen: React.FC = () => {
             }
 
             // Validate phoneNum
-            if (!phoneNum || phoneNum.length !== 10 || !phoneNum.startsWith('0')) {
-                Alert.alert('Lỗi', 'Vui lòng nhập số điện thoại có 10 chữ số và bắt đầu bằng số 0.');
-                return;
-            }
+            // if (!phoneNum || phoneNum.length !== 10 || !phoneNum.startsWith('0')) {
+            //     Alert.alert('Lỗi', 'Vui lòng nhập số điện thoại có 10 chữ số và bắt đầu bằng số 0.');
+            //     return;
+            // }
 
             // Validate IDCard
             if (IDCard.length !== 9 && IDCard.length !== 12) {
