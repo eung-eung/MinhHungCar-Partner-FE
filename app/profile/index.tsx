@@ -30,7 +30,7 @@ const ProfileScreen: React.FC = () => {
     const [lastName, setLastName] = useState<string>('');
     const [phoneNum, setPhoneNum] = useState<string>('');
     const [IDCard, setIDCard] = useState<string>('');
-    const [driveLicense, setDriveLicense] = useState<string>('');
+    // const [driveLicense, setDriveLicense] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [day, setDay] = useState<string>('');
     const [month, setMonth] = useState<string>('');
@@ -71,7 +71,7 @@ const ProfileScreen: React.FC = () => {
             setPhoneNum(response.data.data.phone_number || '');
             setIDCard(response.data.data.identification_card_number || '');
             setEmail(response.data.data.email || '');
-            setDriveLicense(response.data.data.driving_license || '');
+            // setDriveLicense(response.data.data.driving_license || '');
             setAvatarURL(response.data.data.avatar_url || null);
 
             // console.log('Fetch profile successfully ', response.data.data);
@@ -159,7 +159,7 @@ const ProfileScreen: React.FC = () => {
                 phone_number: phoneNum,
                 identification_card_number: IDCard,
                 date_of_birth: formattedDob,
-                driving_license: driveLicense,
+                // driving_license: driveLicense,
                 email: email
             };
 
