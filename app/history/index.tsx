@@ -47,6 +47,7 @@ interface CarDetail {
     year: number;
   };
   license_plate: string;
+  status: string;
   rating: number
 }
 
@@ -91,6 +92,25 @@ const statusConvert: Record<string, string> = {
   completed: 'Hoàn thành',
   canceled: 'Đã hủy'
 };
+
+const statusCarConvert: Record<string, string> = {
+  active: 'Đang hoạt động',
+  inactive: 'Dừng hoạt động',
+};
+
+
+
+const getStatusCarStyles = (status: string | undefined) => {
+  switch (status) {
+    case 'active':
+      return { color: 'green' };
+    case 'inactive':
+      return { color: 'red' };
+    default:
+      return { color: 'gray' }; // Default style
+  }
+};
+
 
 
 
@@ -178,6 +198,15 @@ const HistoryScreen: React.FC = () => {
               <View style={{ width: '100%', height: 'auto', backgroundColor: 'white', marginBottom: 10, paddingVertical: 20, justifyContent: 'center', paddingLeft: 28 }}>
                 <Text style={{ fontSize: 20, fontWeight: 'bold', textTransform: 'uppercase' }}>{detailCar?.car_model.brand + ' ' + detailCar?.car_model.model + ' ' + detailCar?.car_model.year}</Text>
                 <Text style={{ fontSize: 14, color: '#939393', marginBottom: 9, marginTop: 8, fontWeight: '600', textTransform: 'uppercase' }}>Biển số xe: {detailCar?.license_plate}</Text>
+                <Text
+                  style={{
+                    color: getStatusCarStyles(detailCar?.status).color,
+                    fontWeight: 'bold',
+                    marginTop: 5
+                  }}
+                >
+                  {statusCarConvert[detailCar?.status ?? 'inactive'] || 'Unknown Status'}
+                </Text>
               </View>
 
               {/* Tab */}
