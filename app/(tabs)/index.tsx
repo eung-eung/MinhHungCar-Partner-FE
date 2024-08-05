@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, Alert } from 'react-native';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, Alert, RefreshControl } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 import axios from 'axios';
 import { FontAwesome, FontAwesome6, MaterialIcons } from '@expo/vector-icons';
@@ -59,11 +59,28 @@ const HomeScreen: React.FC = () => {
     const token = authContext.access_token;
     const router = useRouter()
 
+    const [refreshing, setRefreshing] = useState(false);
+
+
     useEffect(() => {
         if (token) {
             fetchAndValidateUserInfo();
         }
     }, []);
+
+
+    useEffect(() => {
+        getAvenue();
+    }, [isFocused]);
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await Promise.all([
+            getAvenue()
+        ]);
+        setRefreshing(false);
+    }, []);
+
 
     const fetchAndValidateUserInfo = async () => {
         try {
@@ -133,9 +150,6 @@ const HomeScreen: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        getAvenue();
-    }, [isFocused]);
 
     const handleBarPress = (index: number) => {
         setSelectedBarIndex(index);
@@ -169,7 +183,9 @@ const HomeScreen: React.FC = () => {
                     <ActivityIndicator size="large" />
                 </View>
             ) : (
-                <ScrollView style={{ paddingHorizontal: 24, marginTop: 20 }}>
+                <ScrollView style={{ paddingHorizontal: 24, marginTop: 20 }} refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }>
                     {payments.length > 0 ?
                         <>
                             <View style={styles.totalAvenue}>

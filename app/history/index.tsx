@@ -36,7 +36,6 @@ interface Activity {
   feedback_rating: number;
   feedback_content: string;
   net_receive: number;
-
 }
 
 interface CarDetail {
@@ -143,6 +142,10 @@ const HistoryScreen: React.FC = () => {
           Authorization: `Bearer ${token}`,
         }
       })
+      // const sortedActivities = response.data.data.sort((a: Activity, b: Activity) => {
+      //   return new Date(b.end_date).getTime() - new Date(a.end_date).getTime();
+      // });
+
       setActivityHistory(response.data.data);
       // console.log("Fetch activity history: ", response.data.message)
       setLoading(false);
