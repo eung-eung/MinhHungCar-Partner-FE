@@ -358,24 +358,24 @@ const AddCarInformationScreen: React.FC = () => {
             setLoadButton(true);
 
             // Check config in MinhHungCar garage if selectedParking is 'garage'
-            // if (selectedParking === 'garage') {
-            //     await fetchParkingLotMetadata();
-            //     if (parkingLotMetadata.length === 1) {
-            //         Alert.alert(
-            //             'Lỗi',
-            //             'Bãi đổ MinhHungCar không còn chỗ. Vui lòng chọn để xe tại nhà!',
-            //             [
-            //                 {
-            //                     text: 'OK',
-            //                     onPress: () => {
-            //                         setSelectedParking('home');
-            //                     }
-            //                 }
-            //             ]
-            //         );
-            //         return; // Prevent form submission
-            //     }
-            // }
+            if (selectedParking === 'garage') {
+                await fetchParkingLotMetadata();
+                if (parkingLotMetadata.length !== 1) {
+                    Alert.alert(
+                        'Lỗi',
+                        'Bãi đổ MinhHungCar không còn chỗ. Vui lòng chọn để xe tại nhà!',
+                        [
+                            {
+                                text: 'OK',
+                                onPress: () => {
+                                    setSelectedParking('home');
+                                }
+                            }
+                        ]
+                    );
+                    return; // Prevent form submission
+                }
+            }
 
             const response = await axios.post(
                 apiCar.registerCar,
@@ -405,6 +405,7 @@ const AddCarInformationScreen: React.FC = () => {
                 Alert.alert('Lỗi', 'Biển số xe này đã tồn tại!');
                 console.log("Error register car: ", error.response.data.message)
             } else if (error.response?.data?.error_code === 10031) {
+                console.log("Error register car: ", error.response.data.message)
                 Alert.alert(
                     'Lỗi',
                     'Bãi đổ MinhHungCar không còn chỗ. Vui lòng chọn để xe tại nhà!',
