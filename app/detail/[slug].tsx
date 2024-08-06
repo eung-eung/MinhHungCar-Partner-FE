@@ -231,7 +231,7 @@ export default function DetailScreen() {
                                         <View style={styles.infoRating}>
 
                                             <TabBarIcon name='star' size={26} color="#F3CA52" style={{ marginRight: 5 }} />
-                                            <Text style={styles.infoRatingLabel}>{detailCar.rating}</Text>
+                                            <Text style={styles.infoRatingLabel}>{detailCar.total_trip ? detailCar.rating : '0.0'}</Text>
 
 
                                             <TabBarIcon name='history' size={26} color='green' style={{ marginRight: 5, marginLeft: 25 }} />
