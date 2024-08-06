@@ -29,6 +29,7 @@ interface CarDetail {
     images?: string[];
     total_trip: number;
     status: string;
+    warning_count: number;
     motion: string;
     fuel: string;
     rating: number;
@@ -235,8 +236,17 @@ export default function DetailScreen() {
 
                                             <TabBarIcon name='history' size={26} color='green' style={{ marginRight: 5, marginLeft: 25 }} />
                                             <Text style={styles.infoRatingLabel}>{detailCar.total_trip} chuyến</Text>
+
+                                            {/* <TabBarIcon name='exclamation-thick' size={24} color='red' style={{ marginRight: 0, marginLeft: 10 }} />
+                                            <Text style={styles.infoRatingLabel}>{detailCar.warning_count ? `Số lần vi phạm: ${detailCar.warning_count}/10 ` : ""}</Text> */}
                                         </View>
 
+                                        {/* {detailCar.status === 'active' ? */}
+                                        <View style={styles.infoRating}>
+                                            <TabBarIcon name='exclamation-thick' size={24} color='red' style={{ marginRight: 3, marginLeft: 0 }} />
+                                            <Text style={styles.infoRatingLabel}> {`Số lần vi phạm:   ${detailCar.warning_count}/10 `}</Text>
+                                        </View>
+                                        {/* : ""} */}
 
                                         <View >
                                             <Text style={[styles.statusText, getStatusStyles(detailCar?.status)]}>
@@ -587,14 +597,14 @@ const styles = StyleSheet.create({
         borderColor: '#773BFF',
     },
     btnText: {
-        fontSize: 16,
+        fontSize: 18,
         lineHeight: 26,
         fontWeight: '600',
         color: '#fff',
     },
     button: {
-        width: 110,
-        height: 30,
+        width: '100%',
+        height: 40,
         backgroundColor: '#F4BB4C',
         borderRadius: 5,
         justifyContent: 'center',
@@ -613,7 +623,9 @@ const styles = StyleSheet.create({
         padding: 5,
         textAlign: 'center',
         alignItems: 'center',
-        color: 'white'
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600'
     },
     errorText: {
         textAlign: 'center',
