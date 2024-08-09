@@ -331,7 +331,7 @@ const AddCarInformationScreen: React.FC = () => {
         return true;
     };
     const handleSubmit = async () => {
-        console.log("selectedPeriodCode: ", selectedPeriodCode)
+        console.log("selectedParking: ", selectedParking)
         // Check if user has filled in all required fields
         if (
             !licensePlate ||
@@ -360,7 +360,7 @@ const AddCarInformationScreen: React.FC = () => {
             // Check config in MinhHungCar garage if selectedParking is 'garage'
             if (selectedParking === 'garage') {
                 await fetchParkingLotMetadata();
-                if (parkingLotMetadata.length !== 1) {
+                if (parkingLotMetadata.length === 1) {
                     Alert.alert(
                         'Lỗi',
                         'Bãi đổ MinhHungCar không còn chỗ. Vui lòng chọn để xe tại nhà!',
