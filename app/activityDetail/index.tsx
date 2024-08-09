@@ -366,6 +366,8 @@ export default function ActivityDetailScreen() {
                 <View style={styles.overlay}>
                     <View style={styles.overlayContent}>
                         <Text style={{ textAlign: 'center', fontWeight: '700' }}>Vui lòng giao xe tới MinhHungCar trước thời gian nhận xe 2 tiếng</Text>
+                        <Text style={{ textAlign: 'center', color: 'gray' }}>(Yêu cầu này sẽ tự động bị hủy sau 5 phút nữa)</Text>
+
                     </View>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
