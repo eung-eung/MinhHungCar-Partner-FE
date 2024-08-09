@@ -104,8 +104,6 @@ export default function ActivityDetailScreen() {
     const authCtx = useContext(AuthConText);
     const token = authCtx.access_token;
 
-    console.log("carid: ", carID);
-    console.log("activityID: ", activityID)
 
 
     const [loading, setLoading] = useState(true);
