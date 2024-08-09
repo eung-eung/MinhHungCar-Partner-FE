@@ -65,10 +65,8 @@ const getStatusStyles = (status: string) => {
   switch (status) {
     case 'no_filter':
       return { borderColor: '#F89F36', color: '#F89F36' };
-    case 'waiting_contract_payment':
+    case 'waiting_partner_approval':
       return { borderColor: '#56AEFF', color: '#56AEFF' };
-    case 'waiting_for_agreement':
-      return { borderColor: 'gray', color: 'gray' };
     case 'ordered':
       return { borderColor: '#F4BB4C', color: '#F4BB4C' };
     case 'renting':
@@ -78,12 +76,13 @@ const getStatusStyles = (status: string) => {
     case 'canceled':
       return { borderColor: '#D21312', color: '#D21312' };
     default:
-      return {};
+      return { borderColor: 'grey', color: 'grey' };
   }
 };
 
 const statusConvert: Record<string, string> = {
   no_filter: 'Tất cả',
+  waiting_partner_approval: 'Chờ xác nhận',
   waiting_for_agreement: 'Chờ chấp thuận',
   waiting_contract_payment: 'Chờ thanh toán',
   ordered: 'Đã đặt',
@@ -146,7 +145,17 @@ const HistoryScreen: React.FC = () => {
       //   return new Date(b.end_date).getTime() - new Date(a.end_date).getTime();
       // });
 
-      setActivityHistory(response.data.data);
+      const filterData = response.data.data.filter((data: Activity) => {
+        return (
+          data.status === 'ordered' ||
+          data.status === 'renting' ||
+          data.status === 'completed' ||
+          data.status === 'waiting_partner_approval' ||
+          data.status === 'canceled'
+        );
+      });
+      setActivityHistory(filterData);
+
       // console.log("Fetch activity history: ", response.data.message)
       setLoading(false);
     } catch (error: any) {
@@ -217,6 +226,9 @@ const HistoryScreen: React.FC = () => {
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollViewContent}>
                   <TouchableOpacity onPress={() => handleTabPress('no_filter')} style={[styles.tabItem, activeTab === 'no_filter' && styles.activeTabItem]}>
                     <Text style={[styles.tabText, activeTab === 'no_filter' && { color: '#773BFF', fontWeight: '600' }]}>Tất cả</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleTabPress('waiting_partner_approval')} style={[styles.tabItem, activeTab === 'waiting_partner_approval' && styles.activeTabItem]}>
+                    <Text style={[styles.tabText, activeTab === 'waiting_partner_approval' && { color: '#773BFF', fontWeight: '600' }]}>Chờ xác nhận</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => handleTabPress('ordered')} style={[styles.tabItem, activeTab === 'ordered' && styles.activeTabItem]}>
                     <Text style={[styles.tabText, activeTab === 'ordered' && { color: '#773BFF', fontWeight: '600' }]}>Đã đặt</Text>

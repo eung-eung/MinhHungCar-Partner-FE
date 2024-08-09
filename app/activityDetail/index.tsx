@@ -1,13 +1,14 @@
-import { View, Text, SafeAreaView, ScrollView, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { View, Text, SafeAreaView, ScrollView, StyleSheet, Image, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Divider } from 'react-native-paper';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import axios from 'axios';
 import { AuthConText } from '@/store/AuthContext';
 import Swiper from 'react-native-swiper';
 import { AntDesign } from '@expo/vector-icons';
 import { RefreshControl } from 'react-native';
+import { apiContract } from '@/api/apiConfig';
 
 interface Activity {
     id: number;
@@ -72,10 +73,8 @@ const getStatusStyles = (status: string) => {
     switch (status) {
         case 'no_filter':
             return { borderColor: '#F89F36', color: '#F89F36' };
-        case 'waiting_contract_payment':
+        case 'waiting_partner_approval':
             return { borderColor: '#56AEFF', color: '#56AEFF' };
-        case 'waiting_for_agreement':
-            return { borderColor: 'gray', color: 'gray' };
         case 'ordered':
             return { borderColor: '#F4BB4C', color: '#F4BB4C' };
         case 'renting':
@@ -85,7 +84,7 @@ const getStatusStyles = (status: string) => {
         case 'canceled':
             return { borderColor: '#D21312', color: '#D21312' };
         default:
-            return {};
+            return { borderColor: 'grey', color: 'grey' };
     }
 };
 
@@ -93,6 +92,7 @@ const statusConvert: Record<string, string> = {
     no_filter: 'Tất cả',
     waiting_for_agreement: 'Chờ chấp thuận',
     waiting_contract_payment: 'Chờ thanh toán',
+    waiting_partner_approval: 'Chờ xác nhận',
     ordered: 'Đã đặt',
     renting: 'Đang thuê',
     completed: 'Hoàn thành',
@@ -104,30 +104,19 @@ export default function ActivityDetailScreen() {
     const authCtx = useContext(AuthConText);
     const token = authCtx.access_token;
 
+    console.log("carid: ", carID);
     console.log("activityID: ", activityID)
 
-    // const { licensePlate, carName, startDate, endDate, feebackRating, feebackContent, rentPrice, customerName, avatarUrl, net_receive } = params
+
     const [loading, setLoading] = useState(true);
     const [activityHistory, setActivityHistory] = useState<Activity[]>([]);
     const [detailActivity, setDetailActivity] = useState<Activity>();
     const [detailCar, setDetailCar] = useState<CarDetail>();
     const [refreshing, setRefreshing] = useState(false);
 
-    // useEffect(() => {
-    //     // Simulate data fetching or any async operation
-    //     const fetchData = async () => {
-    //         try {
-    //             // Simulate a network request
-    //             await new Promise(resolve => setTimeout(resolve, 2000));
-    //         } catch (error) {
-    //             console.error('Error fetching data:', error);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
+    const router = useRouter();
 
-    //     fetchData();
-    // }, []);
+
 
     useEffect(() => {
         getActivity();
@@ -144,7 +133,7 @@ export default function ActivityDetailScreen() {
             setActivityHistory(response.data.data);
             const detailActivity = response.data.data.find((act: Activity) => act.id === Number(activityID));
             setDetailActivity(detailActivity);
-            console.log("status: ", detailActivity.status)
+            // console.log("status: ", detailActivity.status)
             setLoading(false);
         } catch (error: any) {
             console.log('Error get Activity history: ', error.response.data.message);
@@ -173,6 +162,55 @@ export default function ActivityDetailScreen() {
         setRefreshing(false);
     }, []);
 
+    //approve/ reject request rent car
+    const approveRejectRequest = async (action: string) => {
+        try {
+            const response = await axios.put(apiContract.approveReject,
+                {
+                    "customer_contract_id": detailActivity?.id,
+                    "action": action
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+            // Handle response if needed
+            // console.log('Response:', response.data.data.status);
+
+        } catch (error: any) {
+            console.log("Error approve/reject request: ", error.response?.data?.message || error.message);
+        }
+    };
+
+    const handleButtonClick = (action: string) => {
+        const message = action === 'approve'
+            ? 'Bạn có chắc muốn xác nhận yêu cầu thuê xe này?'
+            : 'Bạn có chắc muốn hủy yêu cầu thuê xe này?';
+
+        Alert.alert(
+            'Xác nhận',
+            message,
+            [
+                {
+                    text: 'Hủy',
+                    style: 'cancel',
+
+                },
+                {
+                    text: 'OK',
+                    onPress: async () => {
+                        await approveRejectRequest(action);
+                        onRefresh();
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
+    };
+
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
             {loading ? (
@@ -188,8 +226,8 @@ export default function ActivityDetailScreen() {
                         <View style={styles.container}>
                             {/* Info */}
                             <View>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
-                                    <Text style={styles.date}> {formatDateWithTime(new Date(detailActivity.start_date))} → {formatDateWithTime(new Date(detailActivity.end_date))}</Text>
+                                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 15 }}>
+                                    {/* <Text style={styles.date}> {formatDateWithTime(new Date(detailActivity.start_date))} → {formatDateWithTime(new Date(detailActivity.end_date))}</Text> */}
 
                                     {/* <View style={{ borderColor: getStatusStyles(detailActivity.status).borderColor, borderWidth: 1, paddingVertical: 5, paddingHorizontal: 35, borderRadius: 20 }}> */}
                                     <Text style={{ color: getStatusStyles(detailActivity.status).color, fontWeight: 'bold', fontSize: 14 }}>{statusConvert[detailActivity.status]}</Text>
@@ -198,8 +236,12 @@ export default function ActivityDetailScreen() {
                                 <Text style={styles.name}>{`${detailActivity.car.car_model.brand} ${detailActivity.car.car_model.model} ${detailActivity.car.car_model.year}`}</Text>
                                 <Text style={styles.plate}>Biển số xe: {detailActivity.car.license_plate}</Text>
 
-                                <Text style={styles.price}>Giá thuê: {formatNumber(detailActivity.rent_price)} đ</Text>
-                                <Text style={styles.price}>Thực nhận: {formatNumber(detailActivity.net_receive)} đ</Text>
+                                {/* <Text style={styles.price}>Giá thuê:
+                                    <Text style={{ color: '#EF5A6F' }}>  {formatNumber(detailActivity.rent_price)} đ</Text>
+                                </Text>
+                                <Text style={styles.price}>Thực nhận:
+                                    <Text style={{ color: '#EF5A6F' }}> {formatNumber(detailActivity.net_receive)} đ</Text>
+                                </Text> */}
 
                                 {/* {(detailActivity.feedback_rating && detailActivity.feedback_content) ?
                                     <View style={{ flexDirection: 'row' }}>
@@ -208,7 +250,6 @@ export default function ActivityDetailScreen() {
                                         <Text style={styles.ratingText}>{detailActivity.feedback_content}</Text>
                                     </View>
                                     : ""} */}
-
                                 <View style={styles.photos}>
                                     {Array.isArray(detailCar?.images) && detailCar.images.length > 0 ? (
                                         <View style={styles.photos}>
@@ -235,6 +276,33 @@ export default function ActivityDetailScreen() {
                                         <Text style={styles.errorText}>Không có hình ảnh xe</Text>
                                     )}
                                 </View>
+
+                                <View style={styles.table}>
+                                    {/* Table Header Row */}
+                                    <View style={styles.tableRow}>
+                                        <Text style={[styles.tableCell, styles.tableHeaderCell]}>Thời gian nhận xe</Text>
+                                        <Text style={[styles.tableCell, styles.tableHeaderCell]}>Thời gian trả xe</Text>
+                                    </View>
+
+                                    {/* Table Data Row for Dates */}
+                                    <View style={styles.tableRow}>
+                                        <Text style={styles.tableCell}>{formatDateWithTime(new Date(detailActivity.start_date))}</Text>
+                                        <Text style={styles.tableCell}>{formatDateWithTime(new Date(detailActivity.end_date))}</Text>
+                                    </View>
+
+                                    {/* Table Header Row for Pricing */}
+                                    <View style={styles.tableRow}>
+                                        <Text style={[styles.tableCell, styles.tableHeaderCell]}>Giá thuê</Text>
+                                        <Text style={[styles.tableCell, styles.tableHeaderCell]}>Giá thực nhận</Text>
+                                    </View>
+
+                                    {/* Table Data Row for Pricing */}
+                                    <View style={styles.tableRow}>
+                                        <Text style={[styles.tableCell, { color: '#EF5A6F', fontWeight: 'bold' }]}>{formatNumber(detailActivity.rent_price)} đ</Text>
+                                        <Text style={[styles.tableCell, { color: '#EF5A6F', fontWeight: 'bold' }]}>{formatNumber(detailActivity.net_receive)} đ</Text>
+                                    </View>
+                                </View>
+
 
                             </View>
 
@@ -292,8 +360,32 @@ export default function ActivityDetailScreen() {
                             <Text style={styles.emptyChatText}>Chưa có hoạt động nào</Text>
                         </View>
                     )}
+
                 </ScrollView>
+
             )}
+            {detailActivity?.status === 'waiting_partner_approval' ?
+                <View style={styles.overlay}>
+                    <View style={styles.overlayContent}>
+                        <Text style={{ textAlign: 'center', fontWeight: '700' }}>Vui lòng giao xe tới MinhHungCar trước thời gian nhận xe 2 tiếng</Text>
+                    </View>
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                            onPress={() => handleButtonClick('reject')}>
+                            <View style={styles.btnReject}>
+                                <Text style={styles.btnTextReject}>Từ chối</Text>
+                            </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            onPress={() => handleButtonClick('approve')}>
+                            <View style={styles.btn}>
+                                <Text style={styles.btnText}>Xác nhận</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                : ""}
         </SafeAreaView>
     );
 }
@@ -428,9 +520,10 @@ const styles = StyleSheet.create({
     },
     /** Photos */
     photos: {
-        marginTop: 10,
+        marginTop: 2,
+        marginBottom: 28,
         position: 'relative',
-        height: 240,
+        height: 160,
         overflow: 'hidden',
         borderRadius: 12,
     },
@@ -456,7 +549,7 @@ const styles = StyleSheet.create({
         flexShrink: 1,
         flexBasis: 0,
         width: '100%',
-        height: 240,
+        height: 160,
     },
     errorText: {
         textAlign: 'center',
@@ -472,5 +565,112 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#696969',
         marginTop: 10
+    },
+    //table
+    table: {
+        borderWidth: 1,
+        borderColor: '#F1F5F9',
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    tableRow: {
+        flexDirection: 'row',
+        backgroundColor: 'white',
+        borderBottomWidth: 1,
+        borderColor: '#F1F5F9',
+    },
+    tableCell: {
+        padding: 10,
+        flex: 1,
+        borderRightWidth: 1,
+        borderColor: '#F1F5F9',
+        textAlign: 'center',
+    },
+    tableHeaderCell: {
+        backgroundColor: '#F1F5F9',
+        fontWeight: 'bold',
+    },
+    /** Overlay */
+    overlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: '#fff',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingTop: 12,
+        paddingHorizontal: 24,
+        paddingBottom: 45,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+        elevation: 3,
+    },
+    overlayContent: {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        paddingBottom: 15
+    },
+    overlayContentTop: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        marginBottom: 2,
+    },
+
+    overlayContentPrice: {
+        fontSize: 18,
+        lineHeight: 26,
+        fontWeight: '600',
+        color: '#5457FB',
+    },
+    /** Button */
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between', // Distribute space between buttons
+    },
+    btn: {
+        paddingVertical: 10,
+        paddingHorizontal: 50,
+        borderRadius: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        backgroundColor: '#773BFF',
+        borderColor: '#773BFF',
+        marginHorizontal: 8,
+        flex: 1,
+    },
+    btnReject: {
+        paddingVertical: 10,
+        paddingHorizontal: 50,
+        borderRadius: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        backgroundColor: 'white',
+        borderColor: '#773BFF',
+        marginHorizontal: 8,
+        flex: 1,
+    },
+    btnText: {
+        fontSize: 16,
+        lineHeight: 26,
+        fontWeight: '600',
+        color: '#fff',
+    },
+    btnTextReject: {
+        fontSize: 16,
+        lineHeight: 26,
+        fontWeight: '600',
+        color: '#773BFF',
     },
 });

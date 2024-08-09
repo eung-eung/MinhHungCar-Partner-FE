@@ -50,3 +50,7 @@ export const apiExpoToken = {
 export const apiAvenue = {
     getAvenue: `${endpoint}/partner/revenue`,
 }
+
+export const apiContract = {
+    approveReject: `${endpoint}/partner/customer_contract/approve_reject`
+}
