@@ -67,6 +67,10 @@ const getStatusStyles = (status: string) => {
       return { borderColor: '#F89F36', color: '#F89F36' };
     case 'waiting_partner_approval':
       return { borderColor: '#56AEFF', color: '#56AEFF' };
+    case 'waiting_for_agreement':
+      return { borderColor: '#B4B4B8', color: '#B4B4B8' };
+    case 'waiting_contract_payment':
+      return { borderColor: '#6482AD', color: '#6482AD' };
     case 'ordered':
       return { borderColor: '#F4BB4C', color: '#F4BB4C' };
     case 'renting':
@@ -105,7 +109,7 @@ const getStatusCarStyles = (status: string | undefined) => {
     case 'inactive':
       return { color: 'red' };
     default:
-      return { color: 'gray' }; // Default style
+      return { color: 'gray' };
   }
 };
 
@@ -154,7 +158,7 @@ const HistoryScreen: React.FC = () => {
           data.status === 'canceled'
         );
       });
-      setActivityHistory(filterData);
+      setActivityHistory(response.data.data);
 
       // console.log("Fetch activity history: ", response.data.message)
       setLoading(false);
@@ -261,25 +265,27 @@ const HistoryScreen: React.FC = () => {
                               <Text style={{ fontWeight: 'bold', marginHorizontal: 5 }}>→</Text>
                               <Text style={{ fontWeight: '600' }}>{endDate}</Text>
                             </View>
-                            <Text style={{ color: getStatusStyles(act.status).color, fontWeight: 'bold' }}>{statusConvert[act.status]}</Text>
                           </View>
                           <Divider style={{ marginBottom: 10, marginTop: -5 }} />
-                          <View style={{ flexDirection: 'row' }}>
-                            <View style={styles.cardBody}>
-                              <View style={styles.cardRow}>
-                                <Text style={styles.cardTag}>Thành tiền:  {(act.rent_price + act.insurance_amount).toLocaleString()} VNĐ</Text>
-                                <TouchableOpacity
-                                  onPress={() => {
-                                    router.push({
-                                      pathname: '/activityDetail', params: {
-                                        carID: carID,
-                                        activityID: act.id
-                                      }
-                                    })
-                                  }}
-                                  style={styles.button}>
-                                  <Text style={{ color: 'white', fontSize: 14 }}>Chi tiết</Text>
-                                </TouchableOpacity>
+                          <View style={{ flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end', alignSelf: 'flex-end' }}>
+                            <Text style={{ color: getStatusStyles(act.status).color, fontWeight: 'bold', marginBottom: 10, marginTop: 3 }}>{statusConvert[act.status]}</Text>
+                            <View style={{ flexDirection: 'row' }}>
+                              <View style={styles.cardBody}>
+                                <View style={styles.cardRow}>
+                                  <Text style={styles.cardTag}>Thành tiền:  {(act.rent_price + act.insurance_amount).toLocaleString()} VNĐ</Text>
+                                  <TouchableOpacity
+                                    onPress={() => {
+                                      router.push({
+                                        pathname: '/activityDetail', params: {
+                                          carID: carID,
+                                          activityID: act.id
+                                        }
+                                      })
+                                    }}
+                                    style={styles.button}>
+                                    <Text style={{ color: 'white', fontSize: 14 }}>Chi tiết</Text>
+                                  </TouchableOpacity>
+                                </View>
                               </View>
                             </View>
                           </View>

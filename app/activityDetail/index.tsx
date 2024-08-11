@@ -75,6 +75,10 @@ const getStatusStyles = (status: string) => {
             return { borderColor: '#F89F36', color: '#F89F36' };
         case 'waiting_partner_approval':
             return { borderColor: '#56AEFF', color: '#56AEFF' };
+        case 'waiting_for_agreement':
+            return { borderColor: '#B4B4B8', color: '#B4B4B8' };
+        case 'waiting_contract_payment':
+            return { borderColor: '#6482AD', color: '#6482AD' };
         case 'ordered':
             return { borderColor: '#F4BB4C', color: '#F4BB4C' };
         case 'renting':
