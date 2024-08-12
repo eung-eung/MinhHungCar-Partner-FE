@@ -76,17 +76,21 @@ const getStatusStyles = (status: string) => {
         case 'waiting_partner_approval':
             return { borderColor: '#56AEFF', color: '#56AEFF' };
         case 'waiting_for_agreement':
-            return { borderColor: '#B4B4B8', color: '#B4B4B8' };
+            return { borderColor: '#A9A9A9', color: '#A9A9A9' };
         case 'waiting_contract_payment':
             return { borderColor: '#6482AD', color: '#6482AD' };
         case 'ordered':
             return { borderColor: '#F4BB4C', color: '#F4BB4C' };
+        case 'appraising_car_approved':
+            return { borderColor: '#AF47D2', color: '#AF47D2' };
         case 'renting':
             return { borderColor: '#24D02B', color: '#24D02B' };
         case 'completed':
             return { borderColor: '#15891A', color: '#15891A' };
         case 'canceled':
             return { borderColor: '#D21312', color: '#D21312' };
+        case 'appraising_car_rejected':
+            return { borderColor: '#8C6A5D', color: '#8C6A5D' };
         default:
             return { borderColor: 'grey', color: 'grey' };
     }
@@ -98,9 +102,11 @@ const statusConvert: Record<string, string> = {
     waiting_contract_payment: 'Chờ thanh toán',
     waiting_partner_approval: 'Chờ xác nhận',
     ordered: 'Đã đặt',
+    appraising_car_approved: 'Đã kiểm tra',
     renting: 'Đang thuê',
     completed: 'Hoàn thành',
-    canceled: 'Đã hủy'
+    canceled: 'Đã hủy',
+    appraising_car_rejected: 'Kiểm tra thất bại'
 };
 export default function ActivityDetailScreen() {
     const params = useLocalSearchParams()
@@ -149,7 +155,7 @@ export default function ActivityDetailScreen() {
             // console.log('Fetch successfully: ', response.data.message);
         } catch (error: any) {
             if (error.response.data.error_code === 10027) {
-                console.log('Erro get detail car at history: ', error.response.data.message);
+                console.log('Error get detail car at history: ', error.response.data.message);
             } else {
                 console.log('Error getDetailCar: ', error.response.data.message);
             }
