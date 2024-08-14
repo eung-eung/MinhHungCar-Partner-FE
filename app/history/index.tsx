@@ -25,6 +25,7 @@ interface Activity {
       year: number;
     };
     license_plate: string;
+    parking_lot: string;
     price: number;
     status: string;
   };
@@ -46,6 +47,7 @@ interface CarDetail {
     year: number;
   };
   license_plate: string;
+  parking_lot: string;
   status: string;
   rating: number
 }
@@ -77,6 +79,10 @@ const getStatusStyles = (status: string) => {
       return { borderColor: '#AF47D2', color: '#AF47D2' };
     case 'renting':
       return { borderColor: '#24D02B', color: '#24D02B' };
+    case 'returned_car':
+      return { borderColor: '#E178C5', color: '#E178C5' };
+    case 'appraised_return_car':
+      return { borderColor: '#E0A75E', color: '#E0A75E' };
     case 'completed':
       return { borderColor: '#15891A', color: '#15891A' };
     case 'canceled':
@@ -94,11 +100,13 @@ const statusConvert: Record<string, string> = {
   waiting_for_agreement: 'Chờ chấp thuận',
   waiting_contract_payment: 'Chờ thanh toán',
   ordered: 'Đã đặt',
-  appraising_car_approved: 'Đã kiểm tra',
+  appraising_car_approved: 'Đủ điều kiện bàn giao',
   renting: 'Đang thuê',
+  returned_car: 'Đã trả xe',
+  appraised_return_car: 'Hoàn thành kiểm tra',
   completed: 'Hoàn thành',
   canceled: 'Đã hủy',
-  appraising_car_rejected: 'Kiểm tra thất bại'
+  appraising_car_rejected: 'Không đủ điều kiện'
 };
 
 const statusCarConvert: Record<string, string> = {
@@ -151,9 +159,7 @@ const HistoryScreen: React.FC = () => {
           Authorization: `Bearer ${token}`,
         }
       })
-      // const sortedActivities = response.data.data.sort((a: Activity, b: Activity) => {
-      //   return new Date(b.end_date).getTime() - new Date(a.end_date).getTime();
-      // });
+
 
       const filterData = response.data.data.filter((data: Activity) => {
         return (
@@ -217,19 +223,81 @@ const HistoryScreen: React.FC = () => {
             }>
             <View style={styles.container}>
               {/* Info */}
-              <View style={{ width: '100%', height: 'auto', backgroundColor: 'white', marginBottom: 10, paddingVertical: 20, justifyContent: 'center', paddingLeft: 28 }}>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', textTransform: 'uppercase' }}>{detailCar?.car_model.brand + ' ' + detailCar?.car_model.model + ' ' + detailCar?.car_model.year}</Text>
-                <Text style={{ fontSize: 14, color: '#939393', marginBottom: 9, marginTop: 8, fontWeight: '600', textTransform: 'uppercase' }}>Biển số xe: {detailCar?.license_plate}</Text>
+              <View
+                style={{
+                  width: '100%',
+                  backgroundColor: '#f9f9f9',
+                  borderRadius: 10,
+                  marginBottom: 15,
+                  paddingVertical: 20,
+                  paddingHorizontal: 20,
+                  shadowColor: '#000',
+                  shadowOpacity: 0.1,
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowRadius: 4,
+                  elevation: 3,
+                }}
+              >
                 <Text
                   style={{
-                    color: getStatusCarStyles(detailCar?.status).color,
+                    fontSize: 20,
                     fontWeight: 'bold',
-                    marginTop: 5
+                    textTransform: 'uppercase',
+                    color: '#333',
                   }}
                 >
-                  {statusCarConvert[detailCar?.status ?? 'inactive'] || 'Unknown Status'}
+                  {detailCar?.car_model.brand +
+                    ' ' +
+                    detailCar?.car_model.model +
+                    ' ' +
+                    detailCar?.car_model.year}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginVertical: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: '#666',
+                      fontWeight: '600',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    Biển số xe: {detailCar?.license_plate}
+                  </Text>
+                  <Text
+                    style={{
+                      color: getStatusCarStyles(detailCar?.status).color,
+                      fontWeight: 'bold',
+                      fontSize: 14,
+                      paddingVertical: 5,
+                      paddingHorizontal: 10,
+                      borderWidth: 1,
+                      borderColor: getStatusCarStyles(detailCar?.status).color,
+                      borderRadius: 15,
+                      textAlign: 'center',
+                    }}
+                  >
+                    {statusCarConvert[detailCar?.status ?? 'inactive'] || 'Unknown Status'}
+                  </Text>
+                </View>
+                <Text
+                  style={{
+                    marginVertical: 5,
+                    fontWeight: '500',
+                    color: '#555',
+                  }}
+                >
+                  Chỗ để xe: {detailCar?.parking_lot === 'home' ? 'Tại nhà' : 'Bãi đỗ MinhHungCar'}
                 </Text>
               </View>
+
+
 
               {/* Tab */}
               <View style={styles.tabContainer}>
@@ -237,9 +305,11 @@ const HistoryScreen: React.FC = () => {
                   <TouchableOpacity onPress={() => handleTabPress('no_filter')} style={[styles.tabItem, activeTab === 'no_filter' && styles.activeTabItem]}>
                     <Text style={[styles.tabText, activeTab === 'no_filter' && { color: '#773BFF', fontWeight: '600' }]}>Tất cả</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleTabPress('waiting_partner_approval')} style={[styles.tabItem, activeTab === 'waiting_partner_approval' && styles.activeTabItem]}>
-                    <Text style={[styles.tabText, activeTab === 'waiting_partner_approval' && { color: '#773BFF', fontWeight: '600' }]}>Chờ xác nhận</Text>
-                  </TouchableOpacity>
+                  {detailCar?.parking_lot === 'home' ?
+                    <TouchableOpacity onPress={() => handleTabPress('waiting_partner_approval')} style={[styles.tabItem, activeTab === 'waiting_partner_approval' && styles.activeTabItem]}>
+                      <Text style={[styles.tabText, activeTab === 'waiting_partner_approval' && { color: '#773BFF', fontWeight: '600' }]}>Chờ xác nhận</Text>
+                    </TouchableOpacity>
+                    : ""}
                   <TouchableOpacity onPress={() => handleTabPress('waiting_for_agreement')} style={[styles.tabItem, activeTab === 'waiting_for_agreement' && styles.activeTabItem]}>
                     <Text style={[styles.tabText, activeTab === 'waiting_for_agreement' && { color: '#773BFF', fontWeight: '600' }]}>Chờ chấp thuận</Text>
                   </TouchableOpacity>
@@ -250,21 +320,28 @@ const HistoryScreen: React.FC = () => {
                     <Text style={[styles.tabText, activeTab === 'ordered' && { color: '#773BFF', fontWeight: '600' }]}>Đã đặt</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => handleTabPress('appraising_car_approved')} style={[styles.tabItem, activeTab === 'appraising_car_approved' && styles.activeTabItem]}>
-                    <Text style={[styles.tabText, activeTab === 'appraising_car_approved' && { color: '#773BFF', fontWeight: '600' }]}>Đã kiểm tra</Text>
+                    <Text style={[styles.tabText, activeTab === 'appraising_car_approved' && { color: '#773BFF', fontWeight: '600' }]}>Đủ điều kiện bàn giao</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity onPress={() => handleTabPress('renting')} style={[styles.tabItem, activeTab === 'renting' && styles.activeTabItem]}>
                     <Text style={[styles.tabText, activeTab === 'renting' && { color: '#773BFF', fontWeight: '600' }]}>Đang thuê</Text>
                   </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleTabPress('returned_car')} style={[styles.tabItem, activeTab === 'returned_car' && styles.activeTabItem]}>
+                    <Text style={[styles.tabText, activeTab === 'returned_car' && { color: '#773BFF', fontWeight: '600' }]}>Đã trả xe</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleTabPress('appraised_return_car')} style={[styles.tabItem, activeTab === 'appraised_return_car' && styles.activeTabItem]}>
+                    <Text style={[styles.tabText, activeTab === 'appraised_return_car' && { color: '#773BFF', fontWeight: '600' }]}>Hoàn thành kiểm tra</Text>
+                  </TouchableOpacity>
                   <TouchableOpacity onPress={() => handleTabPress('completed')} style={[styles.tabItem, activeTab === 'completed' && styles.activeTabItem]}>
                     <Text style={[styles.tabText, activeTab === 'completed' && { color: '#773BFF', fontWeight: '600' }]}>Hoàn thành</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleTabPress('appraising_car_rejected')} style={[styles.tabItem, activeTab === 'appraising_car_rejected' && styles.activeTabItem]}>
+                    <Text style={[styles.tabText, activeTab === 'appraising_car_rejected' && { color: '#773BFF', fontWeight: '600' }]}>Không đủ điều kiện</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => handleTabPress('canceled')} style={[styles.tabItem, activeTab === 'canceled' && styles.activeTabItem]}>
                     <Text style={[styles.tabText, activeTab === 'canceled' && { color: '#773BFF', fontWeight: '600' }]}>Đã hủy</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleTabPress('appraising_car_rejected')} style={[styles.tabItem, activeTab === 'appraising_car_rejected' && styles.activeTabItem]}>
-                    <Text style={[styles.tabText, activeTab === 'appraising_car_rejected' && { color: '#773BFF', fontWeight: '600' }]}>Kiểm tra thất bại</Text>
-                  </TouchableOpacity>
+
                 </ScrollView>
               </View>
 

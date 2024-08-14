@@ -85,12 +85,17 @@ const getStatusStyles = (status: string) => {
             return { borderColor: '#AF47D2', color: '#AF47D2' };
         case 'renting':
             return { borderColor: '#24D02B', color: '#24D02B' };
+        case 'returned_car':
+            return { borderColor: '#E178C5', color: '#E178C5' };
+        case 'appraised_return_car':
+            return { borderColor: '#E0A75E', color: '#E0A75E' };
         case 'completed':
             return { borderColor: '#15891A', color: '#15891A' };
-        case 'canceled':
-            return { borderColor: '#D21312', color: '#D21312' };
         case 'appraising_car_rejected':
             return { borderColor: '#8C6A5D', color: '#8C6A5D' };
+        case 'canceled':
+            return { borderColor: '#D21312', color: '#D21312' };
+
         default:
             return { borderColor: 'grey', color: 'grey' };
     }
@@ -102,11 +107,13 @@ const statusConvert: Record<string, string> = {
     waiting_contract_payment: 'Chờ thanh toán',
     waiting_partner_approval: 'Chờ xác nhận',
     ordered: 'Đã đặt',
-    appraising_car_approved: 'Đã kiểm tra',
+    appraising_car_approved: 'Đủ điều kiện bàn giao',
     renting: 'Đang thuê',
+    returned_car: 'Đã trả xe',
+    appraised_return_car: 'Hoàn thành kiểm tra',
     completed: 'Hoàn thành',
+    appraising_car_rejected: 'Không đủ điều kiện',
     canceled: 'Đã hủy',
-    appraising_car_rejected: 'Kiểm tra thất bại'
 };
 export default function ActivityDetailScreen() {
     const params = useLocalSearchParams()
