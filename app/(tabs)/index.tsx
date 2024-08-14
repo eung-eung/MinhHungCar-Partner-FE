@@ -50,7 +50,6 @@ interface BarDataItem {
 const HomeScreen: React.FC = () => {
     const [selectedBarIndex, setSelectedBarIndex] = useState<number | null>(null);
     const [payments, setPayments] = useState<Payment[]>([]);
-    const [payments1, setPayments1] = useState<Payment>();
     const [totalAvenue, setTotalAvenue] = useState<number>(0);
     const isFocused = useIsFocused();
     const [loading, setLoading] = useState(true);
@@ -152,29 +151,29 @@ const HomeScreen: React.FC = () => {
 
 
     const handleBarPress = (index: number) => {
-        setSelectedBarIndex(index);
+        setSelectedBarIndex(prevIndex => (prevIndex === index ? null : index));
     };
 
     // Generate bar data based on all months and populate with payment data
     const allMonths = Array.from({ length: 12 }, (_, index) => (index + 1).toString()); // Array of month numbers as strings
 
-    const barData: BarDataItem[] = allMonths.map((month) => {
+    const barData = allMonths.map((month, index) => {
         const payment = payments.find(p => (new Date(p.start_date).getMonth() + 1).toString() === month);
 
         return {
             value: payment ? payment.amount : 0,
             label: month,
             frontColor: '#4ABFF4',
-            onPress: () => {
-                const index = payments.findIndex(p => (new Date(p.start_date).getMonth() + 1).toString() === month);
-                handleBarPress(index);
-            },
-            topLabelComponent: payment ? () => (
-                <Text style={styles.barValueText}>{payment.amount.toLocaleString()}</Text>
+            onPress: () => handleBarPress(index),
+            topLabelComponent: selectedBarIndex === index && payment ? () => (
+                <View style={styles.labelContainer}>
+                    <Text style={styles.labelText}>{payment.amount.toLocaleString()}</Text>
+                </View>
             ) : undefined,
         };
     });
 
+    const maxValue = Math.max(...barData.map(item => item.value));
 
     return (
         <SafeAreaView style={styles.container}>
@@ -189,26 +188,37 @@ const HomeScreen: React.FC = () => {
                     {payments.length > 0 ?
                         <>
                             <View style={styles.totalAvenue}>
-                                <Text style={{ fontSize: 16, fontWeight: '600' }}>Tổng thu nhập các tháng</Text>
-                                <Text style={{ fontSize: 16 }}>{totalAvenue.toLocaleString()}</Text>
+                                <Text style={{ fontSize: 16, fontWeight: '600', marginBottom: 5 }}>Tổng thu nhập các tháng</Text>
+                                <Text style={{ fontSize: 16 }}>{totalAvenue.toLocaleString()} đ</Text>
                             </View>
                             <View style={styles.barChart}>
                                 <Text style={{ color: 'black', fontSize: 16, fontWeight: 'bold', margin: 20, textAlign: 'center' }}>
-                                    Theo tháng
+                                    Theo tháng (năm 2024)
                                 </Text>
-                                <Text style={{ color: 'gray', fontSize: 12, textAlign: 'right' }}>
+                                {/* <Text style={{ color: 'gray', fontSize: 12, textAlign: 'right' }}>
                                     Tỉ lệ: 1:10000
-                                </Text>
+                                </Text> */}
                                 {/* <BarChart
-                                // showFractionalValues
-                                // showYAxisIndices
-                                hideRules
-                                noOfSections={5}
-                                maxValue={totalAvenue > 0 ? totalAvenue : 1}// Adjust maxValue dynamically
-                                data={barData}
-                            // isAnimated
-                            /> */}
-                                <AreaChart ptData={payments} />
+                                    // showFractionalValues
+                                    // showYAxisIndices
+                                    hideRules
+                                    noOfSections={5}
+                                    maxValue={totalAvenue > 0 ? totalAvenue : 1}// Adjust maxValue dynamically
+                                    data={barData}
+                                // isAnimated
+                                /> */}
+                                <BarChart
+                                    data={barData}
+                                    showGradient
+                                    frontColor={'#447EFF'}
+                                    gradientColor={'#773BFF'}
+                                    backgroundColor={'white'}
+                                    isAnimated
+                                    hideYAxisText
+                                    hideRules
+                                    maxValue={maxValue}
+                                />
+                                {/* <AreaChart ptData={payments} /> */}
                             </View>
                             <View style={styles.historyList}>
                                 <Text style={{ color: '#858585', fontWeight: '600', fontSize: 18, marginVertical: 10, marginTop: 15 }}>LỊCH SỬ</Text>
@@ -251,19 +261,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     barChart: {
-        marginTop: 20
+        zIndex: -1,
+        marginTop: 20,
     },
     totalAvenue: {
-        flexDirection: 'row',
+        flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 19,
+        paddingVertical: 10,
         borderWidth: 1,
         borderColor: '#F4F4F4',
         backgroundColor: '#F4F4F4',
         borderRadius: 16,
         width: 335,
-        height: 51
+        height: 60
     },
     barValueText: {
         fontSize: 12,
@@ -288,7 +300,24 @@ const styles = StyleSheet.create({
         marginTop: 20,
         fontSize: 16,
         color: '#B4B4B8',
-    }
+    },
+    labelContainer: {
+        position: 'absolute',
+        top: 30,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        padding: 5,
+        borderRadius: 5,
+        width: 80,
+        height: 30,
+        zIndex: 999,
+        justifyContent: 'center'
+    },
+    labelText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 10,
+        textAlign: 'center'
+    },
 });
 
 export default HomeScreen;
