@@ -51,6 +51,7 @@ const statusConvert: Record<string, string> = {
     approved: 'Đã duyệt',
     rejected: 'Đã từ chối',
     active: 'Đang hoạt động',
+    temporary_resolve: 'Tạm ngưng hoạt động',
     inactive: 'Dừng hoạt động',
     waiting_car_delivery: 'Đợi giao xe',
     'pending_application:pending_car_images': 'Chưa đăng kí hình ảnh',
@@ -60,13 +61,14 @@ const statusConvert: Record<string, string> = {
 
 const TabConvert: Record<string, string> = {
     no_filter: 'Tất cả',
+    pending_application: 'Đợi hoàn thành thông tin',
     pending_approval: 'Chờ duyệt',
     approved: 'Đã duyệt',
     waiting_car_delivery: 'Đợi giao xe',
-    rejected: 'Đã từ chối',
     active: 'Đang hoạt động',
+    temporary_resolve: 'Tạm ngưng hoạt động',
+    rejected: 'Đã từ chối',
     inactive: 'Dừng hoạt động',
-    pending_application: 'Đợi hoàn thành thông tin',
 };
 
 const getStatusStyles = (status: any) => {
@@ -79,6 +81,8 @@ const getStatusStyles = (status: any) => {
             return { borderColor: '#FF4040', color: '#FF4040' };
         case 'active':
             return { borderColor: '#53D23E', color: '#53D23E' };
+        case 'temporary_resolve':
+            return { borderColor: '#C75B7A', color: '#C75B7A' };
         case 'inactive':
             return { borderColor: '#A91D3A', color: '#A91D3A' };
         case 'waiting_car_delivery':
