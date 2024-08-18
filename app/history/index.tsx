@@ -112,7 +112,7 @@ const statusConvert: Record<string, string> = {
 const statusCarConvert: Record<string, string> = {
   active: 'Đang hoạt động',
   inactive: 'Dừng hoạt động',
-  temporary_resolve: 'Tạm ngưng hoạt động'
+  temporary_inactive: 'Tạm ngưng hoạt động'
 };
 
 
@@ -121,7 +121,7 @@ const getStatusCarStyles = (status: string | undefined) => {
   switch (status) {
     case 'active':
       return { color: 'green' };
-    case 'temporary_resolve':
+    case 'temporary_inactive':
       return { color: '#C75B7A' };
     case 'inactive':
       return { color: 'red' };

@@ -88,7 +88,7 @@ const ActivityScreen: React.FC = () => {
                 });
 
             const newCars = response.data.data.cars;
-            const filteredCars = newCars.filter((car: Car) => car.status === 'active' || car.status === 'inactive' || car.status === 'temporary_resolve');
+            const filteredCars = newCars.filter((car: Car) => car.status === 'active' || car.status === 'inactive' || car.status === 'temporary_inactive');
             if (filteredCars.length > 0) {
                 setRegisteredCars(filteredCars)
             }
