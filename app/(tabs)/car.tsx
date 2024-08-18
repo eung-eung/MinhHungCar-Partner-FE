@@ -38,6 +38,7 @@ const statusMessages: Record<string, string> = {
     approved: 'Xe đã được duyệt thành công. Bạn có thể tiến hành kí hợp đồng',
     rejected: 'Thông tin xe bị từ chối. Vui lòng kiểm tra và đăng kí lại',
     active: 'Xe đang được sử dụng bởi MinhHungCar',
+    temporary_resolve: 'Xe đang tạm ngưng hoạt động vì gặp vài sự cố.',
     inactive: 'Xe đã dừng hoạt động. Muốn biết thêm chi tiết vui lòng liên hệ MinhHungCar!',
     waiting_car_delivery: 'Chủ xe phải tới trung tâm để kiểm chứng giấy tờ',
     'pending_application:pending_car_images': 'Đang chờ hoàn thành thông tin ảnh xe',
