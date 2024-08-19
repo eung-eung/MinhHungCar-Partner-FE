@@ -38,6 +38,7 @@ interface Activity {
     insurance_amount: number;
     feedback_rating: number;
     feedback_content: string;
+    technician_appraising_note: string;
     net_receive: number;
 
 }
@@ -248,29 +249,11 @@ export default function ActivityDetailScreen() {
                             {/* Info */}
                             <View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 15 }}>
-                                    {/* <Text style={styles.date}> {formatDateWithTime(new Date(detailActivity.start_date))} → {formatDateWithTime(new Date(detailActivity.end_date))}</Text> */}
-
-                                    {/* <View style={{ borderColor: getStatusStyles(detailActivity.status).borderColor, borderWidth: 1, paddingVertical: 5, paddingHorizontal: 35, borderRadius: 20 }}> */}
                                     <Text style={{ color: getStatusStyles(detailActivity.status).color, fontWeight: 'bold', fontSize: 14 }}>{statusConvert[detailActivity.status]}</Text>
-                                    {/* </View> */}
                                 </View>
                                 <Text style={styles.name}>{`${detailActivity.car.car_model.brand} ${detailActivity.car.car_model.model} ${detailActivity.car.car_model.year}`}</Text>
                                 <Text style={styles.plate}>Biển số xe: {detailActivity.car.license_plate}</Text>
 
-                                {/* <Text style={styles.price}>Giá thuê:
-                                    <Text style={{ color: '#EF5A6F' }}>  {formatNumber(detailActivity.rent_price)} đ</Text>
-                                </Text>
-                                <Text style={styles.price}>Thực nhận:
-                                    <Text style={{ color: '#EF5A6F' }}> {formatNumber(detailActivity.net_receive)} đ</Text>
-                                </Text> */}
-
-                                {/* {(detailActivity.feedback_rating && detailActivity.feedback_content) ?
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <Text style={styles.ratingText}>Đánh giá: </Text>
-                                        <TabBarIcon name='star' color='orange' size={24} />
-                                        <Text style={styles.ratingText}>{detailActivity.feedback_content}</Text>
-                                    </View>
-                                    : ""} */}
                                 <View style={styles.photos}>
                                     {Array.isArray(detailCar?.images) && detailCar.images.length > 0 ? (
                                         <View style={styles.photos}>
@@ -331,9 +314,9 @@ export default function ActivityDetailScreen() {
                             {/* Feedback */}
                             {(detailActivity.feedback_rating && detailActivity.feedback_content) ?
                                 <View>
-                                    <Divider style={{ marginVertical: 20 }} />
+                                    {/* <Divider  style={{ marginTop: 45, marginBottom: 25 }}/> */}
 
-                                    <View style={{ marginTop: 5 }}>
+                                    <View style={{ marginTop: 45, marginBottom: 5 }}>
                                         <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Đánh giá của khách hàng</Text>
                                         <View style={styles.commentContainer}>
                                             {detailActivity.customer.avatar_url && typeof detailActivity.customer.avatar_url === 'string' ? (
@@ -359,18 +342,18 @@ export default function ActivityDetailScreen() {
                                 </View>
                                 : ""}
                             {/* Note */}
-                            {detailActivity.reason ?
+                            {detailActivity.technician_appraising_note ?
                                 <View>
-                                    <Divider style={{ marginVertical: 20 }} />
-                                    <View style={{ marginTop: 10 }}>
-                                        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Ghi chú</Text>
-                                        <Text style={styles.noteContent}>Móp đầu xe 10%, hư xi nhan, hư đèn pha</Text>
-                                        <Image style={styles.mainImageNote} source={{ uri: 'https://baogiaothong.mediacdn.vn/files/news/2018/04/07/170456-img_8945.jpg' }} />
+                                    {/* <Divider style={{ marginVertical: 20 }} /> */}
+                                    <View style={{ marginVertical: 20 }}>
+                                        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Ghi chú của kĩ thuật viên:</Text>
+                                        <Text style={styles.noteContent}>{detailActivity.technician_appraising_note}</Text>
+                                        {/* <Image style={styles.mainImageNote} source={{ uri: 'https://baogiaothong.mediacdn.vn/files/news/2018/04/07/170456-img_8945.jpg' }} />
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <Image style={styles.extraImageNote} source={{ uri: 'https://shitekdetailing.com/uploads/images/bai-viet/gia-sua-xe-o-to-bi-mop-bao-nhieu.jpg' }} />
                                             <Image style={styles.extraImageNote} source={{ uri: 'https://thegioiphuongtien.vn/uploaded/files/50b5149712b35373823b20877a917d4d.jpg' }} />
                                             <Image style={styles.extraImageNote} source={{ uri: 'https://danhbongoto.vn/kcfinder/upload/images/Xe-o-to-bi-tray-xuoc-son.jpg' }} />
-                                        </View>
+                                        </View> */}
                                     </View>
                                 </View>
                                 : ""}
@@ -501,20 +484,6 @@ const styles = StyleSheet.create({
         color: '#333',
         marginTop: 5,
         fontSize: 13
-    },
-    seeMoreContainer: {
-        flexDirection: 'row',
-        padding: 12,
-        borderWidth: 1.5,
-        borderColor: '#828282',
-        marginVertical: 8,
-        borderRadius: 5,
-        justifyContent: 'center'
-    },
-    seeMore: {
-        color: 'black',
-        fontWeight: 'bold',
-        fontSize: 15,
     },
     /* Note */
     noteContent: {
