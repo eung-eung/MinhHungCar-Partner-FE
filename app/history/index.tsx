@@ -295,15 +295,27 @@ const HistoryScreen: React.FC = () => {
                     {statusCarConvert[detailCar?.status ?? 'inactive'] || 'Unknown Status'}
                   </Text>
                 </View>
-                <Text
-                  style={{
-                    marginVertical: 5,
-                    fontWeight: '500',
-                    color: '#555',
-                  }}
-                >
-                  Chỗ để xe: {detailCar?.parking_lot === 'home' ? 'Tại nhà' : 'Bãi đỗ MinhHungCar'}
-                </Text>
+
+                <View style={{ flexDirection: 'row' }}>
+                  <Text
+                    style={{
+                      marginVertical: 5,
+                      fontWeight: '700',
+                      color: '#555',
+                    }}
+                  >
+                    Chỗ để xe: {' '}
+                  </Text>
+                  <Text
+                    style={{
+                      marginVertical: 5,
+                      fontWeight: '500',
+                      color: '#555',
+                    }}
+                  >
+                    {detailCar?.parking_lot === 'home' ? 'Tại nhà' : 'Bãi đỗ MinhHungCar'}
+                  </Text>
+                </View>
               </View>
 
 
