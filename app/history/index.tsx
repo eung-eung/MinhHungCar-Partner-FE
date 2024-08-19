@@ -85,6 +85,10 @@ const getStatusStyles = (status: string) => {
       return { borderColor: '#E0A75E', color: '#E0A75E' };
     case 'completed':
       return { borderColor: '#15891A', color: '#15891A' };
+    case 'pending_resolve':
+      return { borderColor: '#C75B7A', color: '#C75B7A' };
+    case 'resolved':
+      return { borderColor: '#1679AB', color: '#1679AB' };
     case 'canceled':
       return { borderColor: '#D21312', color: '#D21312' };
     case 'appraising_car_rejected':
@@ -105,6 +109,8 @@ const statusConvert: Record<string, string> = {
   returned_car: 'Đã trả xe',
   appraised_return_car: 'Hoàn thành kiểm tra',
   completed: 'Hoàn thành',
+  pending_resolve: 'Đang xử lí sự cố',
+  resolved: 'Đã xử lí sự cố',
   canceled: 'Đã hủy',
   appraising_car_rejected: 'Không đủ điều kiện'
 };
@@ -122,7 +128,7 @@ const getStatusCarStyles = (status: string | undefined) => {
     case 'active':
       return { color: 'green' };
     case 'temporary_inactive':
-      return { color: '#C75B7A' };
+      return { color: '#6482AD' };
     case 'inactive':
       return { color: 'red' };
     default:
@@ -337,6 +343,12 @@ const HistoryScreen: React.FC = () => {
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => handleTabPress('completed')} style={[styles.tabItem, activeTab === 'completed' && styles.activeTabItem]}>
                     <Text style={[styles.tabText, activeTab === 'completed' && { color: '#773BFF', fontWeight: '600' }]}>Hoàn thành</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleTabPress('pending_resolve')} style={[styles.tabItem, activeTab === 'pending_resolve' && styles.activeTabItem]}>
+                    <Text style={[styles.tabText, activeTab === 'pending_resolve' && { color: '#773BFF', fontWeight: '600' }]}>Đang xử lí sự cố</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleTabPress('resolved')} style={[styles.tabItem, activeTab === 'resolved' && styles.activeTabItem]}>
+                    <Text style={[styles.tabText, activeTab === 'resolved' && { color: '#773BFF', fontWeight: '600' }]}>Đã xử lí sự cố</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => handleTabPress('appraising_car_rejected')} style={[styles.tabItem, activeTab === 'appraising_car_rejected' && styles.activeTabItem]}>
                     <Text style={[styles.tabText, activeTab === 'appraising_car_rejected' && { color: '#773BFF', fontWeight: '600' }]}>Không đủ điều kiện</Text>
