@@ -183,7 +183,6 @@ const AddCarInformationScreen: React.FC = () => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                // console.log("API Response:", response.data);
                 const parking_lot: ParkingLotData[] = response.data.data;
                 setParkingLotMetadata(parking_lot);
                 setLoading(false);
@@ -196,7 +195,6 @@ const AddCarInformationScreen: React.FC = () => {
                 }
             }
         } else {
-            // console.log("Selected seat is not set, using parkingLotData");
             setParkingLotMetadata(parkingLotData);
         }
     };
@@ -312,6 +310,24 @@ const AddCarInformationScreen: React.FC = () => {
 
     const handleSeatChange = async (seat: string) => {
         setSelectedSeat(seat);
+        if (selectedParking === 'garage') {
+            await fetchParkingLotMetadata();
+            if (parkingLotMetadata.length === 1) {
+                Alert.alert(
+                    'Lỗi',
+                    'Bãi đổ MinhHungCar không còn chỗ. Vui lòng chọn để xe tại nhà!',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => {
+                                setSelectedParking('home');
+                            }
+                        }
+                    ]
+                );
+                return; // Prevent form submission
+            }
+        }
         await fetchParkingLotMetadata();
         getCarModelIdAndBasePrice(selectedModel, seat);
     };
@@ -331,7 +347,8 @@ const AddCarInformationScreen: React.FC = () => {
         return true;
     };
     const handleSubmit = async () => {
-        console.log("selectedParking: ", selectedParking)
+        console.log("selectedParking: ", selectedParking);
+
         // Check if user has filled in all required fields
         if (
             !licensePlate ||
@@ -360,6 +377,8 @@ const AddCarInformationScreen: React.FC = () => {
             // Check config in MinhHungCar garage if selectedParking is 'garage'
             if (selectedParking === 'garage') {
                 await fetchParkingLotMetadata();
+
+                // Check if parking lot is full after fetching the metadata
                 if (parkingLotMetadata.length === 1) {
                     Alert.alert(
                         'Lỗi',
@@ -373,10 +392,12 @@ const AddCarInformationScreen: React.FC = () => {
                             }
                         ]
                     );
+                    setLoadButton(false);
                     return; // Prevent form submission
                 }
             }
 
+            // Proceed with the car registration API call
             const response = await axios.post(
                 apiCar.registerCar,
                 {
@@ -398,14 +419,12 @@ const AddCarInformationScreen: React.FC = () => {
             setId(response.data.data.car.id);
             setBasePrice(response.data.data.car.car_model.based_price);
 
-            // console.log("id: ", response.data.data.car.id);
-            // console.log("basePrice: ", response.data.data.car.car_model.based_price);
         } catch (error: any) {
             if (error.response?.data?.error_code === 10062) {
                 Alert.alert('Lỗi', 'Biển số xe này đã tồn tại!');
-                console.log("Error register car: ", error.response.data.message)
+                console.log("Error register car: ", error.response.data.message);
             } else if (error.response?.data?.error_code === 10031) {
-                console.log("Error register car: ", error.response.data.message)
+                console.log("Error register car: ", error.response.data.message);
                 Alert.alert(
                     'Lỗi',
                     'Bãi đổ MinhHungCar không còn chỗ. Vui lòng chọn để xe tại nhà!',
@@ -420,7 +439,7 @@ const AddCarInformationScreen: React.FC = () => {
                 );
             } else {
                 Alert.alert('Lỗi', 'Thêm xe thất bại. Vui lòng thử lại!');
-                console.log("Error register car: ", error.response.data.message)
+                console.log("Error register car: ", error.response.data.message);
             }
         } finally {
             setLoadButton(false);
