@@ -169,12 +169,13 @@ const AddCarInformationScreen: React.FC = () => {
             const parking_lot: ParkingLotData[] = response.data.parking_lot;
             setParkingLotData(parking_lot);
             setLoading(false);
+            return parking_lot;
         } catch (error) {
             console.log('Error fetching parking_lot:', error);
         }
     };
 
-    const fetchParkingLotMetadata = async () => {
+    const fetchParkingLotMetadata = async (): Promise<ParkingLotData[]> => {
         if (selectedSeat) {
             console.log("Fetching parking lot metadata for seat:", selectedSeat);
             try {
@@ -186,6 +187,7 @@ const AddCarInformationScreen: React.FC = () => {
                 const parking_lot: ParkingLotData[] = response.data.data;
                 setParkingLotMetadata(parking_lot);
                 setLoading(false);
+                return parking_lot; // Return the fetched data
             } catch (error: any) {
                 console.log("Error fetching parking lot metadata:", error);
                 if (error.response?.data?.error_code === 10044) {
@@ -193,11 +195,14 @@ const AddCarInformationScreen: React.FC = () => {
                 } else {
                     Alert.alert('Lỗi hệ thống', 'Không thể lấy dữ liệu của chỗ để xe');
                 }
+                return [];
             }
         } else {
             setParkingLotMetadata(parkingLotData);
+            return parkingLotData;
         }
     };
+
 
 
 
@@ -374,12 +379,32 @@ const AddCarInformationScreen: React.FC = () => {
         try {
             setLoadButton(true);
 
-            // Check config in MinhHungCar garage if selectedParking is 'garage'
             if (selectedParking === 'garage') {
-                await fetchParkingLotMetadata();
+                const parkingLotData1 = await fetchParkingLotMetadata();
 
-                // Check if parking lot is full after fetching the metadata
-                if (parkingLotMetadata.length === 1) {
+                // Check if parking lot is full after the first fetch
+                if (parkingLotData1.length === 1) {
+                    Alert.alert(
+                        'Lỗi',
+                        'Bãi đổ MinhHungCar không còn chỗ. Vui lòng chọn để xe tại nhà!',
+                        [
+                            {
+                                text: 'OK',
+                                onPress: () => {
+                                    setSelectedParking('home');
+                                }
+                            }
+                        ]
+                    );
+                    setLoadButton(false);
+                    return; // Prevent form submission
+                }
+
+                // Fetch parking lot metadata for the second time
+                const parkingLotData2 = await fetchParkingLotMetadata();
+
+                // Check if parking lot is full after the second fetch
+                if (parkingLotData2.length === 1) {
                     Alert.alert(
                         'Lỗi',
                         'Bãi đổ MinhHungCar không còn chỗ. Vui lòng chọn để xe tại nhà!',
