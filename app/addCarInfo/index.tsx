@@ -399,27 +399,6 @@ const AddCarInformationScreen: React.FC = () => {
                     setLoadButton(false);
                     return; // Prevent form submission
                 }
-
-                // Fetch parking lot metadata for the second time
-                const parkingLotData2 = await fetchParkingLotMetadata();
-
-                // Check if parking lot is full after the second fetch
-                if (parkingLotData2.length === 1) {
-                    Alert.alert(
-                        'Lỗi',
-                        'Bãi đổ MinhHungCar không còn chỗ. Vui lòng chọn để xe tại nhà!',
-                        [
-                            {
-                                text: 'OK',
-                                onPress: () => {
-                                    setSelectedParking('home');
-                                }
-                            }
-                        ]
-                    );
-                    setLoadButton(false);
-                    return; // Prevent form submission
-                }
             }
 
             // Proceed with the car registration API call
