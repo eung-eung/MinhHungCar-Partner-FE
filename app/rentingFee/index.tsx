@@ -127,9 +127,9 @@ const RentingFeeScreen: React.FC = () => {
                     </View>
                     <View style={styles.priceRange}>
                         <Text style={styles.priceRangeText}>
-                            {(basedPriceNumber - 200000).toLocaleString()} VND
+                            {(100000).toLocaleString()} VND
                         </Text>
-                        <Text style={styles.priceRangeText}>{(basedPriceNumber + 200000).toLocaleString()} VND</Text>
+                        <Text style={styles.priceRangeText}>{(basedPriceNumber).toLocaleString()} VND</Text>
                     </View>
                     <View style={styles.sliderContainer}>
                         <LinearGradient
@@ -140,8 +140,8 @@ const RentingFeeScreen: React.FC = () => {
                         />
                         <Slider
                             style={styles.slider}
-                            minimumValue={basedPriceNumber - 200000}
-                            maximumValue={basedPriceNumber + 200000}
+                            minimumValue={100000}
+                            maximumValue={basedPriceNumber}
                             step={1000}
                             value={sliderValue}
                             onValueChange={setSliderValue}

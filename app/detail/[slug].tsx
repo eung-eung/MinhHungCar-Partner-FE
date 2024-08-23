@@ -32,6 +32,7 @@ interface CarDetail {
     warning_count: number;
     motion: string;
     fuel: string;
+    price: number;
     rating: number;
     license_plate: string;
     description: string;
@@ -367,11 +368,24 @@ export default function DetailScreen() {
 
 
                             </ScrollView>
+
                         ) : (
                             <Text style={{ color: '#B4B4B8', textAlign: 'center', marginTop: 100 }}>No data available</Text>
                         )}
+
                     </View>
+                    {detailCar ? (
+                        <View style={styles.overlay}>
+                            <View style={styles.overlayContent}>
+                                <View style={styles.overlayContentTop}>
+                                    <Text style={{ fontSize: 16, fontWeight: '500' }}>Giá cho thuê: </Text>
+                                    <Text style={styles.overlayContentPrice}>{detailCar.price.toLocaleString('vi-VN')} đ/ngày</Text>
+                                </View>
+                            </View>
+                        </View>
+                    ) : ""}
                 </SafeAreaView>
+
             )}
         </View>
     );
@@ -647,5 +661,45 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'flex-start',
         marginVertical: 2,
+    },
+    /** Overlay */
+    overlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: '#fff',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop: 12,
+        paddingHorizontal: 24,
+        paddingBottom: 45,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+        elevation: 3,
+    },
+    overlayContent: {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        // paddingHorizontal: 10
+    },
+    overlayContentTop: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        marginBottom: 2,
+    },
+
+    overlayContentPrice: {
+        fontSize: 16,
+        lineHeight: 26,
+        fontWeight: '700',
+        color: '#5457FB',
     },
 });

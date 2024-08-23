@@ -158,7 +158,10 @@ const HomeScreen: React.FC = () => {
     const allMonths = Array.from({ length: 12 }, (_, index) => (index + 1).toString()); // Array of month numbers as strings
 
     const barData = allMonths.map((month, index) => {
-        const payment = payments.find(p => (new Date(p.start_date).getMonth() + 1).toString() === month);
+        // Find the payment for the given month that also has a status of 'paid'
+        const payment = payments.find(p =>
+            (new Date(p.start_date).getMonth() + 1).toString() === month && p.status === 'paid'
+        );
 
         return {
             value: payment ? payment.amount : 0,
