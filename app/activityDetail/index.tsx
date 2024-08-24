@@ -348,12 +348,15 @@ export default function ActivityDetailScreen() {
                                     <View style={{ marginVertical: 20 }}>
                                         <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Ghi chú của kĩ thuật viên:</Text>
                                         <Text style={styles.noteContent}>{detailActivity.technician_appraising_note}</Text>
-                                        {/* <Image style={styles.mainImageNote} source={{ uri: 'https://baogiaothong.mediacdn.vn/files/news/2018/04/07/170456-img_8945.jpg' }} />
-                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                            <Image style={styles.extraImageNote} source={{ uri: 'https://shitekdetailing.com/uploads/images/bai-viet/gia-sua-xe-o-to-bi-mop-bao-nhieu.jpg' }} />
-                                            <Image style={styles.extraImageNote} source={{ uri: 'https://thegioiphuongtien.vn/uploaded/files/50b5149712b35373823b20877a917d4d.jpg' }} />
-                                            <Image style={styles.extraImageNote} source={{ uri: 'https://danhbongoto.vn/kcfinder/upload/images/Xe-o-to-bi-tray-xuoc-son.jpg' }} />
-                                        </View> */}
+                                    </View>
+                                </View>
+                                : ""}
+                            {detailActivity.reason ?
+                                <View>
+                                    {/* <Divider style={{ marginVertical: 20 }} /> */}
+                                    <View style={{ marginVertical: 20 }}>
+                                        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Lí do hủy:</Text>
+                                        <Text style={styles.noteContent}>{detailActivity.reason}</Text>
                                     </View>
                                 </View>
                                 : ""}
