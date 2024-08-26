@@ -346,8 +346,7 @@ export default function ActivityDetailScreen() {
                                 <View>
                                     {/* <Divider style={{ marginVertical: 20 }} /> */}
                                     <View style={{ marginVertical: 20 }}>
-                                        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Ghi chú của kĩ thuật viên:</Text>
-                                        <Text style={styles.noteContent}>{detailActivity.technician_appraising_note}</Text>
+                                        <Text style={styles.noteContent}> <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Ghi chú của kĩ thuật viên: </Text>{detailActivity.technician_appraising_note}</Text>
                                     </View>
                                 </View>
                                 : ""}
@@ -355,8 +354,7 @@ export default function ActivityDetailScreen() {
                                 <View>
                                     {/* <Divider style={{ marginVertical: 20 }} /> */}
                                     <View style={{ marginVertical: 20 }}>
-                                        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Lí do hủy:</Text>
-                                        <Text style={styles.noteContent}>{detailActivity.reason}</Text>
+                                        <Text style={styles.noteContent}><Text style={{ fontWeight: 'bold', fontSize: 18 }}>Lí do hủy:</Text> {detailActivity.reason}</Text>
                                     </View>
                                 </View>
                                 : ""}

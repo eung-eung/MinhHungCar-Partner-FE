@@ -110,7 +110,7 @@ export default function DetailScreen() {
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
 
     const [offset, setOffset] = useState(0);
-    const limit = 20; // Adjust the limit as needed
+    const limit = 2; // Adjust the limit as needed
     const [hasMoreFeedbacks, setHasMoreFeedbacks] = useState(true);
 
     const [refreshing, setRefreshing] = useState(false);
@@ -232,7 +232,7 @@ export default function DetailScreen() {
                                         <View style={styles.infoRating}>
 
                                             <TabBarIcon name='star' size={26} color="#F3CA52" style={{ marginRight: 5 }} />
-                                            <Text style={styles.infoRatingLabel}>{detailCar.total_trip ? detailCar.rating : '0.0'}</Text>
+                                            <Text style={styles.infoRatingLabel}>{detailCar.total_trip ? detailCar.rating.toFixed(1) : '0.0'}</Text>
 
 
                                             <TabBarIcon name='history' size={26} color='green' style={{ marginRight: 5, marginLeft: 25 }} />
@@ -333,17 +333,17 @@ export default function DetailScreen() {
                                         </>
                                     )}
                                     {feedbacks.map((item, index) => (
-                                        (item.feedback_content && item.feedback_rating) && (
+                                        item.feedback_content && item.feedback_rating && (
                                             <View key={index} style={styles.comment}>
                                                 <View style={styles.commentContainer}>
-                                                    {item.customer.avatar_url ?
+                                                    {item.customer.avatar_url ? (
                                                         <Image source={{ uri: item.customer.avatar_url }} style={styles.commentAvatar} />
-                                                        :
+                                                    ) : (
                                                         <TabBarIcon name='account-circle' size={40} style={styles.commentAvatar} />
-                                                    }
+                                                    )}
                                                     <View style={styles.commentTextContainer}>
                                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                                            <Text style={styles.commentAuthor}>{item.customer.first_name + ' ' + item.customer.last_name}</Text>
+                                                            <Text style={styles.commentAuthor}>{item.customer.last_name + ' ' + item.customer.first_name}</Text>
                                                             <Text style={styles.commentDate}>{formatDate(item.created_at)}</Text>
                                                         </View>
                                                         <View style={styles.commentRating}>
@@ -356,6 +356,7 @@ export default function DetailScreen() {
                                             </View>
                                         )
                                     ))}
+
                                     {hasMoreFeedbacks && (
                                         <TouchableOpacity
                                             style={styles.seeMoreContainer}
@@ -538,7 +539,7 @@ const styles = StyleSheet.create({
     /** comment */
     comment: {
         marginTop: 0,
-        paddingVertical: 16,
+        paddingVertical: 0,
         paddingHorizontal: 10,
     },
     commentTitle: {
@@ -547,7 +548,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         letterSpacing: 0.38,
         color: '#000000',
-        marginBottom: 6,
+        marginBottom: 15,
     },
     commentContainer: {
         flexDirection: 'row',
