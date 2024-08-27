@@ -9,6 +9,10 @@ import { AuthConText } from '@/store/AuthContext';
 import AreaChart from '@/components/AreaChart';
 import { useRouter } from 'expo-router';
 import { ActivityIndicator } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import RNPickerSelect from 'react-native-picker-select';
+import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+
 
 interface Payment {
     id: number;
@@ -47,6 +51,7 @@ interface BarDataItem {
     frontColor: string;
 }
 
+
 const HomeScreen: React.FC = () => {
     const [selectedBarIndex, setSelectedBarIndex] = useState<number | null>(null);
     const [payments, setPayments] = useState<Payment[]>([]);
@@ -60,6 +65,17 @@ const HomeScreen: React.FC = () => {
 
     const [refreshing, setRefreshing] = useState(false);
 
+    const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+    const [years, setYears] = useState<number[]>([]);
+
+    useEffect(() => {
+        // Fetch years from your API or define static years
+        fetchYears();
+    }, []);
+
+    ;
+
+
 
     useEffect(() => {
         if (token) {
@@ -70,7 +86,7 @@ const HomeScreen: React.FC = () => {
 
     useEffect(() => {
         getAvenue();
-    }, [isFocused]);
+    }, [isFocused, selectedYear]);
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
@@ -79,6 +95,24 @@ const HomeScreen: React.FC = () => {
         ]);
         setRefreshing(false);
     }, []);
+
+    const fetchYears = async () => {
+        try {
+            const currentYear = new Date().getFullYear();
+            const startYear = 2023;
+            const yearsArray = [];
+
+            for (let year = startYear; year <= currentYear; year++) {
+                yearsArray.push(year);
+            }
+
+            setYears(yearsArray);
+            setLoading(false);
+        } catch (error) {
+            console.error(error);
+            setLoading(false);
+        }
+    };
 
 
     const fetchAndValidateUserInfo = async () => {
@@ -127,7 +161,10 @@ const HomeScreen: React.FC = () => {
 
     const getAvenue = async () => {
         try {
-            const response = await axios.get('https://minhhungcar.xyz/partner/revenue', {
+            const startDate = `${selectedYear}-01-01T00:00:00Z`;
+            const endDate = `${selectedYear}-12-31T23:59:59Z`;
+
+            const response = await axios.get(`https://minhhungcar.xyz/partner/revenue?start_date=${startDate}&end_date=${endDate}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -139,14 +176,15 @@ const HomeScreen: React.FC = () => {
             setPayments(receivedPayments);
             setTotalAvenue(responseData.total_revenue || 0);
             setLoading(false);
-            // console.log('Get avenue successfully: ', response.data.message);
-            // console.log('Received payments:', receivedPayments);
-            // console.log('API response:', responseData);
         } catch (error: any) {
             console.log('Error getting avenue: ', error.response?.data?.message);
             setPayments([]);
             setTotalAvenue(0);
         }
+    };
+
+    const handleYearChange = (year: number) => {
+        setSelectedYear(year);
     };
 
 
@@ -158,26 +196,27 @@ const HomeScreen: React.FC = () => {
     const allMonths = Array.from({ length: 12 }, (_, index) => (index + 1).toString()); // Array of month numbers as strings
 
     const barData = allMonths.map((month, index) => {
-        // Find the payment for the given month that also has a status of 'paid'
         const payment = payments.find(p =>
             (new Date(p.start_date).getMonth() + 1).toString() === month
-            // && p.status === 'paid'
+            && p.status === 'paid'
         );
 
+        const value = payment && !isNaN(payment.amount) ? payment.amount : 0;
+
         return {
-            value: payment ? payment.amount : 0,
+            value,
             label: month,
             frontColor: '#4ABFF4',
             onPress: () => handleBarPress(index),
             topLabelComponent: selectedBarIndex === index && payment ? () => (
                 <View style={styles.labelContainer}>
-                    <Text style={styles.labelText}>{payment.amount.toLocaleString()}</Text>
+                    <Text style={styles.labelText}>{value.toLocaleString()}</Text>
                 </View>
             ) : undefined,
         };
     });
 
-    const maxValue = Math.max(...barData.map(item => item.value));
+    const maxValue = Math.max(...barData.map(item => item.value)) || 1;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -189,6 +228,29 @@ const HomeScreen: React.FC = () => {
                 <ScrollView style={{ paddingHorizontal: 24, marginTop: 20 }} refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }>
+                    <View style={styles.input}>
+                        <Text style={styles.inputLabel}>
+                            Doanh thu theo năm:
+                        </Text>
+                        <RNPickerSelect
+                            value={selectedYear} // Set default value here
+                            onValueChange={handleYearChange}
+                            placeholder={{
+                                label: "Theo năm",
+                                value: null,
+                                color: '#9EA0A4',
+                            }}
+                            items={years.map((year) => ({
+                                key: year,
+                                label: year.toString(),
+                                value: year,
+                            }))}
+                            style={pickerSelectStyles}
+                            Icon={() => (
+                                <TabBarIcon name='chevron-down' size={24} style={{ paddingRight: 7, paddingTop: 8 }} />
+                            )}
+                        />
+                    </View>
                     {payments.length > 0 ?
                         <>
                             <View style={styles.totalAvenue}>
@@ -197,7 +259,7 @@ const HomeScreen: React.FC = () => {
                             </View>
                             <View style={styles.barChart}>
                                 <Text style={{ color: 'black', fontSize: 16, fontWeight: 'bold', margin: 20, textAlign: 'center' }}>
-                                    Theo tháng (năm 2024)
+                                    Theo tháng (năm {selectedYear})
                                 </Text>
                                 {/* <Text style={{ color: 'gray', fontSize: 12, textAlign: 'right' }}>
                                     Tỉ lệ: 1:10000
@@ -246,7 +308,7 @@ const HomeScreen: React.FC = () => {
                         </> :
                         <View style={styles.emptyContainer}>
                             <MaterialIcons name="history" size={40} color="#B4B4B8" />
-                            <Text style={styles.emptyMessage}>Hiện tại chưa có lịch sử thu nhập nào</Text>
+                            <Text style={styles.emptyMessage}>Chưa có lịch sử thu nhập nào</Text>
                         </View>}
                 </ScrollView>
             )}
@@ -322,6 +384,52 @@ const styles = StyleSheet.create({
         fontSize: 10,
         textAlign: 'center'
     },
+
+    //picker
+    input: {
+        marginBottom: 10,
+    },
+    inputLabel: {
+        fontSize: 17,
+        fontWeight: '600',
+        color: '#222',
+        marginBottom: 8,
+    },
+    required: {
+        color: 'red',
+    },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+    inputIOS: {
+        fontSize: 15,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        borderWidth: 0.5,
+        borderColor: '#B2B2B2',
+        borderRadius: 12,
+        width: '100%',
+        height: 44,
+        marginBottom: 12,
+        color: '#222',
+    },
+    inputAndroid: {
+        fontSize: 15,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        borderWidth: 1,
+        borderColor: '#B2B2B2',
+        borderRadius: 12,
+        width: 335,
+        height: 44,
+        marginBottom: 12,
+        color: '#222',
+    },
+
 });
 
 export default HomeScreen;
