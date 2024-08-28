@@ -277,7 +277,7 @@ const HomeScreen: React.FC = () => {
                                     data={barData}
                                     showGradient
                                     frontColor={'#447EFF'}
-                                    gradientColor={'#773BFF'}
+                                    gradientColor={'#bfbfec'}
                                     backgroundColor={'white'}
                                     isAnimated
                                     hideYAxisText
